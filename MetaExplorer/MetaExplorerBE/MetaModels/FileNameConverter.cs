@@ -1,4 +1,4 @@
-﻿using MetaExplorer.Configuration;
+﻿using MetaExplorerBE.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace MetaExplorer.MetaModels
+namespace MetaExplorerBE.MetaModels
 {
     class FileNameConverter : IConverter
     {

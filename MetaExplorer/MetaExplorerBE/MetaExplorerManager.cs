@@ -1,4 +1,4 @@
-﻿using MetaExplorer.MetaModels;
+﻿using MetaExplorerBE.MetaModels;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace MetaExplorer
+namespace MetaExplorerBE
 {
     public class MetaExplorerManager
     {

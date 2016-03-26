@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MetaExplorer
+namespace MetaExplorerBE
 {
     /// <summary>
     /// This class can be used to run external commands and capture the stdout and stderr.

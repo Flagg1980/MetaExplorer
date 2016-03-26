@@ -1,4 +1,4 @@
-﻿using MetaExplorer.Configuration;
+﻿using MetaExplorerBE.Configuration;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace MetaExplorer.MetaModels
+namespace MetaExplorerBE.MetaModels
 {
     public class VideoMetaModel : INotifyPropertyChanged 
     {

@@ -1,0 +1,15 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="MetaExplorerGUI.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="VideoFilesBasePath" GenerateDefaultValueInCode="false" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">P:\tmp\season 1</Value>
+    </Setting>
+    <Setting Name="VLCLocation" GenerateDefaultValueInCode="false" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">P:\portableApps\VLCPortable\VLCPortable.exe</Value>
+    </Setting>
+    <Setting Name="FFmpegLocation" GenerateDefaultValueInCode="false" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">P:\portableApps\FFmpeg\ffmpeg.exe</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

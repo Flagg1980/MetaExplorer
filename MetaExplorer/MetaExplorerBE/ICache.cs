@@ -12,9 +12,9 @@ using System.Windows.Media;
 using System.Configuration;
 using System.Collections.Specialized;
 using System.Windows.Media.Imaging;
-using MetaExplorer.MetaModels;
+using MetaExplorerBE.MetaModels;
 
-namespace MetaExplorer
+namespace MetaExplorerBE
 {
     /// <summary>
     /// Types of cached objects:

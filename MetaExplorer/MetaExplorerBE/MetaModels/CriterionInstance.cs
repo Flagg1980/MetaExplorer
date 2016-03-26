@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 
-namespace MetaExplorer.MetaModels
+namespace MetaExplorerBE.MetaModels
 {
     public class Criterion
     {

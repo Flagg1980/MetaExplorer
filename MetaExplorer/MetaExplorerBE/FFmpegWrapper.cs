@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace MetaExplorer
+namespace MetaExplorerBE
 {
     public class FFmpegWrapper
     {
