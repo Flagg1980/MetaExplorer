@@ -193,7 +193,7 @@ namespace MetaExplorerBE
             foreach (VideoMetaModel videoFile in noThumbnail)
             {
                 idx++;
-                this.ProgressFile = videoFile.fileName;
+                this.ProgressFile = videoFile.FileName;
                 this.Progress = (idx * 100) / noThumbnail.Count;
 
                 this.UpdateThumbnailCache(videoFile);
@@ -212,7 +212,7 @@ namespace MetaExplorerBE
         {
             FFmpegWrapper wrapper = new FFmpegWrapper(_locationFFmpeg);
 
-            string md5 = Helper.GetMD5Hash(videoFileMetaModel.fileName);
+            string md5 = Helper.GetMD5Hash(videoFileMetaModel.FileName);
             string cacheFile = Path.Combine(LocationThumbnailFiles, md5);
 
             if (File.Exists(cacheFile))
@@ -221,7 +221,7 @@ namespace MetaExplorerBE
             }
 
             //getDuration
-            TimeSpan duration = wrapper.GetDuration(videoFileMetaModel.fileName);
+            TimeSpan duration = wrapper.GetDuration(videoFileMetaModel.FileName);
             TimeSpan position = TimeSpan.FromSeconds(120);  //todo: remove hardcoded time
 
             if (duration.TotalSeconds <= position.TotalSeconds)
@@ -230,7 +230,7 @@ namespace MetaExplorerBE
             }
 
             //generate Thumbnail from movie 
-            wrapper.CreateJpegThumbnail(videoFileMetaModel.fileName, position, cacheFile, false);
+            wrapper.CreateJpegThumbnail(videoFileMetaModel.FileName, position, cacheFile, false);
 
             //update bitmap in VideoMetaModel
             //BitmapImage bi = new BitmapImage(new Uri(cacheFile, UriKind.Absolute));
@@ -297,7 +297,7 @@ namespace MetaExplorerBE
             {
                 i++;
                 this.Progress = (i * 99) / this.videoMetaModelCache.Count;
-                this.ProgressFile = mm.fileName;
+                this.ProgressFile = mm.FileName;
 
                 foreach (string critElem in mm.GetList(criterion))
                 {
@@ -305,14 +305,14 @@ namespace MetaExplorerBE
                     if (existing != null)
                     {
                         existing.Count++;
-                        existing.SumStars += mm.star;
+                        existing.SumStars += mm.Stars;
                     }
                     //find the video files which do not have a criterion instance
                     else
                     {
                         CriterionInstance unknownInstance = new CriterionInstance();
                         unknownInstance.Name = critElem;
-                        unknownInstance.SumStars += mm.star;
+                        unknownInstance.SumStars += mm.Stars;
                         unknownInstance.Count++;
                         unknownInstance.ImageSource = Helper.NAimage; //new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), @"na.png"))); 
                         currentCriterionMetaModelList.Add(unknownInstance);
@@ -376,9 +376,9 @@ namespace MetaExplorerBE
             List<VideoMetaModel> res = new List<VideoMetaModel>(this.videoMetaModelCache);
 
             //check stars
-            if (mmRef.star != 0)
+            if (mmRef.Stars != 0)
             {
-                res = res.Where((VideoMetaModel m) => { return m.star == mmRef.star; }).ToList();
+                res = res.Where((VideoMetaModel m) => { return m.Stars == mmRef.Stars; }).ToList();
             }
 
             foreach (Criterion criterion in CriteriaConfig.Criteria)
@@ -404,9 +404,9 @@ namespace MetaExplorerBE
             }
 
             //check freetext search (last because most expensive
-            if (mmRef.fileName != null && mmRef.fileName != string.Empty)
+            if (mmRef.FileName != null && mmRef.FileName != string.Empty)
             {
-                res = res.Where((VideoMetaModel m) => { return Path.GetFileNameWithoutExtension(m.fileName).IndexOf(mmRef.fileName, StringComparison.CurrentCultureIgnoreCase) >= 0; }).ToList();
+                res = res.Where((VideoMetaModel m) => { return Path.GetFileNameWithoutExtension(m.FileName).IndexOf(mmRef.FileName, StringComparison.CurrentCultureIgnoreCase) >= 0; }).ToList();
             }
 
             return res;

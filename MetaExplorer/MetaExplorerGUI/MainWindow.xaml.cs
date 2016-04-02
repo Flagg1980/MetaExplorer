@@ -205,7 +205,7 @@ namespace MetaExplorerGUI
         {
             //VideoMetaModel found = this.GetVideoMetaModelFromButton(sender as Button);
             VideoMetaModel found = (sender as Button).DataContext as VideoMetaModel;
-            Helper.Play(MetaExplorerGUI.Properties.Settings.Default.VLCLocation, found.fileName);
+            Helper.Play(MetaExplorerGUI.Properties.Settings.Default.VLCLocation, found.FileName);
         }
 
         private void PlayRandomButton_Click(object sender, RoutedEventArgs e)
@@ -217,14 +217,14 @@ namespace MetaExplorerGUI
             int rnd = rand.Next(count);   //0..count-1
 
             VideoMetaModel result = this.myViewModel.CurrentFileSelection[rnd];
-            Helper.Play(MetaExplorerGUI.Properties.Settings.Default.VLCLocation, result.fileName);
+            Helper.Play(MetaExplorerGUI.Properties.Settings.Default.VLCLocation, result.FileName);
         }
 
         private void ContextMenuItem_OpenInExplorer_Click(object sender, RoutedEventArgs e)
         {
             VideoMetaModel found = (sender as MenuItem).DataContext as VideoMetaModel;
 
-            string argument = @"/select, " + found.fileName;
+            string argument = @"/select, " + found.FileName;
             Process.Start("explorer.exe", argument);
         }
 
@@ -309,12 +309,16 @@ namespace MetaExplorerGUI
         /// <param name="e"></param>
         private void CriterionGroupbox_Drop(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent("MetaExplorer.MetaModels.VideoMetaModel"))
+            string expectedDragType = typeof(VideoMetaModel).FullName;
+
+            if (e.Data.GetDataPresent(expectedDragType))
             {
                 VideoMetaModel vmm = e.Data.GetData(typeof(VideoMetaModel)) as VideoMetaModel;
                 GroupBox gb = sender as GroupBox;
                 Label label = gb.FindName("SelectionLabel") as Label;
                 Image image = gb.FindName("SelectionImage") as Image;
+
+                this.SetGroupboxBorder(gb, false);
 
                 string critName = gb.Header as string;
                 List<CriterionInstance> ciList = this.me.Cache.GetCriterionInstances(critName);
@@ -356,8 +360,6 @@ namespace MetaExplorerGUI
 
                 //update the current selection
                 myViewModel.UpdateCurrentSelection();
-
-                this.SetGroupboxBorder(gb, false);
             }
         }
 

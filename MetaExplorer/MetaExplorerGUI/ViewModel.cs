@@ -112,7 +112,7 @@ namespace MetaExplorerGUI
         { 
             this.MMRef = new VideoMetaModel();
 
-            MMRef.fileName = this.FreeTextSearch;
+            MMRef.FileName = this.FreeTextSearch;
 
             CriteriaConfig.Criteria.ForEach((Criterion x) =>
             {

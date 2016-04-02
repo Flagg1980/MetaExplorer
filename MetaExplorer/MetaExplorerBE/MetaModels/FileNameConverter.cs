@@ -23,7 +23,7 @@ namespace MetaExplorerBE.MetaModels
         public VideoMetaModel ConvertFrom(string input)
         { 
             VideoMetaModel mm = new VideoMetaModel();
-            mm.fileName = input;
+            mm.FileName = input;
 
             try
             {
@@ -59,7 +59,7 @@ namespace MetaExplorerBE.MetaModels
                 //segregate stars
                 if (Regex.IsMatch(tokens[2], @"^\d*star$", RegexOptions.IgnoreCase))
                 {
-                    mm.star = Int32.Parse(tokens[2][0].ToString());
+                    mm.Stars = Int32.Parse(tokens[2][0].ToString());
                 }
                 else
                 {
