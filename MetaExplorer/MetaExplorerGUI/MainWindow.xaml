@@ -33,13 +33,13 @@
         <Style x:Key="ThumbnailButtonStyleMouseOver" TargetType="{x:Type Button}">
             <Setter Property="Margin" Value="{StaticResource ThumbButtonMargin}"/>
             <Setter Property="Effect" Value="{StaticResource ThumbDropShadowEffect}"/>
-            <EventSetter Event="ButtonBase.Click" Handler="VideoSelectionButton_Click"/>
+            <EventSetter Event="ButtonBase.MouseDoubleClick" Handler="VideoSelectionButton_Click"/>
         </Style>
 
         <!-- style for the thumbnail button-->
         <Style x:Key="ThumbnailButtonStyle" TargetType="{x:Type Button}">
             <Setter Property="Margin" Value="{StaticResource ThumbButtonMargin}"/>
-            <EventSetter Event="ButtonBase.Click" Handler="VideoSelectionButton_Click"/>
+            <EventSetter Event="ButtonBase.MouseDoubleClick" Handler="VideoSelectionButton_Click"/>
         </Style>
         
         <DataTemplate x:Key="ThumbnailButtonTemplate">

@@ -203,7 +203,6 @@ namespace MetaExplorerGUI
         
         private void VideoSelectionButton_Click(object sender, RoutedEventArgs e)
         {
-            //VideoMetaModel found = this.GetVideoMetaModelFromButton(sender as Button);
             VideoMetaModel found = (sender as Button).DataContext as VideoMetaModel;
             Helper.Play(MetaExplorerGUI.Properties.Settings.Default.VLCLocation, found.FileName);
         }
