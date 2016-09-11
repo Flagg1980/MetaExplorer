@@ -10,12 +10,9 @@ using MetaExplorerBE.Configuration;
 namespace MetaExplorerBE
 {
     /// <summary>
-    /// Types of cached objects:
-    /// - Video File Cache:         A List of all video files in the video file directory
-    /// - Video MetaModel Cache:    A List of all video meta model files
-    /// - Thumbnail File Cache:     A list of all Thumbnails in the .thumbnail directory
+    /// 
     /// </summary>
-    public class Cache : ICache
+    public class VideoMetaModelCache : IVideoMetaModelCache
     {
         #region Private Members
 
@@ -24,8 +21,6 @@ namespace MetaExplorerBE
         private List<String> supportedImageFormats = new List<string> { ".jpg", ".bmp", ".png" };
 
         public List<VideoMetaModel> videoMetaModelCache = new List<VideoMetaModel>();
-
-        private Dictionary<string, List<CriterionInstance>> criterionInstances = new Dictionary<string, List<CriterionInstance>>();
 
         private string[] videoFileCache;
 
@@ -51,80 +46,47 @@ namespace MetaExplorerBE
             set;
         }
 
-        public int Progress
-        {
-            get;
-            private set;
-        }
-
-        public string ProgressFile
-        {
-            get;
-            private set;
-        }
-
         public string[] VideoFileCache
         {
             get { return this.videoFileCache; }
         }
 
-        public List<VideoMetaModel> VideoMetaModelCache
+        public List<VideoMetaModel> Cache
         {
             get { return this.videoMetaModelCache;  }
         }
 
-        public List<CriterionInstance> GetCriterionInstances(Criterion criterion)
-        {
-            return this.criterionInstances[criterion.Name];
-        }
-
-        public List<CriterionInstance> GetCriterionInstances(string criterionName)
-        {
-            return this.criterionInstances[criterionName];
-        }
-
-        public int VideoThumbnailHeight { get; private set; }
-
-        public int VideoThumbnailWidth { get; private set; }
-
-        public int CriterionThumbnailHeight { get; private set; }
-
-        public int CriterionThumbnailWidth { get; private set; }
+        public int ThumbnailHeight { get; private set; }
+        public int ThumbnailWidth { get; private set; }
 
         #region Constructor
 
         /// <summary>
         /// </summary>
-        public Cache(string baseDir, string ffmpegLocation, int videoThumbnailHeight, int videoThumbnailWidth, int criterionThumbnailHeight, int criterionThumbnailWidth)
+        public VideoMetaModelCache(string baseDir, string ffmpegLocation, int thumbnailHeight, int thumbnailWidth)
         {
             this.LocationVideoFiles = baseDir;
             this._locationFFmpeg = ffmpegLocation;
 
-            this.VideoThumbnailHeight = videoThumbnailHeight;
-            this.VideoThumbnailWidth = videoThumbnailWidth;
-            this.CriterionThumbnailHeight = criterionThumbnailHeight;
-            this.CriterionThumbnailWidth = criterionThumbnailWidth;
-
-            //init list
-            CriteriaConfig.Load();
-            CriteriaConfig.Criteria.ForEach((Criterion x) => this.criterionInstances.Add(x.Name, new List<CriterionInstance>()));
+            this.ThumbnailHeight = thumbnailHeight;
+            this.ThumbnailWidth = thumbnailWidth;
         }
 
         #endregion
 
         #region Public Methods
 
-        public async Task UpdateVideoMetaModelCacheAsync()
+        public async Task UpdateVideoMetaModelCacheAsync(IProgress<int> progress, IProgress<string> progressFile)
         {
             this.videoMetaModelCache.Clear();
             IConverter mmConverter = new FileNameConverter();
 
-            this.Progress = 0;
+            progress.Report(0);
             int i = 0;
             foreach (string file in videoFileCache)
             {
-                this.Progress = (i * 99) / videoFileCache.Length;
-                this.ProgressFile = file;
+                progress.Report((i * 99) / videoFileCache.Length);
+                progressFile.Report(file);
                 
                 i++;
                 VideoMetaModel mm = mmConverter.ConvertFrom(file);
@@ -139,7 +101,7 @@ namespace MetaExplorerBE
 
                         //BitmapSource bi = new BitmapImage(uri);
 
-                        BitmapSource bi = CreateReducedThumbnailImage(uri, this.VideoThumbnailHeight, this.VideoThumbnailWidth);
+                        BitmapSource bi = CreateReducedThumbnailImage(uri, this.ThumbnailHeight, this.ThumbnailWidth);
 
                         bi.Freeze(); // Must be done if databinding is done to another thread than this method thread, otherwise error message: “Must create DependencySource on same Thread as the DependencyObject”
                         mm.Thumbnail = bi;
@@ -167,34 +129,34 @@ namespace MetaExplorerBE
             //sort by date
             this.videoMetaModelCache = this.videoMetaModelCache.OrderByDescending(x => x.DateModified).ToList();
 
-            this.Progress = 100;
+            progress.Report(100);
         }
 
 
 
-        public async Task UpdateNonExistingThumbnailCacheAsync()
+        public async Task UpdateNonExistingThumbnailCacheAsync(IProgress<int> progress, IProgress<string> progressFile)
         {
-            this.Progress = 0;
-            this.ProgressFile = "";
+            progress.Report(0);
+            progressFile.Report("");
 
             //get thumbnail in cache
-            List<VideoMetaModel> noThumbnail = this.VideoMetaModelCache.FindAll(x => { return x.Thumbnail == null; });
+            List<VideoMetaModel> noThumbnail = this.Cache.FindAll(x => { return x.Thumbnail == null; });
 
             //update progress
             int idx = 0;
             foreach (VideoMetaModel videoFile in noThumbnail)
             {
                 idx++;
-                this.ProgressFile = videoFile.FileName;
-                this.Progress = (idx * 100) / noThumbnail.Count;
+                progressFile.Report(videoFile.FileName);
+                progress.Report((idx * 100) / noThumbnail.Count);
 
                 this.UpdateThumbnailCache(videoFile);
 
                 await Task.Delay(1);
             }
 
-            this.Progress = 100;
-            this.ProgressFile = "";
+            progress.Report(100);
+            progressFile.Report("");
         }
 
         /// <summary>
@@ -226,7 +188,7 @@ namespace MetaExplorerBE
 
             //update bitmap in VideoMetaModel
             //BitmapImage bi = new BitmapImage(new Uri(cacheFile, UriKind.Absolute));
-            BitmapSource bi = CreateReducedThumbnailImage(new Uri(cacheFile, UriKind.Absolute), this.VideoThumbnailHeight, this.VideoThumbnailWidth);
+            BitmapSource bi = CreateReducedThumbnailImage(new Uri(cacheFile, UriKind.Absolute), this.ThumbnailHeight, this.ThumbnailWidth);
 
             bi.Freeze();              // Must be done if databinding is done to another thread than this method thread, otherwise error message: “Must create DependencySource on same Thread as the DependencyObject”
             videoFileMetaModel.Thumbnail = bi;
@@ -243,106 +205,12 @@ namespace MetaExplorerBE
             return videoFiles;
         }
 
-        public async Task GenerateDictAsync(Criterion criterion)
-        {
-            this.Progress = 0;
-            this.ProgressFile = "";
-
-            List<CriterionInstance> currentCriterionMetaModelList = this.criterionInstances[criterion.Name];
-            currentCriterionMetaModelList.Clear();
-
-            //load all criterion instances from FS
-            List<string> validCriterionInstancesOnFS = new List<string>();
-            string expectedPath = Path.Combine(Directory.GetCurrentDirectory(), criterion.Name);
-            if (Directory.Exists(expectedPath))
-            {
-                validCriterionInstancesOnFS = Directory.GetFiles(expectedPath).ToList();
-                //throw away all files which do not have a proper extension
-                validCriterionInstancesOnFS.RemoveAll(x =>
-                {
-                    string extension = Path.GetExtension(x);
-                    return !this.supportedImageFormats.Contains(extension, StringComparer.CurrentCultureIgnoreCase);
-                });
-
-                //create criterion instances
-                foreach (string vci in validCriterionInstancesOnFS)
-                {
-                    CriterionInstance cmm = new CriterionInstance();
-                    cmm.Name = Path.GetFileNameWithoutExtension(vci);
-                    cmm.Count = 0;
-                    cmm.SumStars = 0;
-                    //cmm.ImageSource = new BitmapImage(new Uri(vci));
-                    cmm.ImageSource = CreateReducedThumbnailImage(new Uri(vci), this.CriterionThumbnailHeight, this.CriterionThumbnailWidth);
-                    currentCriterionMetaModelList.Add(cmm);
-                }
-
-            }
-            else
-            { 
-                //excpetion handling not possible for some reason => gui hangs if exception is thrown here
-            }
-            this.Progress = 0;
-
-            //add statistic values to criterion instances
-            int i = 0;
-            foreach (VideoMetaModel mm in this.videoMetaModelCache)
-            {
-                i++;
-                this.Progress = (i * 99) / this.videoMetaModelCache.Count;
-                this.ProgressFile = mm.FileName;
-
-                foreach (string critElem in mm.GetList(criterion))
-                {
-                    CriterionInstance existing = currentCriterionMetaModelList.Find((CriterionInstance c) => { return c.Name.Equals(critElem, StringComparison.CurrentCultureIgnoreCase); });
-                    if (existing != null)
-                    {
-                        existing.Count++;
-                        existing.SumStars += mm.Stars;
-                    }
-                    //find the video files which do not have a criterion instance
-                    else
-                    {
-                        CriterionInstance unknownInstance = new CriterionInstance();
-                        unknownInstance.Name = critElem;
-                        unknownInstance.SumStars += mm.Stars;
-                        unknownInstance.Count++;
-                        unknownInstance.ImageSource = Helper.NAimage; //new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), @"na.png"))); 
-                        currentCriterionMetaModelList.Add(unknownInstance);
-                    }
-                }
-
-                //speed it up!! Task.Delay() slows up everything!
-                if (i % 20 == 0)
-                {
-                    await Task.Delay(1);
-                }
-            }
-
-            //sort by name only
-            List<CriterionInstance> dummyCriterionMetaModelList = currentCriterionMetaModelList.OrderBy(x => { return x.ImageSource == null; }).ThenBy(x => x.Name).ToList();
-            currentCriterionMetaModelList.Clear();
-            currentCriterionMetaModelList.AddRange(dummyCriterionMetaModelList);
-
-            //foreach orphan criterion instance, mark with a red cross
-            currentCriterionMetaModelList.ForEach(x =>
-            {
-                if (x.Count == 0)
-                {
-                    x.ImageSource = Helper.CrossBitmapImage(x.ImageSource);
-                    x.ImageSource.Freeze();
-                }
-            });
-
-            this.Progress = 100;
-            this.ProgressFile = "";
-        }
-
         /// <summary>
         /// Reads all files from a given base directory and caches the file locations.
         /// </summary>
-        public async Task UpdateVideoFileCacheAsync()
+        public async Task UpdateVideoFileCacheAsync(IProgress<int> progress, IProgress<string> progressFile)
         {
-            this.Progress = 0;
+            progress.Report(0);
 
             string baseDir = this.LocationVideoFiles;
 
@@ -355,7 +223,7 @@ namespace MetaExplorerBE
             await Task.Delay(1);
             this.videoFileCache = files;
 
-            this.Progress = 100;
+            progress.Report(100);
         }
 
         /// <summary>

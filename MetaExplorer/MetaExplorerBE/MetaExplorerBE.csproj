@@ -55,12 +55,14 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cache.cs" />
+    <Compile Include="Cache\CriterionCache.cs" />
+    <Compile Include="Cache\ICriterionCache.cs.cs" />
+    <Compile Include="Cache\VideoMetaModelCache.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="Configuration\CriteriaConfig.cs" />
     <Compile Include="FFmpegWrapper.cs" />
     <Compile Include="Helper.cs" />
-    <Compile Include="ICache.cs" />
+    <Compile Include="Cache\IVideoMetaModelCache.cs" />
     <Compile Include="MetaExplorerManager.cs" />
     <Compile Include="MetaModels\CriterionInstance.cs" />
     <Compile Include="MetaModels\FileNameConverter.cs" />
@@ -74,7 +76,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

@@ -100,7 +100,7 @@ namespace MetaExplorerGUI
         public void UpdateCurrentSelection()
         {
             currentFileSelection.Clear();
-            currentFileSelection.AddRange(me.Cache.GetThumbnailFileSelection(mmRef));
+            currentFileSelection.AddRange(me.VideoMetaModelCache.GetThumbnailFileSelection(mmRef));
             
             this.CurrentFileSelectionCount = this.currentFileSelection.Count();
 
@@ -121,7 +121,7 @@ namespace MetaExplorerGUI
                 if (this.currentCriterionSelectionIndex[x.Name] >= 0)
                 {
                     int critInstanceIndex = this.currentCriterionSelectionIndex[x.Name];
-                    CriterionInstance critInstance = this.me.Cache.GetCriterionInstances(x)[critInstanceIndex];
+                    CriterionInstance critInstance = this.me.CriterionCache.GetCriterionInstances(x)[critInstanceIndex];
                     this.MMRef.criteriaContents[x.Name].Add(critInstance.Name);
                 }
             });

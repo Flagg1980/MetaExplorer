@@ -31,6 +31,9 @@ namespace MetaExplorerGUI
 
         Dictionary<string, GroupBox> dynamicCriterionMap = new Dictionary<string, GroupBox>();
 
+        private int progress;
+        private string progressFile;
+
         public ViewModel MyViewModel
         {
             get { return myViewModel; }
@@ -50,24 +53,44 @@ namespace MetaExplorerGUI
             int criterionThumbNailWidth = Int32.Parse(FindResource("CriterionThumbnailWidth").ToString());
 
             //init meta model manager with dependency injection
-            ICache cache = new Cache(MetaExplorerGUI.Properties.Settings.Default.VideoFilesBasePath, 
+            IVideoMetaModelCache videoMetaModelCache = new VideoMetaModelCache(MetaExplorerGUI.Properties.Settings.Default.VideoFilesBasePath, 
                                     MetaExplorerGUI.Properties.Settings.Default.FFmpegLocation,
                                     videoThumbNailHeight,
-                                    videoThumbNailWidth,
-                                    criterionThumbNailHeight,
-                                    criterionThumbNailWidth
+                                    videoThumbNailWidth
             );
-            me = new MetaExplorerManager(cache);
+            ICriterionCache criterionCache = new CriterionCache(criterionThumbNailHeight, criterionThumbNailWidth);
+
+            me = new MetaExplorerManager(videoMetaModelCache, criterionCache);
 
             //this.myItemsControl.ItemTemplate.
 
-            this.ProgressAsync(me.Cache.UpdateVideoFileCacheAsync(), "Updating Video File Cache");
-            this.ProgressAsync(me.Cache.UpdateVideoMetaModelCacheAsync(), "Updating Video Meta Model Cache");
-            this.ProgressAsync(me.Cache.UpdateNonExistingThumbnailCacheAsync(), "Updating Thumbnails");
+            //this whole async implementation is pure shit!!!!!
+
+            var progressImpl = new Progress<int>(x =>
+            {
+                this.progress = x;
+            });
+
+            var progressFileImpl = new Progress<string>(x =>
+            {
+                this.progressFile = x;
+            });
+
+            Task a1 = me.VideoMetaModelCache.UpdateVideoFileCacheAsync(progressImpl, progressFileImpl);
+            this.ProgressAsync(a1, "Updating Video File Cache");
+            a1.Wait();
+            Task a2 = me.VideoMetaModelCache.UpdateVideoMetaModelCacheAsync(progressImpl, progressFileImpl);
+            this.ProgressAsync(a2, "Updating Video Meta Model Cache");
+            a2.Wait();
+            Task a3 = me.VideoMetaModelCache.UpdateNonExistingThumbnailCacheAsync(progressImpl, progressFileImpl);
+            this.ProgressAsync(a3, "Updating Thumbnails");
+            a3.Wait();         
 
             foreach (Criterion crit in CriteriaConfig.Criteria)
             {
-                this.ProgressAsync(me.Cache.GenerateDictAsync(crit), "Updating " + crit.Name + " Dictionary");
+                Task t = me.CriterionCache.GenerateDictAsync(crit, videoMetaModelCache.Cache, progressImpl, progressFileImpl);
+                this.ProgressAsync(t, "Updating " + crit.Name + " Dictionary");
+                t.Wait();
             }
 
             myViewModel = new ViewModel();
@@ -82,12 +105,14 @@ namespace MetaExplorerGUI
 
         private async void ProgressAsync(Task task, string progressHeading)
         {
+            this.progress = 0;
+
             ProgressWindow.DoWorkWithModal(progressHeading, (progressMsg, progress) =>
             {
-                while (me.Cache.Progress < 100)
+                while (this.progress < 100)
                 {
-                    progress.Report(me.Cache.Progress);
-                    progressMsg.Report(String.Format("Processing: <{0}>", me.Cache.ProgressFile));
+                    progress.Report(this.progress);
+                    progressMsg.Report(String.Format("Processing: <{0}>", this.progressFile));
                     System.Threading.Thread.Sleep(1);
                 }
             });
@@ -120,13 +145,13 @@ namespace MetaExplorerGUI
 
             selectButton.Click += (object sender, RoutedEventArgs args) =>
             {
-                CriterionSelectionWindow w = new CriterionSelectionWindow(myViewModel.MEManager.Cache.GetCriterionInstances(crit));
+                CriterionSelectionWindow w = new CriterionSelectionWindow(myViewModel.MEManager.CriterionCache.GetCriterionInstances(crit));
                 w.ShowDialog();
 
                 if (w.SelectedIndex != -1)
                 {
                     myViewModel.CurrentCriterionSelectionIndex[crit.Name] = w.SelectedIndex;
-                    CriterionInstance ci = this.me.Cache.GetCriterionInstances(crit)[w.SelectedIndex];
+                    CriterionInstance ci = this.me.CriterionCache.GetCriterionInstances(crit)[w.SelectedIndex];
 
                     //update the label and the picture of the button
                     label.Content = ci.Name;
@@ -216,6 +241,12 @@ namespace MetaExplorerGUI
             int rnd = rand.Next(count);   //0..count-1
 
             VideoMetaModel result = this.myViewModel.CurrentFileSelection[rnd];
+
+            //bring video into view
+            Button button = GetButtonByVideoMetaModel(result);
+            button.BringIntoView();
+
+            //play the video
             Helper.Play(MetaExplorerGUI.Properties.Settings.Default.VLCLocation, result.FileName);
         }
 
@@ -320,7 +351,7 @@ namespace MetaExplorerGUI
                 this.SetGroupboxBorder(gb, false);
 
                 string critName = gb.Header as string;
-                List<CriterionInstance> ciList = this.me.Cache.GetCriterionInstances(critName);
+                List<CriterionInstance> ciList = this.me.CriterionCache.GetCriterionInstances(critName);
 
                 //get the criterion instance
                 CriterionInstance ci = null;
@@ -406,5 +437,14 @@ namespace MetaExplorerGUI
         }
 
         #endregion
+
+        private Button GetButtonByVideoMetaModel(VideoMetaModel vmm)
+        {
+            ContentPresenter depobj = myItemsControl.ItemContainerGenerator.ContainerFromItem(vmm) as ContentPresenter;
+            DataTemplate dataTemplate = depobj.ContentTemplate;
+            Button candidate = dataTemplate.FindName("MyButton", depobj) as Button;
+
+            return candidate;
+        }
     }
 }

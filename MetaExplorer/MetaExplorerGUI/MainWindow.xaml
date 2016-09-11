@@ -115,7 +115,7 @@
         <!--
         Thumbnail Area
         -->
-        <ScrollViewer Margin="10" HorizontalScrollBarVisibility="Disabled" 
+        <ScrollViewer x:Name="myScrollViewer" Margin="10" HorizontalScrollBarVisibility="Disabled" 
 			Grid.Row="1" Grid.Column="0">
 
             <ItemsControl x:Name="myItemsControl" ItemsSource="{Binding CurrentFileSelection}" ItemTemplate="{DynamicResource ThumbnailButtonTemplate}">

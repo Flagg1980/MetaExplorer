@@ -13,8 +13,13 @@ namespace MetaExplorerBE
     {
         #region dependency objects
 
+        public IVideoMetaModelCache VideoMetaModelCache
+        {
+            get;
+            private set;
+        }
 
-        public ICache Cache
+        public ICriterionCache CriterionCache
         {
             get;
             private set;
@@ -22,9 +27,10 @@ namespace MetaExplorerBE
 
         #endregion
 
-        public MetaExplorerManager(ICache cache)
+        public MetaExplorerManager(IVideoMetaModelCache videoMetaModelcache, ICriterionCache criterionCache)
         {
-            this.Cache = cache;
+            this.VideoMetaModelCache = videoMetaModelcache;
+            this.CriterionCache = criterionCache;
         }
 
         //#endregion

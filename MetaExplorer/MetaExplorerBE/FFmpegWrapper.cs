@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -56,7 +57,9 @@ namespace MetaExplorerBE
             }
             catch (Exception e)
             {
-                throw new Exception(String.Format("Could not get time duration from video file <{0}> with command <{1}> and error message <{2}>.", inputFile, _execLocation + " " + parameters, e.Message));
+                string errorMsg = String.Format("Could not get time duration from video file <{0}> with command <{1}> and error message <{2}>.", inputFile, _execLocation + " " + parameters, e.Message);
+                Trace.TraceError(errorMsg);
+                throw new Exception(errorMsg);
             }
 
             return result;
@@ -66,7 +69,9 @@ namespace MetaExplorerBE
         {
             if (!overrideOutput && File.Exists(outputFile))
             {
-                throw new Exception(String.Format("Output file <{0}> already exists while override flag was set to <{1}>.", outputFile, overrideOutput));
+                string errorMsg = String.Format("Output file <{0}> already exists while override flag was set to <{1}>.", outputFile, overrideOutput);
+                Trace.TraceError(errorMsg);
+                throw new Exception(errorMsg);
             }
 
             //dirty hack: put .png at the end of output file and rename it back afterwards
@@ -101,8 +106,9 @@ namespace MetaExplorerBE
 
             if (exitCode != 0 || outputIsBad || !fileExists)
             {
-                string errorMessage = String.Format("Something went wrong while creating the output. Exitcode of the command is <{0}>. Parameters were: <{1}>. Output of the command is <{2}>. File was created: <{3}>.", exitCode, parameters, output, fileExists);
-                throw new Exception(errorMessage);
+                string errorMsg = String.Format("Something went wrong while creating the output. Exitcode of the command is <{0}>. Parameters were: <{1}>. Output of the command is <{2}>. File was created: <{3}>.", exitCode, parameters, output, fileExists);
+                Trace.TraceError(errorMsg);
+                throw new Exception(errorMsg);
             }
 
             //rename back
