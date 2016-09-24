@@ -3,19 +3,14 @@ using MetaExplorerBE.Configuration;
 using MetaExplorerBE.MetaModels;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Effects;
-using System.Windows.Media.Imaging;
 
 namespace MetaExplorerGUI
 {
@@ -31,8 +26,8 @@ namespace MetaExplorerGUI
 
         Dictionary<string, GroupBox> dynamicCriterionMap = new Dictionary<string, GroupBox>();
 
-        private int progress;
-        private string progressFile;
+        //private int progress;
+        //private string progressFile;
 
         public ViewModel MyViewModel
         {
@@ -62,35 +57,19 @@ namespace MetaExplorerGUI
 
             me = new MetaExplorerManager(videoMetaModelCache, criterionCache);
 
-            //this.myItemsControl.ItemTemplate.
-
-            //this whole async implementation is pure shit!!!!!
-
-            var progressImpl = new Progress<int>(x =>
-            {
-                this.progress = x;
-            });
-
-            var progressFileImpl = new Progress<string>(x =>
-            {
-                this.progressFile = x;
-            });
-
-            Task a1 = me.VideoMetaModelCache.UpdateVideoFileCacheAsync(progressImpl, progressFileImpl);
-            this.ProgressAsync(a1, "Updating Video File Cache");
-            a1.Wait();
-            Task a2 = me.VideoMetaModelCache.UpdateVideoMetaModelCacheAsync(progressImpl, progressFileImpl);
-            this.ProgressAsync(a2, "Updating Video Meta Model Cache");
-            a2.Wait();
-            Task a3 = me.VideoMetaModelCache.UpdateNonExistingThumbnailCacheAsync(progressImpl, progressFileImpl);
-            this.ProgressAsync(a3, "Updating Thumbnails");
-            a3.Wait();         
+            ProgressWindow.DoWorkWithModal("Updating Video File Cache", me.VideoMetaModelCache.UpdateVideoFileCacheAsync);
+            ProgressWindow.DoWorkWithModal("Updating Video Meta Model Cache", me.VideoMetaModelCache.UpdateVideoMetaModelCacheAsync);
+            ProgressWindow.DoWorkWithModal("Updating Thumbnails", me.VideoMetaModelCache.UpdateNonExistingThumbnailCacheAsync);
 
             foreach (Criterion crit in CriteriaConfig.Criteria)
             {
-                Task t = me.CriterionCache.GenerateDictAsync(crit, videoMetaModelCache.Cache, progressImpl, progressFileImpl);
-                this.ProgressAsync(t, "Updating " + crit.Name + " Dictionary");
-                t.Wait();
+                Func<IProgress<int>, IProgress<string>, Task> crit_work = (progress_int, progress_str) =>
+                {
+                    return me.CriterionCache.GenerateDictAsync(crit, videoMetaModelCache.Cache, progress_int, progress_str);
+                };
+
+
+                ProgressWindow.DoWorkWithModal("Updating " + crit.Name + " Dictionary", crit_work);
             }
 
             myViewModel = new ViewModel();
@@ -103,22 +82,7 @@ namespace MetaExplorerGUI
             myViewModel.UpdateCurrentSelection();
         }
 
-        private async void ProgressAsync(Task task, string progressHeading)
-        {
-            this.progress = 0;
 
-            ProgressWindow.DoWorkWithModal(progressHeading, (progressMsg, progress) =>
-            {
-                while (this.progress < 100)
-                {
-                    progress.Report(this.progress);
-                    progressMsg.Report(String.Format("Processing: <{0}>", this.progressFile));
-                    System.Threading.Thread.Sleep(1);
-                }
-            });
-
-            await task;
-        }
 
         public void AddDynamicCriterionButton(Criterion crit)
         {

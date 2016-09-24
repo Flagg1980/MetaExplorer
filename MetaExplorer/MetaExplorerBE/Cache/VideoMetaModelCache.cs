@@ -85,10 +85,6 @@ namespace MetaExplorerBE
             int i = 0;
             foreach (string file in videoFileCache)
             {
-                progress.Report((i * 99) / videoFileCache.Length);
-                progressFile.Report(file);
-                
-                i++;
                 VideoMetaModel mm = mmConverter.ConvertFrom(file);
                 try
                 {
@@ -120,10 +116,11 @@ namespace MetaExplorerBE
                     throw new Exception(String.Format("Error while attaching thumbnail to video meta model for file <{0}>. Message: <{1}>", file, e.Message));
                 }
 
-                if (i % 20 == 0)
-                {
-                    await Task.Delay(1); //for async processing
-                }
+                progress.Report((i * 99) / videoFileCache.Length);
+                progressFile.Report(file);
+                i++;
+
+                await Task.Delay(TimeSpan.FromTicks(10));
             }
 
             //sort by date
@@ -146,13 +143,13 @@ namespace MetaExplorerBE
             int idx = 0;
             foreach (VideoMetaModel videoFile in noThumbnail)
             {
+                this.UpdateThumbnailCache(videoFile);
+
                 idx++;
                 progressFile.Report(videoFile.FileName);
                 progress.Report((idx * 100) / noThumbnail.Count);
 
-                this.UpdateThumbnailCache(videoFile);
-
-                await Task.Delay(1);
+                await Task.Delay(TimeSpan.FromTicks(10));
             }
 
             progress.Report(100);
@@ -220,8 +217,9 @@ namespace MetaExplorerBE
             }
 
             string[] files = Directory.GetFiles(baseDir, "*", SearchOption.AllDirectories);
-            await Task.Delay(1);
             this.videoFileCache = files;
+
+            await Task.Delay(TimeSpan.FromTicks(10));
 
             progress.Report(100);
         }

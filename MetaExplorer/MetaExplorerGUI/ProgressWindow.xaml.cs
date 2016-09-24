@@ -1,5 +1,6 @@
 ﻿using System;
-using System.ComponentModel;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace MetaExplorerGUI
@@ -14,35 +15,32 @@ namespace MetaExplorerGUI
             InitializeComponent();
         }
 
-        public static void DoWorkWithModal(string heading, Action<IProgress<string> , IProgress<int>> work)
+        public static void DoWorkWithModal(string heading, Func<IProgress<int>, IProgress<string>, Task> work)
         {
             ProgressWindow splash = new ProgressWindow();
-            splash.HeadingTextBlock.Text = heading;
+            Task task = null;
 
             splash.Loaded += (_, args) =>
             {
-                BackgroundWorker worker = new BackgroundWorker();
-
                 Progress<string> progressMsg = new Progress<string>(data => splash.MyProgressTextblock.Text = data);
                 Progress<int> progress = new Progress<int>(data => splash.MyProgressBar.Value = data);
 
-                worker.DoWork += (s, workerArgs) => work(progressMsg, progress);
-
-                worker.RunWorkerCompleted += (s, workerArgs) =>
+                Action action = new Action(async () =>
                 {
-                    //handle if an exception was thrown in the backgound worker thread
-                    if (workerArgs.Error != null)
-                    {
-                        MessageBox.Show(String.Format("There was an error in the background worker thread: <{0}>!", workerArgs.Error.ToString()));
-                    }
+                    await work(progress, progressMsg);
 
                     splash.Close();
-                };
+                });
 
-                worker.RunWorkerAsync();
+                task = Task.Factory.StartNew(action, 
+                                            CancellationToken.None, 
+                                            TaskCreationOptions.None, 
+                                            TaskScheduler.FromCurrentSynchronizationContext());
+
             };
 
             splash.ShowDialog();
+            task.Wait();
         }
     }
 }

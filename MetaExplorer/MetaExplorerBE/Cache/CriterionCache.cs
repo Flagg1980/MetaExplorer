@@ -97,8 +97,10 @@ namespace MetaExplorerBE
                 }
             }
             else
-            { 
+            {
                 //excpetion handling not possible for some reason => gui hangs if exception is thrown here
+                string errorMsg = "Directory <" + expectedPath + " does not exist.";
+                throw new Exception(errorMsg);
             }
             progress.Report(0);
 
@@ -106,10 +108,6 @@ namespace MetaExplorerBE
             int i = 0;
             foreach (VideoMetaModel mm in videoMetaModels)
             {
-                i++;
-                progress.Report((i * 99) / videoMetaModels.Count);
-                progressFile.Report(mm.FileName);
-
                 foreach (string critElem in mm.GetList(criterion))
                 {
                     CriterionInstance existing = currentCriterionMetaModelList.Find((CriterionInstance c) => { return c.Name.Equals(critElem, StringComparison.CurrentCultureIgnoreCase); });
@@ -130,11 +128,11 @@ namespace MetaExplorerBE
                     }
                 }
 
-                //speed it up!! Task.Delay() slows up everything!
-                if (i % 20 == 0)
-                {
-                    await Task.Delay(1);
-                }
+                i++;
+                progress.Report((i * 99) / videoMetaModels.Count);
+                progressFile.Report(mm.FileName);
+
+                await Task.Delay(TimeSpan.FromTicks(10));
             }
 
             //sort by name only
