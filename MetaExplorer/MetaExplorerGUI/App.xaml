@@ -17,11 +17,14 @@
             <Thickness x:Key="ThumbButtonThickness" Bottom="15" Left="15" Right="15" Top="15"/>
             <Thickness x:Key="ThumbButtonMargin" Bottom="10" Left="10" Right="10" Top="10"/>
 
-            <System:Int16 x:Key="VideoThumbnailHeight">170</System:Int16>
-            <System:Int16 x:Key="VideoThumbnailWidth">300</System:Int16>
+            <System:Int16 x:Key="ThumbnailButtonWidth">360</System:Int16>
+            <System:Int16 x:Key="ThumbnailButtonHeight">240</System:Int16>
 
-            <System:Int16 x:Key="CriterionThumbnailHeight">200</System:Int16>
+            <System:Int16 x:Key="VideoThumbnailWidth">360</System:Int16>
+            <System:Int16 x:Key="VideoThumbnailHeight">200</System:Int16>
+
             <System:Int16 x:Key="CriterionThumbnailWidth">200</System:Int16>
+            <System:Int16 x:Key="CriterionThumbnailHeight">200</System:Int16>
 
         </ResourceDictionary>
     </Application.Resources>

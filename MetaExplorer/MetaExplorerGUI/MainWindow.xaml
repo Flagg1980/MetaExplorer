@@ -8,8 +8,7 @@
 
     <Window.Resources>
 
-        <System:Int16 x:Key="ThumbnailButtonHeight">210</System:Int16>
-        <System:Int16 x:Key="ThumbnailButtonWidth">300</System:Int16>
+        
 
         <Style x:Key="HiddenButtonStyle" TargetType="{x:Type Button}">
             <Setter Property="Padding" Value="1"/>
