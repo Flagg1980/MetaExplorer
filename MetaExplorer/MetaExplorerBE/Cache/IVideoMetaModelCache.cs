@@ -41,5 +41,11 @@ namespace MetaExplorerBE
         /// <param name="regex"></param>
         /// <returns></returns>
         List<VideoMetaModel> GetVideoFileSelection(VideoMetaModel mmRef);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="func"></param>
+        void ResortBy(Func<VideoMetaModel, object> func);
     }
 }

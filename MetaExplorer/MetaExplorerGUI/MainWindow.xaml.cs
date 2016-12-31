@@ -21,6 +21,7 @@ namespace MetaExplorerGUI
     {
         private ViewModel myViewModel;
         private MetaExplorerManager me;
+        private bool windowInitiallyCompletelyRendered = false;
 
         private Point dragDropStartPoint;
 
@@ -409,6 +410,42 @@ namespace MetaExplorerGUI
             Button candidate = dataTemplate.FindName("MyButton", depobj) as Button;
 
             return candidate;
+        }
+
+        private void SortingSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            //the first time this event occurs during rendering of the main window, 
+            //this one we want to ignore
+            if (!windowInitiallyCompletelyRendered)
+                return;
+
+            var selecteditem = e.AddedItems[0] as ComboBoxItem;
+            string itemstr = selecteditem.Content.ToString().ToLower();
+
+            if (itemstr.Contains("date"))
+            {
+                this.myViewModel.MEManager.VideoMetaModelCache.ResortBy(x => x.DateModified);
+            }
+            else if (itemstr.Contains("resolution"))
+            {
+                this.myViewModel.MEManager.VideoMetaModelCache.ResortBy(x => x.FrameHeight * x.FrameWidth);
+            }
+            else if (itemstr.Contains("bitrate"))
+            {
+                this.myViewModel.MEManager.VideoMetaModelCache.ResortBy(x => x.BitRate);
+            }
+            else
+            {
+                string errormsg = String.Format("Unknown content in selected sort item <{0}>", itemstr);
+                throw new Exception(errormsg);
+            }
+
+            this.myViewModel.UpdateCurrentSelection();
+        }
+
+        private void Window_ContentRendered(object sender, EventArgs e)
+        {
+            windowInitiallyCompletelyRendered = true;
         }
     }
 }

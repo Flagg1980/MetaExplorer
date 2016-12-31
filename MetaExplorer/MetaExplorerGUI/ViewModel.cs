@@ -97,6 +97,13 @@ namespace MetaExplorerGUI
 
         #region Public Methods
 
+        //public void Resort()
+        //{
+        //    //sort by property
+        //    //this.MEManager.VideoMetaModelCache = this.videoMetaModelCache.OrderByDescending(x => x.DateModified).ToList();
+        //    this.MEManager.VideoMetaModelCache.ResortBy(x => x.DateModified);
+        //}
+
         public void UpdateCurrentSelection()
         {
             currentFileSelection.Clear();

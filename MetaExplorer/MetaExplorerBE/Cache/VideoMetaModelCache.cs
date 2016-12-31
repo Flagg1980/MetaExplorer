@@ -138,7 +138,8 @@ namespace MetaExplorerBE
             }
 
             //sort by date
-            this.videoMetaModelCache = this.videoMetaModelCache.OrderByDescending(x => x.DateModified).ToList();
+            //this.videoMetaModelCache = this.videoMetaModelCache.OrderByDescending(x => x.DateModified).ToList();
+            this.ResortBy(x => x.DateModified);
 
             progress.Report(100);
         }
@@ -282,6 +283,12 @@ namespace MetaExplorerBE
             }
 
             return res;
+        }
+
+        public void ResortBy(Func<VideoMetaModel, object> func)
+        {
+            //this.videoMetaModelCache = this.videoMetaModelCache.OrderByDescending(x => x.DateModified).ToList();
+            this.videoMetaModelCache = this.videoMetaModelCache.OrderByDescending(func).ToList();
         }
 
         #endregion

@@ -4,7 +4,7 @@
         xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:MetaExplorerGUI" x:Class="MetaExplorerGUI.MainWindow"
         Title="MainWindow" 
-        MinHeight="500" MinWidth="800" WindowStartupLocation="CenterScreen">
+        MinHeight="500" MinWidth="800" WindowStartupLocation="CenterScreen" ContentRendered="Window_ContentRendered">
 
     <Window.Resources>
 
@@ -109,9 +109,12 @@
 
         <StackPanel Orientation="Horizontal" VerticalAlignment="Top"
 			Grid.Row="0" Grid.Column="0">
-            <Label Content="Base Dir: "/>
-            <TextBox Width="150"/>
-            <Button Content="Apply" Width="60"/>
+            <Label Content="Sort by: "/>
+            <ComboBox SelectedIndex="0" Cursor="Arrow" Width="100" SelectionChanged="SortingSelectionChanged" >
+                <ComboBoxItem Content="Date"/>
+                <ComboBoxItem Content="Resolution"/>
+                <ComboBoxItem Content="Bitrate"/>
+            </ComboBox>
         </StackPanel>
 
         <!--
