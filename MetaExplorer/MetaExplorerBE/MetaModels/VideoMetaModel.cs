@@ -40,7 +40,9 @@ namespace MetaExplorerBE.MetaModels
             set { _thumbnail = value;  OnPropertyChanged("Thumbnail"); }
         }
 
-        public string ThumbnailCaption { get; set; }
+        public string ThumbnailCaption1 { get; set; }
+
+        public string ThumbnailCaption2 { get; set; }
 
         public DateTime DateModified { get; set; }
 
@@ -49,6 +51,12 @@ namespace MetaExplorerBE.MetaModels
         public string FileName { get; set; }
 
         public int Stars { get; set; }
+
+        public int BitRate { get; set; }
+
+        public int FrameWidth { get; set; }
+
+        public int FrameHeight { get; set; }
 
         #endregion
 

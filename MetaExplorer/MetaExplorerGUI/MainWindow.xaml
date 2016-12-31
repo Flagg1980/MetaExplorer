@@ -8,7 +8,7 @@
 
     <Window.Resources>
 
-        <System:Int16 x:Key="ThumbnailButtonHeight">200</System:Int16>
+        <System:Int16 x:Key="ThumbnailButtonHeight">210</System:Int16>
         <System:Int16 x:Key="ThumbnailButtonWidth">300</System:Int16>
 
         <Style x:Key="HiddenButtonStyle" TargetType="{x:Type Button}">
@@ -47,8 +47,11 @@
                     PreviewMouseLeftButtonDown="ThumbnailButton_PreviewMouseLeftButtonDown" PreviewMouseMove="ThumbnailButton_MouseMove" >                <!-- Used for Drag&Drop-->
                 <StackPanel Orientation="Vertical">
                     <Image Source="{Binding Path=Thumbnail}" Height="{Binding Source={StaticResource VideoThumbnailHeight}}" Width="{Binding Source={StaticResource VideoThumbnailWidth}}" VerticalAlignment="Top"/>
-                    <Label HorizontalAlignment="Center" FontSize="10" FontFamily="Comic Sans MS">
-                        <TextBlock Text="{Binding Path=ThumbnailCaption}"/>
+                    <Label HorizontalAlignment="Center" FontSize="10" FontFamily="Comic Sans MS" Padding="5,5,5,0">
+                        <TextBlock Text="{Binding Path=ThumbnailCaption1}"/>
+                    </Label>
+                    <Label HorizontalAlignment="Center" FontSize="10" FontFamily="Consolas" Padding="5,5,5,0" >
+                        <TextBlock Text="{Binding Path=ThumbnailCaption2}"/>
                     </Label>
                 </StackPanel>
                 <Button.ContextMenu>

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using MetaExplorerBE.MetaModels;
 using MetaExplorerBE.Configuration;
+using MetaExplorerBE.ExtendedFileProperties;
 
 namespace MetaExplorerBE
 {
@@ -23,6 +24,8 @@ namespace MetaExplorerBE
         public List<VideoMetaModel> videoMetaModelCache = new List<VideoMetaModel>();
 
         private string[] videoFileCache;
+
+        private IExtendedFilePropertiesProvider myExtendedPropertiesProvider;
 
         #endregion
 
@@ -70,6 +73,8 @@ namespace MetaExplorerBE
 
             this.ThumbnailHeight = thumbnailHeight;
             this.ThumbnailWidth = thumbnailWidth;
+
+            myExtendedPropertiesProvider = new ExtendedFilePropertiesProvider(ExtendedFilePropertiesTechnology.Shell32).Provider;
         }
 
         #endregion
@@ -107,8 +112,17 @@ namespace MetaExplorerBE
                         mm.Thumbnail = null;
                     }
 
-                    //add thumbnail caption
-                    mm.ThumbnailCaption = Path.GetFileName(file);
+                    //retrieve extended file properties
+                    FileInfo fi = new FileInfo(file);
+                    mm.BitRate = myExtendedPropertiesProvider.GetBitrate(fi);
+                    mm.FrameHeight = myExtendedPropertiesProvider.GetFrameHeight(fi);
+                    mm.FrameWidth = myExtendedPropertiesProvider.GetFrameWidth(fi);
+
+                    //define the captions of the thumbnails
+                    mm.ThumbnailCaption1 = Path.GetFileName(file);
+                    mm.ThumbnailCaption2 = String.Format("{0}x{1}(@{2})", mm.FrameWidth, mm.FrameHeight, mm.BitRate);
+
+                    //add meta model to cache
                     this.videoMetaModelCache.Add(mm);
                 }
                 catch (Exception e)
