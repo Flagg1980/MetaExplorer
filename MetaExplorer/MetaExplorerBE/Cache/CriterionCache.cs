@@ -132,7 +132,7 @@ namespace MetaExplorerBE
                 progress.Report((i * 99) / videoMetaModels.Count);
                 progressFile.Report(mm.FileName);
 
-                await Task.Delay(TimeSpan.FromTicks(10));
+                await Task.Delay(MetaExplorerManager.AsyncWaitTime);
             }
 
             //sort by name only

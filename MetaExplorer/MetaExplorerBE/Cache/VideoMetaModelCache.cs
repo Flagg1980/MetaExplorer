@@ -134,7 +134,7 @@ namespace MetaExplorerBE
                 progressFile.Report(file);
                 i++;
 
-                await Task.Delay(TimeSpan.FromTicks(10));
+                await Task.Delay(MetaExplorerManager.AsyncWaitTime);
             }
 
             //sort by date
@@ -164,7 +164,7 @@ namespace MetaExplorerBE
                 progressFile.Report(videoFile.FileName);
                 progress.Report((idx * 100) / noThumbnail.Count);
 
-                await Task.Delay(TimeSpan.FromTicks(10));
+                await Task.Delay(MetaExplorerManager.AsyncWaitTime);
             }
 
             progress.Report(100);
@@ -234,7 +234,7 @@ namespace MetaExplorerBE
             string[] files = Directory.GetFiles(baseDir, "*", SearchOption.AllDirectories);
             this.videoFileCache = files;
 
-            await Task.Delay(TimeSpan.FromTicks(10));
+            await Task.Delay(MetaExplorerManager.AsyncWaitTime);
 
             progress.Report(100);
         }

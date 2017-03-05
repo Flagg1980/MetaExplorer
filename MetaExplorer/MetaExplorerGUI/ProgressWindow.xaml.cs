@@ -19,9 +19,11 @@ namespace MetaExplorerGUI
         {
             ProgressWindow splash = new ProgressWindow();
             Task task = null;
+            
 
             splash.Loaded += (_, args) =>
             {
+                splash.HeadingTextBlock.Text = heading;
                 Progress<string> progressMsg = new Progress<string>(data => splash.MyProgressTextblock.Text = data);
                 Progress<int> progress = new Progress<int>(data => splash.MyProgressBar.Value = data);
 
