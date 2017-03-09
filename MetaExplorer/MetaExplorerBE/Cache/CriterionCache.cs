@@ -63,95 +63,96 @@ namespace MetaExplorerBE
         /// (They appear as red cross later in the application).
         /// </param>
         /// <returns></returns>
-        public async Task GenerateDictAsync(Criterion criterion, List<VideoMetaModel> videoMetaModels, IProgress<int> progress, IProgress<string> progressFile)
+        public Task GenerateDictAsync(Criterion criterion, List<VideoMetaModel> videoMetaModels, IProgress<int> progress, IProgress<string> progressFile)
         {
-            progress.Report(0);
-            progressFile.Report("");
-
-            List<CriterionInstance> currentCriterionMetaModelList = this.criterionInstances[criterion.Name];
-            currentCriterionMetaModelList.Clear();
-
-            //load all criterion instances from FS
-            List<string> validCriterionInstancesOnFS = new List<string>();
-            string expectedPath = Path.Combine(Directory.GetCurrentDirectory(), criterion.Name);
-            if (Directory.Exists(expectedPath))
+            return Task.Factory.StartNew(() =>
             {
-                validCriterionInstancesOnFS = Directory.GetFiles(expectedPath).ToList();
-                //throw away all files which do not have a proper extension
-                validCriterionInstancesOnFS.RemoveAll(x =>
+                progress.Report(0);
+                progressFile.Report("");
+
+                List<CriterionInstance> currentCriterionMetaModelList = this.criterionInstances[criterion.Name];
+                currentCriterionMetaModelList.Clear();
+
+                //load all criterion instances from FS
+                List<string> validCriterionInstancesOnFS = new List<string>();
+                string expectedPath = Path.Combine(Directory.GetCurrentDirectory(), criterion.Name);
+                if (Directory.Exists(expectedPath))
                 {
-                    string extension = Path.GetExtension(x);
-                    return !this.supportedImageFormats.Contains(extension, StringComparer.CurrentCultureIgnoreCase);
+                    validCriterionInstancesOnFS = Directory.GetFiles(expectedPath).ToList();
+                    //throw away all files which do not have a proper extension
+                    validCriterionInstancesOnFS.RemoveAll(x =>
+                    {
+                        string extension = Path.GetExtension(x);
+                        return !this.supportedImageFormats.Contains(extension, StringComparer.CurrentCultureIgnoreCase);
+                    });
+
+                    //create criterion instances
+                    foreach (string vci in validCriterionInstancesOnFS)
+                    {
+                        CriterionInstance cmm = new CriterionInstance();
+                        cmm.Name = Path.GetFileNameWithoutExtension(vci);
+                        cmm.Count = 0;
+                        cmm.SumStars = 0;
+                        //cmm.ImageSource = new BitmapImage(new Uri(vci));
+                        cmm.ImageSource = CreateReducedThumbnailImage(new Uri(vci), this.ThumbnailHeight, this.ThumbnailWidth);
+                        currentCriterionMetaModelList.Add(cmm);
+                    }
+                }
+                else
+                {
+                    //excpetion handling not possible for some reason => gui hangs if exception is thrown here
+                    string errorMsg = "Directory <" + expectedPath + " does not exist.";
+                    throw new Exception(errorMsg);
+                }
+                progress.Report(0);
+
+                //add statistic values to criterion instances
+                int i = 0;
+                foreach (VideoMetaModel mm in videoMetaModels)
+                {
+                    foreach (string critElem in mm.GetList(criterion))
+                    {
+                        CriterionInstance existing = currentCriterionMetaModelList.Find((CriterionInstance c) => { return c.Name.Equals(critElem, StringComparison.CurrentCultureIgnoreCase); });
+                        if (existing != null)
+                        {
+                            existing.Count++;
+                            existing.SumStars += mm.Stars;
+                        }
+                        //find the video files which do not have a criterion instance
+                        else
+                        {
+                            CriterionInstance unknownInstance = new CriterionInstance();
+                            unknownInstance.Name = critElem;
+                            unknownInstance.SumStars += mm.Stars;
+                            unknownInstance.Count++;
+                            unknownInstance.ImageSource = Helper.NAimage; //new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), @"na.png"))); 
+                            currentCriterionMetaModelList.Add(unknownInstance);
+                        }
+                    }
+
+                    i++;
+                    progress.Report((i * 99) / videoMetaModels.Count);
+                    progressFile.Report(mm.FileName);
+                }
+
+                //sort by name only
+                List<CriterionInstance> dummyCriterionMetaModelList = currentCriterionMetaModelList.OrderBy(x => { return x.ImageSource == null; }).ThenBy(x => x.Name).ToList();
+                currentCriterionMetaModelList.Clear();
+                currentCriterionMetaModelList.AddRange(dummyCriterionMetaModelList);
+
+                //foreach orphan criterion instance, mark with a red cross
+                currentCriterionMetaModelList.ForEach(x =>
+                {
+                    if (x.Count == 0)
+                    {
+                        x.ImageSource = Helper.CrossBitmapImage(x.ImageSource);
+                        x.ImageSource.Freeze();
+                    }
                 });
 
-                //create criterion instances
-                foreach (string vci in validCriterionInstancesOnFS)
-                {
-                    CriterionInstance cmm = new CriterionInstance();
-                    cmm.Name = Path.GetFileNameWithoutExtension(vci);
-                    cmm.Count = 0;
-                    cmm.SumStars = 0;
-                    //cmm.ImageSource = new BitmapImage(new Uri(vci));
-                    cmm.ImageSource = CreateReducedThumbnailImage(new Uri(vci), this.ThumbnailHeight, this.ThumbnailWidth);
-                    currentCriterionMetaModelList.Add(cmm);
-                }
-            }
-            else
-            {
-                //excpetion handling not possible for some reason => gui hangs if exception is thrown here
-                string errorMsg = "Directory <" + expectedPath + " does not exist.";
-                throw new Exception(errorMsg);
-            }
-            progress.Report(0);
-
-            //add statistic values to criterion instances
-            int i = 0;
-            foreach (VideoMetaModel mm in videoMetaModels)
-            {
-                foreach (string critElem in mm.GetList(criterion))
-                {
-                    CriterionInstance existing = currentCriterionMetaModelList.Find((CriterionInstance c) => { return c.Name.Equals(critElem, StringComparison.CurrentCultureIgnoreCase); });
-                    if (existing != null)
-                    {
-                        existing.Count++;
-                        existing.SumStars += mm.Stars;
-                    }
-                    //find the video files which do not have a criterion instance
-                    else
-                    {
-                        CriterionInstance unknownInstance = new CriterionInstance();
-                        unknownInstance.Name = critElem;
-                        unknownInstance.SumStars += mm.Stars;
-                        unknownInstance.Count++;
-                        unknownInstance.ImageSource = Helper.NAimage; //new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), @"na.png"))); 
-                        currentCriterionMetaModelList.Add(unknownInstance);
-                    }
-                }
-
-                i++;
-                progress.Report((i * 99) / videoMetaModels.Count);
-                progressFile.Report(mm.FileName);
-
-                await Task.Delay(MetaExplorerManager.AsyncWaitTime);
-            }
-
-            //sort by name only
-            List<CriterionInstance> dummyCriterionMetaModelList = currentCriterionMetaModelList.OrderBy(x => { return x.ImageSource == null; }).ThenBy(x => x.Name).ToList();
-            currentCriterionMetaModelList.Clear();
-            currentCriterionMetaModelList.AddRange(dummyCriterionMetaModelList);
-
-            //foreach orphan criterion instance, mark with a red cross
-            currentCriterionMetaModelList.ForEach(x =>
-            {
-                if (x.Count == 0)
-                {
-                    x.ImageSource = Helper.CrossBitmapImage(x.ImageSource);
-                    x.ImageSource.Freeze();
-                }
+                progress.Report(100);
+                progressFile.Report("");
             });
-
-            progress.Report(100);
-            progressFile.Report("");
         }
 
         #endregion

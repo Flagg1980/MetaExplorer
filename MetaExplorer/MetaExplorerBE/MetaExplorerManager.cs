@@ -11,8 +11,6 @@ namespace MetaExplorerBE
 {
     public class MetaExplorerManager
     {
-        public static readonly TimeSpan AsyncWaitTime = TimeSpan.FromTicks(5000);
-            
         #region dependency objects
 
         public IVideoMetaModelCache VideoMetaModelCache

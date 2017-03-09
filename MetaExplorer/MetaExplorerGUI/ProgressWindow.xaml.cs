@@ -21,28 +21,19 @@ namespace MetaExplorerGUI
             Task task = null;
             
 
-            splash.Loaded += (_, args) =>
+            splash.Loaded += async (_, args) =>
             {
                 splash.HeadingTextBlock.Text = heading;
                 Progress<string> progressMsg = new Progress<string>(data => splash.MyProgressTextblock.Text = data);
                 Progress<int> progress = new Progress<int>(data => splash.MyProgressBar.Value = data);
 
-                Action action = new Action(async () =>
-                {
-                    await work(progress, progressMsg);
 
-                    splash.Close();
-                });
+                await work(progress, progressMsg);
 
-                task = Task.Factory.StartNew(action, 
-                                            CancellationToken.None, 
-                                            TaskCreationOptions.None, 
-                                            TaskScheduler.FromCurrentSynchronizationContext());
-
+                splash.Close();
             };
 
             splash.ShowDialog();
-            task.Wait();
         }
     }
 }

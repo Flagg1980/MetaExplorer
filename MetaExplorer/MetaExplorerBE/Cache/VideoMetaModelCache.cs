@@ -81,94 +81,97 @@ namespace MetaExplorerBE
 
         #region Public Methods
 
-        public async Task UpdateVideoMetaModelCacheAsync(IProgress<int> progress, IProgress<string> progressFile)
+        public Task UpdateVideoMetaModelCacheAsync(IProgress<int> progress, IProgress<string> progressFile)
         {
-            this.videoMetaModelCache.Clear();
-            IConverter mmConverter = new FileNameConverter();
-
-            progress.Report(0);
-            int i = 0;
-            foreach (string file in videoFileCache)
+            return Task.Factory.StartNew(() =>
             {
-                VideoMetaModel mm = mmConverter.ConvertFrom(file);
-                try
+                this.videoMetaModelCache.Clear();
+                IConverter mmConverter = new FileNameConverter();
+
+                progress.Report(0);
+
+                int i = 0;
+                foreach (string file in videoFileCache)
                 {
-                    //attach thumbnail
-                    string md5 = Helper.GetMD5Hash(file);
-                    string cacheFile = Path.Combine(LocationThumbnailFiles, md5);
-                    if (File.Exists(cacheFile))
+                    VideoMetaModel mm = mmConverter.ConvertFrom(file);
+                    try
                     {
-                        Uri uri = new Uri(cacheFile, UriKind.Absolute);
+                        //attach thumbnail
+                        string md5 = Helper.GetMD5Hash(file);
+                        string cacheFile = Path.Combine(LocationThumbnailFiles, md5);
+                        if (File.Exists(cacheFile))
+                        {
+                            Uri uri = new Uri(cacheFile, UriKind.Absolute);
 
-                        //BitmapSource bi = new BitmapImage(uri);
+                            //BitmapSource bi = new BitmapImage(uri);
 
-                        BitmapSource bi = CreateReducedThumbnailImage(uri, this.ThumbnailHeight, this.ThumbnailWidth);
+                            BitmapSource bi = CreateReducedThumbnailImage(uri, this.ThumbnailHeight, this.ThumbnailWidth);
 
-                        bi.Freeze(); // Must be done if databinding is done to another thread than this method thread, otherwise error message: “Must create DependencySource on same Thread as the DependencyObject”
-                        mm.Thumbnail = bi;
+                            bi.Freeze(); // Must be done if databinding is done to another thread than this method thread, otherwise error message: “Must create DependencySource on same Thread as the DependencyObject”
+                            mm.Thumbnail = bi;
+                        }
+                        else
+                        {
+                            mm.Thumbnail = null;
+                        }
+
+                        //retrieve extended file properties
+                        FileInfo fi = new FileInfo(file);
+                        mm.BitRate = myExtendedPropertiesProvider.GetBitrate(fi);
+                        mm.FrameHeight = myExtendedPropertiesProvider.GetFrameHeight(fi);
+                        mm.FrameWidth = myExtendedPropertiesProvider.GetFrameWidth(fi);
+
+                        //define the captions of the thumbnails
+                        mm.ThumbnailCaption1 = Path.GetFileName(file);
+                        mm.ThumbnailCaption2 = String.Format("{0}x{1}(@{2})", mm.FrameWidth, mm.FrameHeight, mm.BitRate);
+
+                        //add meta model to cache
+                        this.videoMetaModelCache.Add(mm);
                     }
-                    else
+                    catch (Exception e)
                     {
-                        mm.Thumbnail = null;
+                        throw new Exception(String.Format("Error while attaching thumbnail to video meta model for file <{0}>. Message: <{1}>", file, e.Message));
                     }
 
-                    //retrieve extended file properties
-                    FileInfo fi = new FileInfo(file);
-                    mm.BitRate = myExtendedPropertiesProvider.GetBitrate(fi);
-                    mm.FrameHeight = myExtendedPropertiesProvider.GetFrameHeight(fi);
-                    mm.FrameWidth = myExtendedPropertiesProvider.GetFrameWidth(fi);
-
-                    //define the captions of the thumbnails
-                    mm.ThumbnailCaption1 = Path.GetFileName(file);
-                    mm.ThumbnailCaption2 = String.Format("{0}x{1}(@{2})", mm.FrameWidth, mm.FrameHeight, mm.BitRate);
-
-                    //add meta model to cache
-                    this.videoMetaModelCache.Add(mm);
-                }
-                catch (Exception e)
-                {
-                    throw new Exception(String.Format("Error while attaching thumbnail to video meta model for file <{0}>. Message: <{1}>", file, e.Message));
+                    progress.Report((i * 99) / videoFileCache.Length);
+                    progressFile.Report(file);
+                    i++;
                 }
 
-                progress.Report((i * 99) / videoFileCache.Length);
-                progressFile.Report(file);
-                i++;
+                //sort by date
+                //this.videoMetaModelCache = this.videoMetaModelCache.OrderByDescending(x => x.DateModified).ToList();
+                this.ResortBy(x => x.DateModified);
 
-                await Task.Delay(MetaExplorerManager.AsyncWaitTime);
-            }
-
-            //sort by date
-            //this.videoMetaModelCache = this.videoMetaModelCache.OrderByDescending(x => x.DateModified).ToList();
-            this.ResortBy(x => x.DateModified);
-
-            progress.Report(100);
+                progress.Report(100);
+            });
         }
 
 
 
-        public async Task UpdateNonExistingThumbnailCacheAsync(IProgress<int> progress, IProgress<string> progressFile)
+        public Task UpdateNonExistingThumbnailCacheAsync(IProgress<int> progress, IProgress<string> progressFile)
         {
-            progress.Report(0);
-            progressFile.Report("");
-
-            //get thumbnail in cache
-            List<VideoMetaModel> noThumbnail = this.Cache.FindAll(x => { return x.Thumbnail == null; });
-
-            //update progress
-            int idx = 0;
-            foreach (VideoMetaModel videoFile in noThumbnail)
+            return Task.Factory.StartNew(() =>
             {
-                this.UpdateThumbnailCache(videoFile);
+                progress.Report(0);
+                progressFile.Report("");
 
-                idx++;
-                progressFile.Report(videoFile.FileName);
-                progress.Report((idx * 100) / noThumbnail.Count);
+                //get thumbnail in cache
+                List<VideoMetaModel> noThumbnail = this.Cache.FindAll(x => { return x.Thumbnail == null; });
 
-                await Task.Delay(MetaExplorerManager.AsyncWaitTime);
-            }
+                //update progress
+                int idx = 0;
+                foreach (VideoMetaModel videoFile in noThumbnail)
+                {
+                    this.UpdateThumbnailCache(videoFile);
 
-            progress.Report(100);
-            progressFile.Report("");
+                    idx++;
+                    progressFile.Report(videoFile.FileName);
+                    progress.Report((idx * 100) / noThumbnail.Count);
+                }
+
+                progress.Report(100);
+                progressFile.Report("");
+            });
         }
 
         /// <summary>
@@ -220,23 +223,24 @@ namespace MetaExplorerBE
         /// <summary>
         /// Reads all files from a given base directory and caches the file locations.
         /// </summary>
-        public async Task UpdateVideoFileCacheAsync(IProgress<int> progress, IProgress<string> progressFile)
+        public Task UpdateVideoFileCacheAsync(IProgress<int> progress, IProgress<string> progressFile)
         {
-            progress.Report(0);
-
-            string baseDir = this.LocationVideoFiles;
-
-            if (!Directory.Exists(baseDir))
+            return Task.Factory.StartNew(() =>
             {
-                throw new Exception(String.Format("Basedir <{0}> does not exist.", baseDir));
-            }
+                progress.Report(0);
 
-            string[] files = Directory.GetFiles(baseDir, "*", SearchOption.AllDirectories);
-            this.videoFileCache = files;
+                string baseDir = this.LocationVideoFiles;
 
-            await Task.Delay(MetaExplorerManager.AsyncWaitTime);
+                if (!Directory.Exists(baseDir))
+                {
+                    throw new Exception(String.Format("Basedir <{0}> does not exist.", baseDir));
+                }
 
-            progress.Report(100);
+                string[] files = Directory.GetFiles(baseDir, "*", SearchOption.AllDirectories);
+                this.videoFileCache = files;
+
+                progress.Report(100);
+            });
         }
 
         /// <summary>
