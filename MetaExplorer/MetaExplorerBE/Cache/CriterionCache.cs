@@ -95,6 +95,7 @@ namespace MetaExplorerBE
                         cmm.SumStars = 0;
                         //cmm.ImageSource = new BitmapImage(new Uri(vci));
                         cmm.ImageSource = CreateReducedThumbnailImage(new Uri(vci), this.ThumbnailHeight, this.ThumbnailWidth);
+                        cmm.ImageSource.Freeze();
                         currentCriterionMetaModelList.Add(cmm);
                     }
                 }
@@ -126,6 +127,7 @@ namespace MetaExplorerBE
                             unknownInstance.SumStars += mm.Stars;
                             unknownInstance.Count++;
                             unknownInstance.ImageSource = Helper.NAimage; //new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), @"na.png"))); 
+                            unknownInstance.ImageSource.Freeze();
                             currentCriterionMetaModelList.Add(unknownInstance);
                         }
                     }
