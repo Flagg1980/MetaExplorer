@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MetaExplorerBE;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -18,7 +19,7 @@ namespace MetaExplorerGUI
         public static void DoWorkWithModal(string heading, Func<IProgress<int>, IProgress<string>, Task> work)
         {
             ProgressWindow splash = new ProgressWindow();
-            Task task = null;
+            //Task task = null;
             
 
             splash.Loaded += async (_, args) =>

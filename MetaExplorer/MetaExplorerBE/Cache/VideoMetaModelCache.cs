@@ -13,17 +13,9 @@ namespace MetaExplorerBE
     /// <summary>
     /// 
     /// </summary>
-    public class VideoMetaModelCache : IVideoMetaModelCache
+    public class VideoMetaModelCache : BaseCache<VideoMetaModel>
     {
         #region Private Members
-
-        private string _locationFFmpeg;
-
-        private List<String> supportedImageFormats = new List<string> { ".jpg", ".bmp", ".png" };
-
-        public List<VideoMetaModel> videoMetaModelCache = new List<VideoMetaModel>();
-
-        private string[] videoFileCache;
 
         private IExtendedFilePropertiesProvider myExtendedPropertiesProvider;
 
@@ -31,48 +23,17 @@ namespace MetaExplorerBE
 
         private string BaseDir { get; set; }
 
-        private string LocationThumbnailFiles
-        {
-            get
-            {
-                string expectedLocation = Path.Combine(Directory.GetCurrentDirectory(), ".cache");
-                if (!Directory.Exists(expectedLocation))
-                    Directory.CreateDirectory(expectedLocation);
-
-                return expectedLocation;
-            }
-        }
-
-        private string LocationVideoFiles
-        {
-            get;
-            set;
-        }
-
-        public string[] VideoFileCache
-        {
-            get { return this.videoFileCache; }
-        }
-
-        public List<VideoMetaModel> Cache
-        {
-            get { return this.videoMetaModelCache;  }
-        }
-
-        public int ThumbnailHeight { get; private set; }
-        public int ThumbnailWidth { get; private set; }
+        private readonly VideoFileCache myVideoFileCache;
+        private readonly VideoThumbnailCache myVideoThumbnailCache;
 
         #region Constructor
 
         /// <summary>
         /// </summary>
-        public VideoMetaModelCache(string baseDir, string ffmpegLocation, int thumbnailHeight, int thumbnailWidth)
+        public VideoMetaModelCache(VideoFileCache videoFileCache, VideoThumbnailCache videoThumbnailCache)
         {
-            this.LocationVideoFiles = baseDir;
-            this._locationFFmpeg = ffmpegLocation;
-
-            this.ThumbnailHeight = thumbnailHeight;
-            this.ThumbnailWidth = thumbnailWidth;
+            this.myVideoFileCache = videoFileCache;
+            this.myVideoThumbnailCache = videoThumbnailCache;
 
             myExtendedPropertiesProvider = new ExtendedFilePropertiesProvider(ExtendedFilePropertiesTechnology.Shell32).Provider;
         }
@@ -81,37 +42,34 @@ namespace MetaExplorerBE
 
         #region Public Methods
 
-        public Task UpdateVideoMetaModelCacheAsync(IProgress<int> progress, IProgress<string> progressFile)
+        public override Task InitCacheAsync(IProgress<int> progress, IProgress<string> progressFile)
         {
             return Task.Factory.StartNew(() =>
             {
-                this.videoMetaModelCache.Clear();
+                this.CachedItems.Clear();
                 IConverter mmConverter = new FileNameConverter();
 
                 progress.Report(0);
 
                 int i = 0;
-                foreach (string file in videoFileCache)
+                foreach (string file in myVideoFileCache.CachedItems)
                 {
                     VideoMetaModel mm = mmConverter.ConvertFrom(file);
                     try
                     {
                         //attach thumbnail
                         string md5 = Helper.GetMD5Hash(file);
-                        string cacheFile = Path.Combine(LocationThumbnailFiles, md5);
-                        if (File.Exists(cacheFile))
+
+                        var cachedThumb = myVideoThumbnailCache.GetByFilename(md5);
+
+                        if (cachedThumb != null)
                         {
-                            Uri uri = new Uri(cacheFile, UriKind.Absolute);
-
-                            //BitmapSource bi = new BitmapImage(uri);
-
-                            BitmapSource bi = CreateReducedThumbnailImage(uri, this.ThumbnailHeight, this.ThumbnailWidth);
-
-                            bi.Freeze(); // Must be done if databinding is done to another thread than this method thread, otherwise error message: “Must create DependencySource on same Thread as the DependencyObject”
-                            mm.Thumbnail = bi;
+                            mm.Thumbnail = cachedThumb;
+                            mm.Thumbnail.Freeze();
                         }
                         else
                         {
+                            //TODO: create thumbnail if not yet existing
                             mm.Thumbnail = null;
                         }
 
@@ -126,20 +84,19 @@ namespace MetaExplorerBE
                         mm.ThumbnailCaption2 = String.Format("{0}x{1}(@{2})", mm.FrameWidth, mm.FrameHeight, mm.BitRate);
 
                         //add meta model to cache
-                        this.videoMetaModelCache.Add(mm);
+                        this.CachedItems.Add(mm);
                     }
                     catch (Exception e)
                     {
                         throw new Exception(String.Format("Error while attaching thumbnail to video meta model for file <{0}>. Message: <{1}>", file, e.Message));
                     }
 
-                    progress.Report((i * 99) / videoFileCache.Length);
+                    progress.Report((i * 99) / myVideoFileCache.CachedItems.Count);
                     progressFile.Report(file);
                     i++;
                 }
 
                 //sort by date
-                //this.videoMetaModelCache = this.videoMetaModelCache.OrderByDescending(x => x.DateModified).ToList();
                 this.ResortBy(x => x.DateModified);
 
                 progress.Report(100);
@@ -156,57 +113,22 @@ namespace MetaExplorerBE
                 progressFile.Report("");
 
                 //get thumbnail in cache
-                List<VideoMetaModel> noThumbnail = this.Cache.FindAll(x => { return x.Thumbnail == null; });
+                List<VideoMetaModel> noThumbnail = this.CachedItems.FindAll(x => { return x.Thumbnail == null; });
 
                 //update progress
                 int idx = 0;
-                foreach (VideoMetaModel videoFile in noThumbnail)
+                foreach (VideoMetaModel videoMetaModel in noThumbnail)
                 {
-                    this.UpdateThumbnailCache(videoFile);
+                    this.myVideoThumbnailCache.UpdateThumbnailCache(Path.GetFileName(videoMetaModel.FileName));
 
                     idx++;
-                    progressFile.Report(videoFile.FileName);
+                    progressFile.Report(videoMetaModel.FileName);
                     progress.Report((idx * 100) / noThumbnail.Count);
                 }
 
                 progress.Report(100);
                 progressFile.Report("");
             });
-        }
-
-        /// <summary>
-        /// Updates a thumbnail cache entry for a given video file. If the cache entry already exists, it is overwritten.
-        /// </summary>
-        public void UpdateThumbnailCache(VideoMetaModel videoFileMetaModel)
-        {
-            FFmpegWrapper wrapper = new FFmpegWrapper(_locationFFmpeg);
-
-            string md5 = Helper.GetMD5Hash(videoFileMetaModel.FileName);
-            string cacheFile = Path.Combine(LocationThumbnailFiles, md5);
-
-            if (File.Exists(cacheFile))
-            {
-                File.Delete(cacheFile);
-            }
-
-            //getDuration
-            TimeSpan duration = wrapper.GetDuration(videoFileMetaModel.FileName);
-            TimeSpan position = TimeSpan.FromSeconds(120);  //todo: remove hardcoded time
-
-            if (duration.TotalSeconds <= position.TotalSeconds)
-            {
-                position = TimeSpan.FromTicks(duration.Ticks / 2);
-            }
-
-            //generate Thumbnail from movie 
-            wrapper.CreateJpegThumbnail(videoFileMetaModel.FileName, position, cacheFile, false);
-
-            //update bitmap in VideoMetaModel
-            //BitmapImage bi = new BitmapImage(new Uri(cacheFile, UriKind.Absolute));
-            BitmapSource bi = CreateReducedThumbnailImage(new Uri(cacheFile, UriKind.Absolute), this.ThumbnailHeight, this.ThumbnailWidth);
-
-            bi.Freeze();              // Must be done if databinding is done to another thread than this method thread, otherwise error message: “Must create DependencySource on same Thread as the DependencyObject”
-            videoFileMetaModel.Thumbnail = bi;
         }
 
         /// <summary>
@@ -221,36 +143,13 @@ namespace MetaExplorerBE
         }
 
         /// <summary>
-        /// Reads all files from a given base directory and caches the file locations.
-        /// </summary>
-        public Task UpdateVideoFileCacheAsync(IProgress<int> progress, IProgress<string> progressFile)
-        {
-            return Task.Factory.StartNew(() =>
-            {
-                progress.Report(0);
-
-                string baseDir = this.LocationVideoFiles;
-
-                if (!Directory.Exists(baseDir))
-                {
-                    throw new Exception(String.Format("Basedir <{0}> does not exist.", baseDir));
-                }
-
-                string[] files = Directory.GetFiles(baseDir, "*", SearchOption.AllDirectories);
-                this.videoFileCache = files;
-
-                progress.Report(100);
-            });
-        }
-
-        /// <summary>
         /// 
         /// </summary>
         /// <param name="regex"></param>
         /// <returns></returns>
         public List<VideoMetaModel> GetVideoFileSelection(VideoMetaModel mmRef)
         {
-            List<VideoMetaModel> res = new List<VideoMetaModel>(this.videoMetaModelCache);
+            List<VideoMetaModel> res = new List<VideoMetaModel>(this.CachedItems);
 
             //check stars
             if (mmRef.Stars != 0)
@@ -260,7 +159,6 @@ namespace MetaExplorerBE
 
             foreach (Criterion criterion in CriteriaConfig.Criteria)
             {
-                //return m.actors.Contains(mmRef.actors[0], StringComparer.CurrentCultureIgnoreCase); 
                 List<string> critContent = mmRef.criteriaContents[criterion.Name];
 
                 if (critContent.Count == 0)
@@ -291,32 +189,7 @@ namespace MetaExplorerBE
 
         public void ResortBy(Func<VideoMetaModel, object> func)
         {
-            //this.videoMetaModelCache = this.videoMetaModelCache.OrderByDescending(x => x.DateModified).ToList();
-            this.videoMetaModelCache = this.videoMetaModelCache.OrderByDescending(func).ToList();
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        private BitmapSource CreateReducedThumbnailImage(Uri uri, int desiredHeight, int desiredWidth)
-        {
-            // Define a BitmapImage.
-            BitmapImage bi = new BitmapImage();
-
-            // Begin initialization.
-            bi.BeginInit();
-
-            // Set properties.
-            bi.CacheOption = BitmapCacheOption.OnDemand;
-            bi.CreateOptions = BitmapCreateOptions.DelayCreation;
-            bi.DecodePixelHeight = desiredHeight;
-            bi.DecodePixelWidth = desiredWidth;
-            bi.UriSource = uri;
-
-            // End initialization.
-            bi.EndInit();
-            return bi;
+            this.CachedItems = this.CachedItems.OrderByDescending(func).ToList();
         }
 
         #endregion

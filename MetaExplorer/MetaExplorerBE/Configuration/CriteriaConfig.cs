@@ -14,6 +14,11 @@ namespace MetaExplorerBE.Configuration
         private static readonly string fileName = "CriteriaConfig.xml";
         private static readonly string PATH = Path.Combine(Directory.GetCurrentDirectory(), fileName);
 
+        static CriteriaConfig()
+        {
+            Load();
+        }
+
         public static void Load()
         {
             if (!File.Exists(PATH))

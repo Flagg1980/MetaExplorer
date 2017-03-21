@@ -1,4 +1,5 @@
-﻿using MetaExplorerBE.MetaModels;
+﻿using MetaExplorerBE;
+using MetaExplorerBE.MetaModels;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -13,13 +14,20 @@ namespace MetaExplorerBE
     {
         #region dependency objects
 
-        public IVideoMetaModelCache VideoMetaModelCache
+        public VideoMetaModelCache VideoMetaModelCache
         {
             get;
             private set;
         }
 
-        public ICriterionCache CriterionCache
+        public CriterionCache CriterionCache
+        {
+            get;
+            private set;
+        }
+
+        //new!!
+        public ICache VideoFileCache
         {
             get;
             private set;
@@ -27,10 +35,13 @@ namespace MetaExplorerBE
 
         #endregion
 
-        public MetaExplorerManager(IVideoMetaModelCache videoMetaModelcache, ICriterionCache criterionCache)
+        public MetaExplorerManager(VideoFileCache videoFileCache, VideoMetaModelCache videoMetaModelcache, CriterionCache criterionCache)
         {
             this.VideoMetaModelCache = videoMetaModelcache;
             this.CriterionCache = criterionCache;
+
+            //new!!
+            this.VideoFileCache = videoFileCache;
         }
 
         //#endregion

@@ -12,42 +12,45 @@ namespace MetaExplorerBE
     /// <summary>
     /// This file caches criterion instances and their thumbnails.
     /// </summary>
-    public class CriterionCache : ICriterionCache
+    public class CriterionCache : BaseCache<string,List<CriterionInstance>>
     {
         #region Private Members
 
-        private List<String> supportedImageFormats = new List<string> { ".jpg", ".bmp", ".png" };
+        //private List<String> supportedImageFormats = new List<string> { ".jpg", ".bmp", ".png" };
 
-        private Dictionary<string, List<CriterionInstance>> criterionInstances = new Dictionary<string, List<CriterionInstance>>();
+        //private Dictionary<string, List<CriterionInstance>> criterionInstances = new Dictionary<string, List<CriterionInstance>>();
 
         #endregion
 
         public List<CriterionInstance> GetCriterionInstances(Criterion criterion)
         {
-            return this.criterionInstances[criterion.Name];
+            return this.CachedItems[criterion.Name];
         }
 
         public List<CriterionInstance> GetCriterionInstances(string criterionName)
         {
-            return this.criterionInstances[criterionName];
+            return this.CachedItems[criterionName];
         }
 
-        public int ThumbnailHeight { get; private set; }
+        //public int ThumbnailHeight { get; private set; }
 
-        public int ThumbnailWidth { get; private set; }
+        //public int ThumbnailWidth { get; private set; }
+
+        private readonly ImageThumbnailCache myCriterionThumbnailCache;
+        private readonly VideoMetaModelCache myVideoMetaModelCache;
 
         #region Constructor
 
         /// <summary>
         /// </summary>
-        public CriterionCache(int thumbnailHeight, int thumbnailWidth)
+        public CriterionCache(ImageThumbnailCache criterionThumbnailCache, VideoMetaModelCache videoMetaModelCache)
         {
-            this.ThumbnailHeight = thumbnailHeight;
-            this.ThumbnailWidth = thumbnailWidth;
+            myCriterionThumbnailCache = criterionThumbnailCache;
+            myVideoMetaModelCache = videoMetaModelCache;
 
             //init list
             CriteriaConfig.Load();
-            CriteriaConfig.Criteria.ForEach((Criterion x) => this.criterionInstances.Add(x.Name, new List<CriterionInstance>()));
+            CriteriaConfig.Criteria.ForEach((Criterion x) => this.CachedItems.Add(x.Name, new List<CriterionInstance>()));
         }
 
         #endregion
@@ -63,124 +66,98 @@ namespace MetaExplorerBE
         /// (They appear as red cross later in the application).
         /// </param>
         /// <returns></returns>
-        public Task GenerateDictAsync(Criterion criterion, List<VideoMetaModel> videoMetaModels, IProgress<int> progress, IProgress<string> progressFile)
+        public override Task InitCacheAsync(IProgress<int> progress, IProgress<string> progressFile)
         {
             return Task.Factory.StartNew(() =>
             {
-                progress.Report(0);
-                progressFile.Report("");
-
-                List<CriterionInstance> currentCriterionMetaModelList = this.criterionInstances[criterion.Name];
-                currentCriterionMetaModelList.Clear();
-
-                //load all criterion instances from FS
-                List<string> validCriterionInstancesOnFS = new List<string>();
-                string expectedPath = Path.Combine(Directory.GetCurrentDirectory(), criterion.Name);
-                if (Directory.Exists(expectedPath))
+                foreach (Criterion crit in CriteriaConfig.Criteria)
                 {
-                    validCriterionInstancesOnFS = Directory.GetFiles(expectedPath).ToList();
-                    //throw away all files which do not have a proper extension
-                    validCriterionInstancesOnFS.RemoveAll(x =>
-                    {
-                        string extension = Path.GetExtension(x);
-                        return !this.supportedImageFormats.Contains(extension, StringComparer.CurrentCultureIgnoreCase);
-                    });
-
-                    //create criterion instances
-                    foreach (string vci in validCriterionInstancesOnFS)
-                    {
-                        CriterionInstance cmm = new CriterionInstance();
-                        cmm.Name = Path.GetFileNameWithoutExtension(vci);
-                        cmm.Count = 0;
-                        cmm.SumStars = 0;
-                        //cmm.ImageSource = new BitmapImage(new Uri(vci));
-                        cmm.ImageSource = CreateReducedThumbnailImage(new Uri(vci), this.ThumbnailHeight, this.ThumbnailWidth);
-                        cmm.ImageSource.Freeze();
-                        currentCriterionMetaModelList.Add(cmm);
-                    }
+                    InitCacheCrit(crit, progress, progressFile);
                 }
-                else
-                {
-                    //excpetion handling not possible for some reason => gui hangs if exception is thrown here
-                    string errorMsg = "Directory <" + expectedPath + " does not exist.";
-                    throw new Exception(errorMsg);
-                }
-                progress.Report(0);
-
-                //add statistic values to criterion instances
-                int i = 0;
-                foreach (VideoMetaModel mm in videoMetaModels)
-                {
-                    foreach (string critElem in mm.GetList(criterion))
-                    {
-                        CriterionInstance existing = currentCriterionMetaModelList.Find((CriterionInstance c) => { return c.Name.Equals(critElem, StringComparison.CurrentCultureIgnoreCase); });
-                        if (existing != null)
-                        {
-                            existing.Count++;
-                            existing.SumStars += mm.Stars;
-                        }
-                        //find the video files which do not have a criterion instance
-                        else
-                        {
-                            CriterionInstance unknownInstance = new CriterionInstance();
-                            unknownInstance.Name = critElem;
-                            unknownInstance.SumStars += mm.Stars;
-                            unknownInstance.Count++;
-                            unknownInstance.ImageSource = Helper.NAimage; //new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), @"na.png"))); 
-                            unknownInstance.ImageSource.Freeze();
-                            currentCriterionMetaModelList.Add(unknownInstance);
-                        }
-                    }
-
-                    i++;
-                    progress.Report((i * 99) / videoMetaModels.Count);
-                    progressFile.Report(mm.FileName);
-                }
-
-                //sort by name only
-                List<CriterionInstance> dummyCriterionMetaModelList = currentCriterionMetaModelList.OrderBy(x => { return x.ImageSource == null; }).ThenBy(x => x.Name).ToList();
-                currentCriterionMetaModelList.Clear();
-                currentCriterionMetaModelList.AddRange(dummyCriterionMetaModelList);
-
-                //foreach orphan criterion instance, mark with a red cross
-                currentCriterionMetaModelList.ForEach(x =>
-                {
-                    if (x.Count == 0)
-                    {
-                        x.ImageSource = Helper.CrossBitmapImage(x.ImageSource);
-                        x.ImageSource.Freeze();
-                    }
-                });
-
-                progress.Report(100);
-                progressFile.Report("");
             });
         }
 
         #endregion
 
-        #region Private Methods
-
-        private BitmapSource CreateReducedThumbnailImage(Uri uri, int desiredHeight, int desiredWidth)
+        private void InitCacheCrit(Criterion criterion, IProgress<int> progress, IProgress<string> progressFile)
         {
-            // Define a BitmapImage.
-            BitmapImage bi = new BitmapImage();
+            progress.Report(0);
+            progressFile.Report("Updating Criterion Cache <" + criterion.Name + ">");
 
-            // Begin initialization.
-            bi.BeginInit();
+            List<CriterionInstance> currentCriterionMetaModelList = this.CachedItems[criterion.Name];
+            if (currentCriterionMetaModelList == null)
+                currentCriterionMetaModelList = new List<CriterionInstance>();
 
-            // Set properties.
-            bi.CacheOption = BitmapCacheOption.OnDemand;
-            bi.CreateOptions = BitmapCreateOptions.DelayCreation;
-            bi.DecodePixelHeight = desiredHeight;
-            bi.DecodePixelWidth = desiredWidth;
-            bi.UriSource = uri;
+            currentCriterionMetaModelList.Clear();
 
-            // End initialization.
-            bi.EndInit();
-            return bi;
+            // create criterion instances for all thumbnails found for this criterion
+            var allRelevantCriterionInstances = this.myCriterionThumbnailCache.CachedItems
+                .Select(x => x)
+                .Where(x => string.Equals(x.Key.Directory.Name, criterion.Name, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            allRelevantCriterionInstances.ForEach(x =>
+            {
+                CriterionInstance cmm = new CriterionInstance();
+                cmm.Name = Path.GetFileNameWithoutExtension(x.Key.FullName);
+                cmm.Count = 0;
+                cmm.SumStars = 0;
+                cmm.ImageSource = myCriterionThumbnailCache.GetByFilename(Path.GetFileName(x.Key.Name));
+                cmm.ImageSource.Freeze();
+                currentCriterionMetaModelList.Add(cmm);
+            });
+
+            // create criterion instances for all criteria coming from the video meta models but do not have a file system (thumbnail) representative
+            int i = 0;
+            //from all video meta model cached items
+            this.myVideoMetaModelCache.CachedItems.ForEach(vmm =>
+            {
+                //look at all criterion instances for this criterion
+                vmm.GetList(criterion).ForEach(crit =>
+                {
+                    //is this already in the criterion meta model list?
+                    CriterionInstance existing = currentCriterionMetaModelList.Find(ci =>
+                    {
+                        return string.Equals(crit, ci.Name, StringComparison.OrdinalIgnoreCase);
+                    });
+
+                    if (existing == null)
+                    {
+                        existing = new CriterionInstance();
+                        existing.Name = crit;
+                        existing.ImageSource = Helper.NAimage;
+                        existing.ImageSource.Freeze();
+                        currentCriterionMetaModelList.Add(existing);
+                    }
+
+                    //add statistic information
+                    existing.SumStars += vmm.Stars;
+                    existing.Count++;
+
+                    //track progress
+                    i++;
+                    progress.Report((i * 99) / this.myVideoMetaModelCache.CachedItems.Count);
+                    progressFile.Report(vmm.FileName);
+                });
+            });
+
+            //sort by name only
+            List<CriterionInstance> dummyCriterionMetaModelList = currentCriterionMetaModelList.OrderBy(x => { return x.ImageSource == null; }).ThenBy(x => x.Name).ToList();
+            currentCriterionMetaModelList.Clear();
+            currentCriterionMetaModelList.AddRange(dummyCriterionMetaModelList);
+
+            //foreach orphan criterion instance, mark with a red cross
+            currentCriterionMetaModelList.ForEach(x =>
+            {
+                if (x.Count == 0)
+                {
+                    x.ImageSource = Helper.CrossBitmapImage(x.ImageSource);
+                    x.ImageSource.Freeze();
+                }
+            });
+
+            progress.Report(100);
+            progressFile.Report("");
         }
-
-        #endregion
     }
 }

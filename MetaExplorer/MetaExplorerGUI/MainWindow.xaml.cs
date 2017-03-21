@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -48,30 +49,65 @@ namespace MetaExplorerGUI
             int criterionThumbNailHeight = Int32.Parse(FindResource("CriterionThumbnailHeight").ToString());
             int criterionThumbNailWidth = Int32.Parse(FindResource("CriterionThumbnailWidth").ToString());
 
-            //init meta model manager with dependency injection
-            IVideoMetaModelCache videoMetaModelCache = new VideoMetaModelCache(MetaExplorerGUI.Properties.Settings.Default.VideoFilesBasePath, 
-                                    MetaExplorerGUI.Properties.Settings.Default.FFmpegLocation,
-                                    videoThumbNailHeight,
-                                    videoThumbNailWidth
+            //INIT cache Video Files
+            var videoFileCache = new VideoFileCache(
+                MetaExplorerGUI.Properties.Settings.Default.VideoFilesBasePath
+                );
+            ProgressWindow.DoWorkWithModal("Updating Video File Cache", videoFileCache.InitCacheAsync);
+
+            //INIT cache video thumbnails
+            var videoThumbnailCache = new VideoThumbnailCache(
+                Path.Combine(Directory.GetCurrentDirectory(), ".cache"),
+                videoThumbNailHeight,
+                videoThumbNailWidth,
+                MetaExplorerGUI.Properties.Settings.Default.FFmpegLocation
+                );
+            ProgressWindow.DoWorkWithModal("Updating Video Thumbnails", videoThumbnailCache.InitCacheAsync);
+
+            //INIT cache criterion thumbnails
+            List<string> criterionThumbPaths = CriteriaConfig.Criteria.Select(x => Path.Combine(Directory.GetCurrentDirectory(), x.Name)).ToList();
+            var criterionThumbnailCache = new ImageThumbnailCache(
+                criterionThumbPaths,
+                criterionThumbNailHeight,
+                criterionThumbNailWidth
+                );
+            ProgressWindow.DoWorkWithModal("Updating Criterion Thumbnails", criterionThumbnailCache.InitCacheAsync);
+
+            //INIT cache video meta model
+            var videoMetaModelCache = new VideoMetaModelCache(
+                videoFileCache,
+                videoThumbnailCache
             );
-            ICriterionCache criterionCache = new CriterionCache(criterionThumbNailHeight, criterionThumbNailWidth);
+            ProgressWindow.DoWorkWithModal("Updating Video Meta Model Cache", videoMetaModelCache.InitCacheAsync);
+            ProgressWindow.DoWorkWithModal("Updating Video Meta Model Cache", videoMetaModelCache.UpdateNonExistingThumbnailCacheAsync);
 
-            me = new MetaExplorerManager(videoMetaModelCache, criterionCache);
+            //INIT cache criterion
+            var criterionCache = new CriterionCache(criterionThumbnailCache, videoMetaModelCache);
+            ProgressWindow.DoWorkWithModal("Updating Criterion Cache", criterionCache.InitCacheAsync);
 
-            ProgressWindow.DoWorkWithModal("Updating Video File Cache", me.VideoMetaModelCache.UpdateVideoFileCacheAsync);
-            ProgressWindow.DoWorkWithModal("Updating Video Meta Model Cache", me.VideoMetaModelCache.UpdateVideoMetaModelCacheAsync);
-            ProgressWindow.DoWorkWithModal("Updating Thumbnails", me.VideoMetaModelCache.UpdateNonExistingThumbnailCacheAsync);
-
-            foreach (Criterion crit in CriteriaConfig.Criteria)
-            {
-                Func<IProgress<int>, IProgress<string>, Task> crit_work = (progress_int, progress_str) =>
-                {
-                    return me.CriterionCache.GenerateDictAsync(crit, videoMetaModelCache.Cache, progress_int, progress_str);
-                };
+            //============================================
 
 
-                ProgressWindow.DoWorkWithModal("Updating " + crit.Name + " Dictionary", crit_work);
-            }
+
+
+            me = new MetaExplorerManager(videoFileCache, videoMetaModelCache, criterionCache);
+
+            //ProgressWindow.DoWorkWithModal("Updating Video File Cache", me.VideoMetaModelCache.UpdateVideoFileCacheAsync);
+            
+
+            
+            
+
+            //foreach (Criterion crit in CriteriaConfig.Criteria)
+            //{
+            //    Func<IProgress<int>, IProgress<string>, Task> crit_work = (progress_int, progress_str) =>
+            //    {
+            //        return me.CriterionCache.GenerateDictAsync(crit, videoMetaModelCache.CachedItems, progress_int, progress_str);
+            //    };
+
+
+            //    ProgressWindow.DoWorkWithModal("Updating " + crit.Name + " Dictionary", crit_work);
+            //}
 
             myViewModel = new ViewModel();
             myViewModel.MEManager = me;
@@ -157,7 +193,7 @@ namespace MetaExplorerGUI
         private void Event_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (CriteriaConfig.Criteria.Exists((Criterion x) => e.PropertyName == x.Name) || e.PropertyName == "FreeTextSearch")
-            { 
+            {
                 myViewModel.UpdateMMref();
                 myViewModel.UpdateCurrentSelection();
             }
@@ -190,7 +226,7 @@ namespace MetaExplorerGUI
             this.MyViewModel.FreeTextSearch = String.Empty;
         }
 
-        
+
         private void VideoSelectionButton_Click(object sender, RoutedEventArgs e)
         {
             VideoMetaModel found = (sender as Button).DataContext as VideoMetaModel;
@@ -254,7 +290,7 @@ namespace MetaExplorerGUI
             {
                 // Get the dragged button
                 Button button = sender as Button;
-                
+
                 //perform the drag
                 DragDrop.DoDragDrop(button, videoMetaModel, DragDropEffects.All);
             }
@@ -393,9 +429,9 @@ namespace MetaExplorerGUI
             //magic diff without which it does not work for drag&drop in groupboxes
             const int DIFF = 10;
 
-            bool inside =   mousePos.X >= controlPos.X && 
+            bool inside = mousePos.X >= controlPos.X &&
                             mousePos.Y >= controlPos.Y + DIFF &&
-                            mousePos.X <= controlPos.X + control.ActualWidth && 
+                            mousePos.X <= controlPos.X + control.ActualWidth &&
                             mousePos.Y <= controlPos.Y + control.ActualHeight;
 
             return inside;

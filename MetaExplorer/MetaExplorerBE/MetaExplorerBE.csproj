@@ -55,9 +55,13 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cache\BaseCache.cs" />
     <Compile Include="Cache\CriterionCache.cs" />
-    <Compile Include="Cache\ICriterionCache.cs.cs" />
+    <Compile Include="Cache\ImageThumbnailCache.cs" />
+    <Compile Include="Cache\BaseThumbnailCache.cs" />
     <Compile Include="Cache\VideoMetaModelCache.cs" />
+    <Compile Include="Cache\VideoThumbnailCache.cs" />
+    <Compile Include="Cache\VideoFileCache.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="Configuration\CriteriaConfig.cs" />
     <Compile Include="ExtendedFileProperties\ExtendedFilePropertiesProvider.cs" />
@@ -65,7 +69,6 @@
     <Compile Include="ExtendedFileProperties\Shellprovider.cs" />
     <Compile Include="FFmpegWrapper.cs" />
     <Compile Include="Helper.cs" />
-    <Compile Include="Cache\IVideoMetaModelCache.cs" />
     <Compile Include="MetaExplorerManager.cs" />
     <Compile Include="MetaModels\CriterionInstance.cs" />
     <Compile Include="MetaModels\FileNameConverter.cs" />
