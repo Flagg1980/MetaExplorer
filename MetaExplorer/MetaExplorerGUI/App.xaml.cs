@@ -1,13 +1,6 @@
-﻿using MetaExplorerBE.Configuration;
-using MetaExplorerBE.MetaModels;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
+﻿using MetaExplorer.Common;
+using MetaExplorer.Domain;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace MetaExplorerGUI

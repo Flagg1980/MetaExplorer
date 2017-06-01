@@ -8,7 +8,7 @@
         <DataTemplate x:Key="DetailedTemplate">
             <WrapPanel>
                 <StackPanel Name ="sp" Orientation="Horizontal">
-                    <Image Width="{Binding Source={StaticResource CriterionThumbnailWidth}}" Height="{Binding Source={StaticResource CriterionThumbnailHeight}}" Source="{Binding Path=ImageSource}"></Image>
+                    <Image Width="{Binding Source={StaticResource CriterionThumbnailWidth}}" Height="{Binding Source={StaticResource CriterionThumbnailHeight}}" Source="{Binding Path=Thumbnail.Image}"></Image>
                     <StackPanel Orientation="Vertical" Width="250">
                         <Label Height="140" Width="250" VerticalContentAlignment="Center" FontSize="22" FontFamily="Comic Sans MS" Content="{Binding Path=Name}"></Label>
                         <Label Height="40" Width="250" VerticalAlignment="Center" FontSize="12" Content="{Binding Path=Stats}"></Label>

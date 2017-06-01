@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using MetaExplorerBE.MetaModels;
 using MetaExplorerBE.Configuration;
+using MetaExplorer.Domain;
+using MetaExplorer.Common;
 
 namespace MetaExplorerBE
 {
@@ -102,8 +104,8 @@ namespace MetaExplorerBE
                 cmm.Name = Path.GetFileNameWithoutExtension(x.Key.FullName);
                 cmm.Count = 0;
                 cmm.SumStars = 0;
-                cmm.ImageSource = myCriterionThumbnailCache.GetByFilename(Path.GetFileName(x.Key.Name));
-                cmm.ImageSource.Freeze();
+                cmm.Thumbnail.Image = myCriterionThumbnailCache.GetByFilename(Path.GetFileName(x.Key.Name));
+                cmm.Thumbnail.Image.Freeze();
                 currentCriterionMetaModelList.Add(cmm);
             });
 
@@ -125,8 +127,8 @@ namespace MetaExplorerBE
                     {
                         existing = new CriterionInstance();
                         existing.Name = crit;
-                        existing.ImageSource = Helper.NAimage;
-                        existing.ImageSource.Freeze();
+                        existing.Thumbnail.Image = Helper.NAimage;
+                        existing.Thumbnail.Image.Freeze();
                         currentCriterionMetaModelList.Add(existing);
                     }
 
@@ -137,12 +139,18 @@ namespace MetaExplorerBE
                     //track progress
                     i++;
                     progress.Report((i * 99) / this.myVideoMetaModelCache.CachedItems.Count);
-                    progressFile.Report(vmm.FileName);
+                    progressFile.Report(vmm.LocationOnFS);
                 });
             });
 
             //sort by name only
-            List<CriterionInstance> dummyCriterionMetaModelList = currentCriterionMetaModelList.OrderBy(x => { return x.ImageSource == null; }).ThenBy(x => x.Name).ToList();
+            List<CriterionInstance> dummyCriterionMetaModelList = 
+                currentCriterionMetaModelList.OrderBy(x => 
+                {
+                    return x.Thumbnail.Image == null;
+                }).
+                ThenBy(x => x.Name).ToList();
+
             currentCriterionMetaModelList.Clear();
             currentCriterionMetaModelList.AddRange(dummyCriterionMetaModelList);
 
@@ -151,8 +159,8 @@ namespace MetaExplorerBE
             {
                 if (x.Count == 0)
                 {
-                    x.ImageSource = Helper.CrossBitmapImage(x.ImageSource);
-                    x.ImageSource.Freeze();
+                    x.Thumbnail.Image = Helper.CrossBitmapImage(x.Thumbnail.Image);
+                    x.Thumbnail.Image.Freeze();
                 }
             });
 

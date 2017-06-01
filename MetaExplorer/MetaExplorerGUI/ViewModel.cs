@@ -1,16 +1,12 @@
 ﻿#region Imports
 
+using MetaExplorer.Common;
+using MetaExplorer.Domain;
 using MetaExplorerBE;
-using MetaExplorerBE.Configuration;
-using MetaExplorerBE.MetaModels;
-using MetaExplorerGUI.Properties;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
 
 #endregion
 
@@ -29,9 +25,9 @@ namespace MetaExplorerGUI
 
         private MetaExplorerManager me;
 
-        private RangeObservableCollection<VideoMetaModel> currentFileSelection;
+        private RangeObservableCollection<Video> currentFileSelection;
 
-        private VideoMetaModel mmRef = null;
+        private Video mmRef = null;
 
         #endregion
 
@@ -48,13 +44,13 @@ namespace MetaExplorerGUI
             set { this._freeTextSearch = value; OnPropertyChanged("FreeTextSearch");  }
         }
 
-        public VideoMetaModel MMRef
+        public Video MMRef
         {
             get { return this.mmRef; }
             private set { this.mmRef = value; }
         }
 
-        public RangeObservableCollection<VideoMetaModel> CurrentFileSelection
+        public RangeObservableCollection<Video> CurrentFileSelection
         {
             get { return this.currentFileSelection; }
         }
@@ -88,7 +84,7 @@ namespace MetaExplorerGUI
 
         public ViewModel()
         {
-            currentFileSelection = new RangeObservableCollection<VideoMetaModel>();
+            currentFileSelection = new RangeObservableCollection<Video>();
 
             CriteriaConfig.Criteria.ForEach((Criterion x) => currentCriterionSelectionIndex[x.Name] = -1);
         }
@@ -112,18 +108,18 @@ namespace MetaExplorerGUI
             this.CurrentFileSelectionCount = this.currentFileSelection.Count();
 
             this.CurrentFileSelectionSize = 0;
-            foreach (VideoMetaModel vmm in this.currentFileSelection) { this.CurrentFileSelectionSize += vmm.FileSize; }
+            foreach (Video vmm in this.currentFileSelection) { this.CurrentFileSelectionSize += vmm.FileSize; }
         }
 
         public void UpdateMMref()
         { 
-            this.MMRef = new VideoMetaModel();
+            this.MMRef = new Video();
 
-            MMRef.FileName = this.FreeTextSearch;
+            MMRef.LocationOnFS = this.FreeTextSearch;
 
             CriteriaConfig.Criteria.ForEach((Criterion x) =>
             {
-                this.MMRef.criteriaContents[x.Name].Clear();
+                this.MMRef.criteriaContents[x.Name] = new List<string>();
 
                 if (this.currentCriterionSelectionIndex[x.Name] >= 0)
                 {

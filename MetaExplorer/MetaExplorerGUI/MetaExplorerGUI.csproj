@@ -113,6 +113,14 @@
     <Resource Include="Resources\HardDiskImage.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{101CF2B8-5B26-4C51-8368-D83775F591FC}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Domain\Domain.csproj">
+      <Project>{CC447023-1442-418D-B100-6C50DC93CFEA}</Project>
+      <Name>Domain</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MetaExplorerBE\MetaExplorerBE.csproj">
       <Project>{8cb8174a-acc7-4508-8b52-c3644c5ed59f}</Project>
       <Name>MetaExplorerBE</Name>

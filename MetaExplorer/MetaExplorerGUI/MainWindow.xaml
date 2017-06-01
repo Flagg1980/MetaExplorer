@@ -45,7 +45,7 @@
             <Button Name="MyButton" Style="{StaticResource ResourceKey=ThumbnailButtonStyle}" Height="{Binding Source={StaticResource ThumbnailButtonHeight}}" Width="{Binding Source={StaticResource ThumbnailButtonWidth}}"
                     PreviewMouseLeftButtonDown="ThumbnailButton_PreviewMouseLeftButtonDown" PreviewMouseMove="ThumbnailButton_MouseMove" >                <!-- Used for Drag&Drop-->
                 <StackPanel Orientation="Vertical">
-                    <Image Source="{Binding Path=Thumbnail}" Height="{Binding Source={StaticResource VideoThumbnailHeight}}" Width="{Binding Source={StaticResource VideoThumbnailWidth}}" VerticalAlignment="Top"/>
+                    <Image Source="{Binding Path=Thumbnail.Image}" Height="{Binding Source={StaticResource VideoThumbnailHeight}}" Width="{Binding Source={StaticResource VideoThumbnailWidth}}" VerticalAlignment="Top"/>
                     <Label HorizontalAlignment="Center" FontSize="10" FontFamily="Comic Sans MS" Padding="5,5,5,0">
                         <TextBlock Text="{Binding Path=ThumbnailCaption1}"/>
                     </Label>

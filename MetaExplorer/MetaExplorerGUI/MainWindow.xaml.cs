@@ -1,13 +1,12 @@
-﻿using MetaExplorerBE;
-using MetaExplorerBE.Configuration;
-using MetaExplorerBE.MetaModels;
+﻿using MetaExplorer.Common;
+using MetaExplorer.Domain;
+using MetaExplorerBE;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -156,7 +155,7 @@ namespace MetaExplorerGUI
 
                     //update the label and the picture of the button
                     label.Content = ci.Name;
-                    image.Source = ci.ImageSource;
+                    image.Source = ci.Thumbnail.Image;
 
                     //update the MMref
                     myViewModel.UpdateMMref();
@@ -229,8 +228,8 @@ namespace MetaExplorerGUI
 
         private void VideoSelectionButton_Click(object sender, RoutedEventArgs e)
         {
-            VideoMetaModel found = (sender as Button).DataContext as VideoMetaModel;
-            Helper.Play(MetaExplorerGUI.Properties.Settings.Default.VLCLocation, found.FileName);
+            Video found = (sender as Button).DataContext as Video;
+            Helper.Play(MetaExplorerGUI.Properties.Settings.Default.VLCLocation, found.LocationOnFS);
         }
 
         private void PlayRandomButton_Click(object sender, RoutedEventArgs e)
@@ -241,21 +240,21 @@ namespace MetaExplorerGUI
             Random rand = new Random();
             int rnd = rand.Next(count);   //0..count-1
 
-            VideoMetaModel result = this.myViewModel.CurrentFileSelection[rnd];
+            Video result = this.myViewModel.CurrentFileSelection[rnd];
 
             //bring video into view
             Button button = GetButtonByVideoMetaModel(result);
             button.BringIntoView();
 
             //play the video
-            Helper.Play(MetaExplorerGUI.Properties.Settings.Default.VLCLocation, result.FileName);
+            Helper.Play(MetaExplorerGUI.Properties.Settings.Default.VLCLocation, result.LocationOnFS);
         }
 
         private void ContextMenuItem_OpenInExplorer_Click(object sender, RoutedEventArgs e)
         {
-            VideoMetaModel found = (sender as MenuItem).DataContext as VideoMetaModel;
+            Video found = (sender as MenuItem).DataContext as Video;
 
-            string argument = @"/select, " + found.FileName;
+            string argument = @"/select, " + found.LocationOnFS;
             Process.Start("explorer.exe", argument);
         }
 
@@ -282,7 +281,7 @@ namespace MetaExplorerGUI
             // Get the current mouse position
             Point mousePos = e.GetPosition(null);
             Vector diff = dragDropStartPoint - mousePos;
-            VideoMetaModel videoMetaModel = (sender as Button).DataContext as VideoMetaModel;
+            Video videoMetaModel = (sender as Button).DataContext as Video;
 
             if (e.LeftButton == MouseButtonState.Pressed &&
                (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance ||
@@ -340,11 +339,11 @@ namespace MetaExplorerGUI
         /// <param name="e"></param>
         private void CriterionGroupbox_Drop(object sender, DragEventArgs e)
         {
-            string expectedDragType = typeof(VideoMetaModel).FullName;
+            string expectedDragType = typeof(Video).FullName;
 
             if (e.Data.GetDataPresent(expectedDragType))
             {
-                VideoMetaModel vmm = e.Data.GetData(typeof(VideoMetaModel)) as VideoMetaModel;
+                Video vmm = e.Data.GetData(typeof(Video)) as Video;
                 GroupBox gb = sender as GroupBox;
                 Label label = gb.FindName("SelectionLabel") as Label;
                 Image image = gb.FindName("SelectionImage") as Image;
@@ -381,7 +380,7 @@ namespace MetaExplorerGUI
 
                 //update the label and the picture of the button
                 label.Content = ci.Name;
-                image.Source = ci.ImageSource;
+                image.Source = ci.Thumbnail.Image;
 
                 //important: set the current selection index such that the MMref can be set up properly
                 myViewModel.CurrentCriterionSelectionIndex[critName] = ciIndex;
@@ -439,7 +438,7 @@ namespace MetaExplorerGUI
 
         #endregion
 
-        private Button GetButtonByVideoMetaModel(VideoMetaModel vmm)
+        private Button GetButtonByVideoMetaModel(Video vmm)
         {
             ContentPresenter depobj = myItemsControl.ItemContainerGenerator.ContainerFromItem(vmm) as ContentPresenter;
             DataTemplate dataTemplate = depobj.ContentTemplate;

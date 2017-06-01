@@ -1,4 +1,5 @@
-﻿using MetaExplorerBE.MetaModels;
+﻿using MetaExplorer.Domain;
+using MetaExplorerBE.MetaModels;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;

@@ -7,13 +7,15 @@ using System.Windows.Media.Imaging;
 using MetaExplorerBE.MetaModels;
 using MetaExplorerBE.Configuration;
 using MetaExplorerBE.ExtendedFileProperties;
+using MetaExplorer.Domain;
+using MetaExplorer.Common;
 
 namespace MetaExplorerBE
 {
     /// <summary>
     /// 
     /// </summary>
-    public class VideoMetaModelCache : BaseCache<VideoMetaModel>
+    public class VideoMetaModelCache : BaseCache<Video>
     {
         #region Private Members
 
@@ -54,7 +56,7 @@ namespace MetaExplorerBE
                 int i = 0;
                 foreach (string file in myVideoFileCache.CachedItems)
                 {
-                    VideoMetaModel mm = mmConverter.ConvertFrom(file);
+                    Video mm = mmConverter.ConvertFrom(file);
                     try
                     {
                         //attach thumbnail
@@ -64,8 +66,8 @@ namespace MetaExplorerBE
 
                         if (cachedThumb != null)
                         {
-                            mm.Thumbnail = cachedThumb;
-                            mm.Thumbnail.Freeze();
+                            mm.Thumbnail.Image = cachedThumb;
+                            mm.Thumbnail.Image.Freeze();
                         }
                         else
                         {
@@ -113,16 +115,16 @@ namespace MetaExplorerBE
                 progressFile.Report("");
 
                 //get thumbnail in cache
-                List<VideoMetaModel> noThumbnail = this.CachedItems.FindAll(x => { return x.Thumbnail == null; });
+                List<Video> noThumbnail = this.CachedItems.FindAll(x => { return x.Thumbnail == null; });
 
                 //update progress
                 int idx = 0;
-                foreach (VideoMetaModel videoMetaModel in noThumbnail)
+                foreach (Video videoMetaModel in noThumbnail)
                 {
-                    this.myVideoThumbnailCache.UpdateThumbnailCache(Path.GetFileName(videoMetaModel.FileName));
+                    this.myVideoThumbnailCache.UpdateThumbnailCache(Path.GetFileName(videoMetaModel.LocationOnFS));
 
                     idx++;
-                    progressFile.Report(videoMetaModel.FileName);
+                    progressFile.Report(videoMetaModel.LocationOnFS);
                     progress.Report((idx * 100) / noThumbnail.Count);
                 }
 
@@ -136,9 +138,9 @@ namespace MetaExplorerBE
         /// </summary>
         /// <param name="regex"></param>
         /// <returns></returns>
-        public List<VideoMetaModel> GetThumbnailFileSelection(VideoMetaModel mmRef)
+        public List<Video> GetThumbnailFileSelection(Video mmRef)
         {
-            List<VideoMetaModel> videoFiles = this.GetVideoFileSelection(mmRef);
+            List<Video> videoFiles = this.GetVideoFileSelection(mmRef);
             return videoFiles;
         }
 
@@ -147,14 +149,14 @@ namespace MetaExplorerBE
         /// </summary>
         /// <param name="regex"></param>
         /// <returns></returns>
-        public List<VideoMetaModel> GetVideoFileSelection(VideoMetaModel mmRef)
+        public List<Video> GetVideoFileSelection(Video mmRef)
         {
-            List<VideoMetaModel> res = new List<VideoMetaModel>(this.CachedItems);
+            List<Video> res = new List<Video>(this.CachedItems);
 
             //check stars
             if (mmRef.Stars != 0)
             {
-                res = res.Where((VideoMetaModel m) => { return m.Stars == mmRef.Stars; }).ToList();
+                res = res.Where((Video m) => { return m.Stars == mmRef.Stars; }).ToList();
             }
 
             foreach (Criterion criterion in CriteriaConfig.Criteria)
@@ -171,7 +173,7 @@ namespace MetaExplorerBE
                 }
                 else
                 {
-                    res = res.Where((VideoMetaModel m) =>
+                    res = res.Where((Video m) =>
                                     {
                                         return m.criteriaContents[criterion.Name].Contains(mmRef.criteriaContents[criterion.Name][0], StringComparer.CurrentCultureIgnoreCase);
                                     }).ToList();
@@ -179,15 +181,15 @@ namespace MetaExplorerBE
             }
 
             //check freetext search (last because most expensive
-            if (mmRef.FileName != null && mmRef.FileName != string.Empty)
+            if (mmRef.LocationOnFS != null && mmRef.LocationOnFS != string.Empty)
             {
-                res = res.Where((VideoMetaModel m) => { return Path.GetFileNameWithoutExtension(m.FileName).IndexOf(mmRef.FileName, StringComparison.CurrentCultureIgnoreCase) >= 0; }).ToList();
+                res = res.Where((Video m) => { return Path.GetFileNameWithoutExtension(m.LocationOnFS).IndexOf(mmRef.LocationOnFS, StringComparison.CurrentCultureIgnoreCase) >= 0; }).ToList();
             }
 
             return res;
         }
 
-        public void ResortBy(Func<VideoMetaModel, object> func)
+        public void ResortBy(Func<Video, object> func)
         {
             this.CachedItems = this.CachedItems.OrderByDescending(func).ToList();
         }

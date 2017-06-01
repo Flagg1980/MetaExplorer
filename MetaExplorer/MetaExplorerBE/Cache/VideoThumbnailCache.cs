@@ -43,6 +43,9 @@ namespace MetaExplorerBE
                 progressFile.Report(myThumbnailPath);
 
                 //read all files and throw away all files which do not have a proper extension
+                if (!Directory.Exists(myThumbnailPath))
+                    Directory.CreateDirectory(myThumbnailPath);
+
                 var validThumbnails = Directory.GetFiles(myThumbnailPath).ToList();
 
                 //create thumbnails

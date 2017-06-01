@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MetaExplorer.Domain;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,8 +9,8 @@ namespace MetaExplorerBE.MetaModels
 {
     interface IConverter
     {
-        VideoMetaModel ConvertFrom(string input);
+        Video ConvertFrom(string input);
 
-        string ConvertTo(VideoMetaModel input);
+        string ConvertTo(Video input);
     }
 }

@@ -15,80 +15,80 @@ namespace MetaExplorerBE.MetaModels
     /// <summary>
     /// Represents a video which was loaded from file system.
     /// </summary>
-    public class VideoMetaModel : INotifyPropertyChanged 
-    {
-        #region Private Members
+    //public class VideoMetaModel : INotifyPropertyChanged 
+    //{
+    //    #region Private Members
 
-        private BitmapSource _thumbnail = null;
+    //    private BitmapSource _thumbnail = null;
 
-        #endregion
+    //    #endregion
 
-        #region Public Members
+    //    #region Public Members
 
-        public event PropertyChangedEventHandler PropertyChanged;
+    //    public event PropertyChangedEventHandler PropertyChanged;
 
-        //criteriaContents["Actors"]=("a", "n", "o")
-        public Dictionary<string, List<string>> criteriaContents = new Dictionary<string, List<string>>();
+    //    //criteriaContents["Actors"]=("a", "n", "o")
+    //    public Dictionary<string, List<string>> criteriaContents = new Dictionary<string, List<string>>();
 
-        #endregion
+    //    #endregion
 
-        #region Public Properties
+    //    #region Public Properties
 
-        public BitmapSource Thumbnail
-        {
-            get { return _thumbnail; }
-            set { _thumbnail = value;  OnPropertyChanged("Thumbnail"); }
-        }
+    //    public BitmapSource Thumbnail
+    //    {
+    //        get { return _thumbnail; }
+    //        set { _thumbnail = value;  OnPropertyChanged("Thumbnail"); }
+    //    }
 
-        public string ThumbnailCaption1 { get; set; }
+    //    public string ThumbnailCaption1 { get; set; }
 
-        public string ThumbnailCaption2 { get; set; }
+    //    public string ThumbnailCaption2 { get; set; }
 
-        public DateTime DateModified { get; set; }
+    //    public DateTime DateModified { get; set; }
 
-        public long FileSize { get; set; }
+    //    public long FileSize { get; set; }
 
-        public string FileName { get; set; }
+    //    public string FileName { get; set; }
 
-        public int Stars { get; set; }
+    //    public int Stars { get; set; }
 
-        public int BitRate { get; set; }
+    //    public int BitRate { get; set; }
 
-        public int FrameWidth { get; set; }
+    //    public int FrameWidth { get; set; }
 
-        public int FrameHeight { get; set; }
+    //    public int FrameHeight { get; set; }
 
-        #endregion
+    //    #endregion
 
-        #region C'tor
+    //    #region C'tor
 
-        public VideoMetaModel()
-        {
-            CriteriaConfig.Criteria.ForEach((Criterion crit) => this.criteriaContents[crit.Name] = new List<string>());
-        }
+    //    public VideoMetaModel()
+    //    {
+    //        CriteriaConfig.Criteria.ForEach((Criterion crit) => this.criteriaContents[crit.Name] = new List<string>());
+    //    }
 
-        #endregion
+    //    #endregion
 
-        #region Public Methods
+    //    #region Public Methods
 
-        public List<string> GetList(Criterion criterion)
-        {
-            return this.criteriaContents[criterion.Name];
-        }
+    //    public List<string> GetList(Criterion criterion)
+    //    {
+    //        return this.criteriaContents[criterion.Name];
+    //    }
 
-        #endregion
+    //    #endregion
 
-        #region Private Methods
+    //    #region Private Methods
 
-        private void OnPropertyChanged(string value)
-        {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
-            {
-                handler(this, new PropertyChangedEventArgs(value));
-            }
-        }
+    //    private void OnPropertyChanged(string value)
+    //    {
+    //        PropertyChangedEventHandler handler = PropertyChanged;
+    //        if (handler != null)
+    //        {
+    //            handler(this, new PropertyChangedEventArgs(value));
+    //        }
+    //    }
 
-        #endregion
-    }
+    //    #endregion
+    //}
 }

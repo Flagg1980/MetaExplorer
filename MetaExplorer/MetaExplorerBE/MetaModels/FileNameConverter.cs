@@ -1,4 +1,6 @@
-﻿using MetaExplorerBE.Configuration;
+﻿using MetaExplorer.Common;
+using MetaExplorer.Domain;
+using MetaExplorerBE.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,10 +22,10 @@ namespace MetaExplorerBE.MetaModels
         /// </summary>
         /// <param name="input">Full filename</param>
         /// <returns></returns>
-        public VideoMetaModel ConvertFrom(string input)
-        { 
-            VideoMetaModel mm = new VideoMetaModel();
-            mm.FileName = input;
+        public Video ConvertFrom(string input)
+        {
+            Video mm = new Video();
+            mm.LocationOnFS = input;
 
             try
             {
@@ -74,7 +76,7 @@ namespace MetaExplorerBE.MetaModels
             }
         }
 
-        public string ConvertTo(VideoMetaModel input)
+        public string ConvertTo(Video input)
         {
             throw new NotImplementedException();
         }
