@@ -20,7 +20,7 @@ namespace MetaExplorerGUI
     public partial class MainWindow : Window
     {
         private ViewModel myViewModel;
-        private MetaExplorerManager me;
+        //private MetaExplorerManager me;
         private bool windowInitiallyCompletelyRendered = false;
 
         private Point dragDropStartPoint;
@@ -89,7 +89,7 @@ namespace MetaExplorerGUI
 
 
 
-            me = new MetaExplorerManager(videoFileCache, videoMetaModelCache, criterionCache);
+            //me = new MetaExplorerManager(videoFileCache, videoMetaModelCache, criterionCache);
 
             //ProgressWindow.DoWorkWithModal("Updating Video File Cache", me.VideoMetaModelCache.UpdateVideoFileCacheAsync);
             
@@ -109,7 +109,10 @@ namespace MetaExplorerGUI
             //}
 
             myViewModel = new ViewModel();
-            myViewModel.MEManager = me;
+            myViewModel.CriterionCache = criterionCache;
+            myViewModel.VideoFileCache = videoFileCache;
+            myViewModel.VideoMetaModelCache = videoMetaModelCache;
+
             this.DataContext = myViewModel;
             myItemsControl.DataContext = myViewModel;
             myViewModel.PropertyChanged += Event_PropertyChanged;
@@ -145,13 +148,13 @@ namespace MetaExplorerGUI
 
             selectButton.Click += (object sender, RoutedEventArgs args) =>
             {
-                CriterionSelectionWindow w = new CriterionSelectionWindow(myViewModel.MEManager.CriterionCache.GetCriterionInstances(crit));
+                CriterionSelectionWindow w = new CriterionSelectionWindow(myViewModel.CriterionCache.GetCriterionInstances(crit));
                 w.ShowDialog();
 
                 if (w.SelectedIndex != -1)
                 {
                     myViewModel.CurrentCriterionSelectionIndex[crit.Name] = w.SelectedIndex;
-                    CriterionInstance ci = this.me.CriterionCache.GetCriterionInstances(crit)[w.SelectedIndex];
+                    CriterionInstance ci = this.myViewModel.CriterionCache.GetCriterionInstances(crit)[w.SelectedIndex];
 
                     //update the label and the picture of the button
                     label.Content = ci.Name;
@@ -229,7 +232,7 @@ namespace MetaExplorerGUI
         private void VideoSelectionButton_Click(object sender, RoutedEventArgs e)
         {
             Video found = (sender as Button).DataContext as Video;
-            Helper.Play(MetaExplorerGUI.Properties.Settings.Default.VLCLocation, found.LocationOnFS);
+            Helper.Play(MetaExplorerGUI.Properties.Settings.Default.VLCLocation, found.File.FullName);
         }
 
         private void PlayRandomButton_Click(object sender, RoutedEventArgs e)
@@ -247,14 +250,14 @@ namespace MetaExplorerGUI
             button.BringIntoView();
 
             //play the video
-            Helper.Play(MetaExplorerGUI.Properties.Settings.Default.VLCLocation, result.LocationOnFS);
+            Helper.Play(MetaExplorerGUI.Properties.Settings.Default.VLCLocation, result.File.FullName);
         }
 
         private void ContextMenuItem_OpenInExplorer_Click(object sender, RoutedEventArgs e)
         {
             Video found = (sender as MenuItem).DataContext as Video;
 
-            string argument = @"/select, " + found.LocationOnFS;
+            string argument = @"/select, " + found.File.FullName;
             Process.Start("explorer.exe", argument);
         }
 
@@ -351,7 +354,7 @@ namespace MetaExplorerGUI
                 this.SetGroupboxBorder(gb, false);
 
                 string critName = gb.Header as string;
-                List<CriterionInstance> ciList = this.me.CriterionCache.GetCriterionInstances(critName);
+                List<CriterionInstance> ciList = this.myViewModel.CriterionCache.GetCriterionInstances(critName);
 
                 //get the criterion instance
                 CriterionInstance ci = null;
@@ -459,15 +462,15 @@ namespace MetaExplorerGUI
 
             if (itemstr.Contains("date"))
             {
-                this.myViewModel.MEManager.VideoMetaModelCache.ResortBy(x => x.DateModified);
+                this.myViewModel.VideoMetaModelCache.ResortBy(x => x.File.LastWriteTime);
             }
             else if (itemstr.Contains("resolution"))
             {
-                this.myViewModel.MEManager.VideoMetaModelCache.ResortBy(x => x.FrameHeight * x.FrameWidth);
+                this.myViewModel.VideoMetaModelCache.ResortBy(x => x.FrameHeight * x.FrameWidth);
             }
             else if (itemstr.Contains("bitrate"))
             {
-                this.myViewModel.MEManager.VideoMetaModelCache.ResortBy(x => x.BitRate);
+                this.myViewModel.VideoMetaModelCache.ResortBy(x => x.BitRate);
             }
             else
             {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace MetaExplorer.Domain
 {
@@ -19,15 +20,15 @@ namespace MetaExplorer.Domain
 
         public Thumbnail Thumbnail { get; set; }
 
-        public DateTime DateModified { get; set; }
+        //public DateTime DateModified { get; set; }
 
         public string ThumbnailCaption1 { get; set; }
 
         public string ThumbnailCaption2 { get; set; }
 
-        public long FileSize { get; set; }
+        //public long FileSize { get; set; }
 
-        public string LocationOnFS { get; set; }
+        public FileInfo File { get; set; }
 
         public int Stars { get; set; }
 

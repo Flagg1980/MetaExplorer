@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace MetaExplorerBE
+namespace MetaExplorer.Common
 {
     /// <summary>
     /// This class can be used to run external commands and capture the stdout and stderr.

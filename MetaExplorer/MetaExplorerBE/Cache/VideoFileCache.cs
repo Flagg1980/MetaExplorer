@@ -12,11 +12,11 @@ namespace MetaExplorerBE
     /// </summary>
     public class VideoFileCache : BaseCache<string>
     {
-        private string myFileLocation;
+        private string myPathToVideoFiles;
 
-        public VideoFileCache(string fileLocation)
+        public VideoFileCache(string pathToVideoFiles)
         {
-            myFileLocation = fileLocation;
+            myPathToVideoFiles = pathToVideoFiles;
         }
 
         public override Task InitCacheAsync(IProgress<int> progress, IProgress<string> progressFile)
@@ -27,12 +27,12 @@ namespace MetaExplorerBE
 
                 //string baseDir = this.LocationVideoFiles;
 
-                if (!Directory.Exists(myFileLocation))
+                if (!Directory.Exists(myPathToVideoFiles))
                 {
-                    throw new Exception(String.Format("Basedir <{0}> does not exist.", myFileLocation));
+                    throw new Exception(String.Format("Basedir <{0}> does not exist.", myPathToVideoFiles));
                 }
 
-                string[] files = Directory.GetFiles(myFileLocation, "*", SearchOption.AllDirectories);
+                string[] files = Directory.GetFiles(myPathToVideoFiles, "*", SearchOption.AllDirectories);
                 this.CachedItems = files.ToList();
 
                 progress.Report(100);

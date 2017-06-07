@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using MetaExplorerBE.MetaModels;
-using MetaExplorerBE.Configuration;
 using MetaExplorer.Domain;
 using MetaExplorer.Common;
 
@@ -139,7 +138,7 @@ namespace MetaExplorerBE
                     //track progress
                     i++;
                     progress.Report((i * 99) / this.myVideoMetaModelCache.CachedItems.Count);
-                    progressFile.Report(vmm.LocationOnFS);
+                    progressFile.Report(vmm.File.FullName);
                 });
             });
 

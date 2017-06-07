@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Drawing;
-using System.Globalization;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Common.Properties;
 
-namespace MetaExplorerBE
+namespace MetaExplorer.Common
 {
     public class Helper
     {
@@ -79,7 +75,7 @@ namespace MetaExplorerBE
             {
                 if (_NAimage == null)
                 {
-                    Bitmap bitmap = Properties.Resources.na;
+                    Bitmap bitmap = Resources.na;
                     var memoryStream = new System.IO.MemoryStream();
                     bitmap.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
                     _NAimage = new BitmapImage();

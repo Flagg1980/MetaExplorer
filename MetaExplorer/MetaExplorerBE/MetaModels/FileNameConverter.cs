@@ -1,6 +1,5 @@
 ﻿using MetaExplorer.Common;
 using MetaExplorer.Domain;
-using MetaExplorerBE.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,22 +19,22 @@ namespace MetaExplorerBE.MetaModels
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="input">Full filename</param>
+        /// <param name="input">file location</param>
         /// <returns></returns>
         public Video ConvertFrom(string input)
         {
             Video mm = new Video();
-            mm.LocationOnFS = input;
+            mm.File = new FileInfo(input);
 
             try
             {
                 string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(input);
 
                 //get "Date Modified" for later sorting
-                mm.DateModified = (new FileInfo(input)).LastWriteTime;
+                //mm.DateModified = mm.File.LastWriteTime;
 
                 //get file size
-                mm.FileSize = (new FileInfo(input)).Length;
+                //mm.FileSize = (new FileInfo(input)).Length;
 
                 //create tokens
                 MatchCollection bla = Regex.Matches(fileNameWithoutExtension, @"\[.*?\]");

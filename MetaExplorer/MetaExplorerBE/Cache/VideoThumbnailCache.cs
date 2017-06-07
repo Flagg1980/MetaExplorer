@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using MetaExplorer.Common;
+using System;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 
@@ -66,19 +65,21 @@ namespace MetaExplorerBE
         /// <summary>
         /// Updates a thumbnail cache entry for a given video file. If the cache entry already exists, it is overwritten.
         /// </summary>
-        public BitmapSource UpdateThumbnailCache(string fileName)
+        public BitmapSource UpdateThumbnailCache(FileInfo file)
         {
             FFmpegWrapper wrapper = new FFmpegWrapper(myFFmpegLocation);
 
-            string cacheFile = Path.Combine(myThumbnailPath, fileName);
+            string md5 = Helper.GetMD5Hash(file.Name);
 
-            if (File.Exists(cacheFile))
+            string cacheFileLocation = Path.Combine(myThumbnailPath, md5);
+
+            if (File.Exists(cacheFileLocation))
             {
-                File.Delete(cacheFile);
+                File.Delete(cacheFileLocation);
             }
 
             //getDuration
-            TimeSpan duration = wrapper.GetDuration(fileName);
+            TimeSpan duration = wrapper.GetDuration(file.FullName);
             TimeSpan position = TimeSpan.FromSeconds(120);  //todo: remove hardcoded time
 
             if (duration.TotalSeconds <= position.TotalSeconds)
@@ -87,14 +88,14 @@ namespace MetaExplorerBE
             }
 
             //generate Thumbnail from movie 
-            wrapper.CreateJpegThumbnail(fileName, position, cacheFile, false);
+            wrapper.CreateJpegThumbnail(file.FullName, position, cacheFileLocation, false);
 
-            BitmapSource bs = this.CreateReducedThumbnailImage(new Uri(cacheFile), this.myThumbnailHeight, this.myThumbnailWidth);
+            BitmapSource bs = this.CreateReducedThumbnailImage(new Uri(cacheFileLocation), this.myThumbnailHeight, this.myThumbnailWidth);
             bs.Freeze();
-            this.CachedItems.Add(new FileInfo(cacheFile), bs);
+            this.CachedItems.Add(new FileInfo(cacheFileLocation), bs);
 
             //return the created bitmap
-            return this.GetByFilename(fileName);
+            return bs;
         }
     }
 }

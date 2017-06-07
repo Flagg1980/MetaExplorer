@@ -1,14 +1,12 @@
-﻿using System;
+﻿using MetaExplorer.Common;
+using MetaExplorer.Domain;
+using MetaExplorerBE.ExtendedFileProperties;
+using MetaExplorerBE.MetaModels;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
-using MetaExplorerBE.MetaModels;
-using MetaExplorerBE.Configuration;
-using MetaExplorerBE.ExtendedFileProperties;
-using MetaExplorer.Domain;
-using MetaExplorer.Common;
 
 namespace MetaExplorerBE
 {
@@ -60,7 +58,7 @@ namespace MetaExplorerBE
                     try
                     {
                         //attach thumbnail
-                        string md5 = Helper.GetMD5Hash(file);
+                        string md5 = Helper.GetMD5Hash(Path.GetFileName(file));
 
                         var cachedThumb = myVideoThumbnailCache.GetByFilename(md5);
 
@@ -99,7 +97,7 @@ namespace MetaExplorerBE
                 }
 
                 //sort by date
-                this.ResortBy(x => x.DateModified);
+                this.ResortBy(x => x.File.LastWriteTime);
 
                 progress.Report(100);
             });
@@ -121,10 +119,14 @@ namespace MetaExplorerBE
                 int idx = 0;
                 foreach (Video videoMetaModel in noThumbnail)
                 {
-                    this.myVideoThumbnailCache.UpdateThumbnailCache(Path.GetFileName(videoMetaModel.LocationOnFS));
+                    var bitmapSource = this.myVideoThumbnailCache.UpdateThumbnailCache(videoMetaModel.File);
+
+                    videoMetaModel.Thumbnail = new Thumbnail();
+                    videoMetaModel.Thumbnail.Image = bitmapSource;
+                    videoMetaModel.Thumbnail.Image.Freeze();
 
                     idx++;
-                    progressFile.Report(videoMetaModel.LocationOnFS);
+                    progressFile.Report(videoMetaModel.File.FullName);
                     progress.Report((idx * 100) / noThumbnail.Count);
                 }
 
@@ -175,15 +177,21 @@ namespace MetaExplorerBE
                 {
                     res = res.Where((Video m) =>
                                     {
-                                        return m.criteriaContents[criterion.Name].Contains(mmRef.criteriaContents[criterion.Name][0], StringComparer.CurrentCultureIgnoreCase);
-                                    }).ToList();
+                                        return m.criteriaContents[criterion.Name].Contains(mmRef.criteriaContents[criterion.Name][0], 
+                                                                                           StringComparer.CurrentCultureIgnoreCase);
+                                    })
+                                    .ToList();
                 }
             }
 
-            //check freetext search (last because most expensive
-            if (mmRef.LocationOnFS != null && mmRef.LocationOnFS != string.Empty)
+            //check freetext search (last because most expensive)
+            if (!string.IsNullOrEmpty(mmRef.ThumbnailCaption1))
             {
-                res = res.Where((Video m) => { return Path.GetFileNameWithoutExtension(m.LocationOnFS).IndexOf(mmRef.LocationOnFS, StringComparison.CurrentCultureIgnoreCase) >= 0; }).ToList();
+                res = res.Where((Video m) => 
+                    {
+                        return Path.GetFileNameWithoutExtension(m.File.FullName).IndexOf(mmRef.ThumbnailCaption1, StringComparison.CurrentCultureIgnoreCase) >= 0;
+                    })
+                    .ToList();
             }
 
             return res;

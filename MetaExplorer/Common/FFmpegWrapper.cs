@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
-namespace MetaExplorerBE
+namespace MetaExplorer.Common
 {
     public class FFmpegWrapper
     {
@@ -25,7 +23,7 @@ namespace MetaExplorerBE
         {
             if (!File.Exists(execLocation))
             {
-                throw new Exception(String.Format("Could not file FFmpeg location <{0}>.", execLocation));
+                throw new Exception(String.Format("Could not find FFmpeg at expected location <{0}>.", execLocation));
             }
             else
             {
@@ -33,13 +31,13 @@ namespace MetaExplorerBE
             }
         }
 
-        public TimeSpan GetDuration(string inputFile)
+        public TimeSpan GetDuration(string inputFileLocation)
         {
             Command c = new Command();
 
             //construct parameters
             string parameters = "";
-            parameters += @"-i " + '"' + inputFile + '"';               //input file
+            parameters += @"-i " + '"' + inputFileLocation + '"';               //input file
 
             //execute command 
             c.Cmd(_execLocation, parameters, TIMEOUT_EXEC);
@@ -48,21 +46,19 @@ namespace MetaExplorerBE
             string output = c.FlushStdoutAndErr();
 
             //grep duration
-            TimeSpan result;
             try
             {
                 Match m = Regex.Match(output, @"Duration: (\d{1,3}):(\d\d):(\d\d)");
 
-                result = new TimeSpan(Int32.Parse(m.Groups[1].Value), Int32.Parse(m.Groups[2].Value), Int32.Parse(m.Groups[3].Value));
+                TimeSpan result = new TimeSpan(Int32.Parse(m.Groups[1].Value), Int32.Parse(m.Groups[2].Value), Int32.Parse(m.Groups[3].Value));
+                return result;
             }
             catch (Exception e)
             {
-                string errorMsg = String.Format("Could not get time duration from video file <{0}> with command <{1}> and error message <{2}>.", inputFile, _execLocation + " " + parameters, e.Message);
+                string errorMsg = String.Format("Could not get time duration from video file <{0}> with command <{1}> and error message <{2}>.", inputFileLocation, _execLocation + " " + parameters, e.Message);
                 Trace.TraceError(errorMsg);
                 throw new Exception(errorMsg);
             }
-
-            return result;
         }
 
         public void CreateJpegThumbnail(string inputFile, TimeSpan position, string outputFile, bool overrideOutput = false)
