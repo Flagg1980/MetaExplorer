@@ -1,4 +1,5 @@
 ﻿using MetaExplorer.Common;
+using MetaExplorer.Common.VideoProperties;
 using MetaExplorer.Domain;
 using MetaExplorerBE.ExtendedFileProperties;
 using MetaExplorerBE.MetaModels;
@@ -17,7 +18,7 @@ namespace MetaExplorerBE
     {
         #region Private Members
 
-        private IExtendedFilePropertiesProvider myExtendedPropertiesProvider;
+        private IVideoPropertiesProvider myExtendedPropertiesProvider;
 
         #endregion
 
@@ -35,7 +36,7 @@ namespace MetaExplorerBE
             this.myVideoFileCache = videoFileCache;
             this.myVideoThumbnailCache = videoThumbnailCache;
 
-            myExtendedPropertiesProvider = new ExtendedFilePropertiesProvider(ExtendedFilePropertiesTechnology.Shell32).Provider;
+            myExtendedPropertiesProvider = new VideoPropertiesProvider(VideoPropertiesTechnology.MediaToolkit).Provider;
         }
 
         #endregion
@@ -75,9 +76,11 @@ namespace MetaExplorerBE
 
                         //retrieve extended file properties
                         FileInfo fi = new FileInfo(file);
-                        mm.BitRate = myExtendedPropertiesProvider.GetBitrate(fi);
-                        mm.FrameHeight = myExtendedPropertiesProvider.GetFrameHeight(fi);
-                        mm.FrameWidth = myExtendedPropertiesProvider.GetFrameWidth(fi);
+                        VideoProperties vp = myExtendedPropertiesProvider.GetVideoProperties(fi);
+
+                        mm.BitRate = vp.bitrate;
+                        mm.FrameHeight = vp.frameheight;
+                        mm.FrameWidth = vp.frameWidth;
 
                         //define the captions of the thumbnails
                         mm.ThumbnailCaption1 = Path.GetFileName(file);

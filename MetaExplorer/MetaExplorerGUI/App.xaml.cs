@@ -1,5 +1,6 @@
 ﻿using MetaExplorer.Common;
 using MetaExplorer.Domain;
+using System;
 using System.Diagnostics;
 using System.Windows;
 
@@ -23,6 +24,7 @@ namespace MetaExplorerGUI
             e.Handled = true;
         }
 
+        [STAThread]
         private void ApplicationStart(object sender, StartupEventArgs e)
         {
             //show the main window

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace MetaExplorerBE.ExtendedFileProperties
 {
+    [Obsolete]
     public interface IExtendedFilePropertiesProvider
     {
         int GetBitrate(FileInfo file);

@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 
 namespace MetaExplorerBE.ExtendedFileProperties
 {
+    [Obsolete]
     public enum ExtendedFilePropertiesTechnology
     {
         Shell32
     }
 
+    [Obsolete]
     public class ExtendedFilePropertiesProvider 
     {
         public IExtendedFilePropertiesProvider Provider

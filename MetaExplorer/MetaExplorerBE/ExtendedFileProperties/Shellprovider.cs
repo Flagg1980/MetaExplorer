@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace MetaExplorerBE.ExtendedFileProperties
 {
+    [Obsolete]
     internal class Shellprovider : IExtendedFilePropertiesProvider
     {
         const int IDX_TOTAL_BITRATE = 310;
@@ -15,7 +16,7 @@ namespace MetaExplorerBE.ExtendedFileProperties
         const int IDX_FRAME_WIDTH = 308;
         const int IDX_FRAME_HEIGHT = 306;
 
-        Shell32.Shell myShell = new Shell32.Shell();
+        
 
         public int GetBitrate(FileInfo file)
         {
@@ -32,11 +33,13 @@ namespace MetaExplorerBE.ExtendedFileProperties
             return this.GetNumericalProperty(file, IDX_FRAME_HEIGHT);
         }
 
-
+        [STAThread]
         private string GetProperty(FileInfo file, int index)
         {
             try
             {
+
+                Shell32.Shell myShell = new Shell32.Shell();
                 //set the namespace to file path
                 Shell32.Folder folder = myShell.NameSpace(file.DirectoryName);
                 ////get ahandle to the file
