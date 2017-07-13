@@ -1,7 +1,6 @@
 ﻿using MetaExplorer.Common;
 using MetaExplorer.Common.VideoProperties;
 using MetaExplorer.Domain;
-using MetaExplorerBE.ExtendedFileProperties;
 using MetaExplorerBE.MetaModels;
 using System;
 using System.Collections.Generic;
@@ -36,7 +35,7 @@ namespace MetaExplorerBE
             this.myVideoFileCache = videoFileCache;
             this.myVideoThumbnailCache = videoThumbnailCache;
 
-            myExtendedPropertiesProvider = new VideoPropertiesProvider(VideoPropertiesTechnology.MediaToolkit).Provider;
+            myExtendedPropertiesProvider = new VideoPropertiesProvider(VideoPropertiesTechnology.WinAPICodePack).Provider;
         }
 
         #endregion
@@ -84,7 +83,7 @@ namespace MetaExplorerBE
 
                         //define the captions of the thumbnails
                         mm.ThumbnailCaption1 = Path.GetFileName(file);
-                        mm.ThumbnailCaption2 = String.Format("{0}x{1}(@{2})", mm.FrameWidth, mm.FrameHeight, mm.BitRate);
+                        mm.ThumbnailCaption2 = String.Format("{0} x {1} ({2} kbps)", mm.FrameWidth, mm.FrameHeight, mm.BitRate/1000);
 
                         //add meta model to cache
                         this.CachedItems.Add(mm);

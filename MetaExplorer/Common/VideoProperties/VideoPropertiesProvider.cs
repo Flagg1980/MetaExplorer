@@ -5,7 +5,8 @@ namespace MetaExplorer.Common.VideoProperties
     public enum VideoPropertiesTechnology
     {
         Shell32,
-        MediaToolkit
+        MediaToolkit,
+        WinAPICodePack
     }
 
     public class VideoPropertiesProvider
@@ -22,6 +23,8 @@ namespace MetaExplorer.Common.VideoProperties
                 Provider = new Shellprovider();
             else if (technology == VideoPropertiesTechnology.MediaToolkit)
                 Provider = new MediaToolkitProvider();
+            else if (technology == VideoPropertiesTechnology.WinAPICodePack)
+                Provider = new WindowsApiCodepackProvider();
             else
             {
                 string errorMsg = String.Format("Unsupported Technology: <{0}>", technology.ToString());
