@@ -37,8 +37,10 @@ namespace MetaExplorerBE
                     //check if directory exists
                     if (!Directory.Exists(myThumbnailPath))
                     {
+                        //TODO: better logging, make user aware!
                         string errorMsg = String.Format("Directory does not exist: <{0}>.", myThumbnailPath);
                         Console.WriteLine(errorMsg);
+                        continue;
                     }
 
                     //update progress
