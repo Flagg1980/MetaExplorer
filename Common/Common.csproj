@@ -79,6 +79,7 @@
     </Compile>
     <Compile Include="VideoProperties\IVideoPropertiesProvider.cs" />
     <Compile Include="VideoProperties\MediaToolkitProvider.cs" />
+    <Compile Include="VideoProperties\DefaultProvider.cs" />
     <Compile Include="VideoProperties\WindowsApiCodepackProvider.cs" />
     <Compile Include="VideoProperties\ShellProvider.cs" />
     <Compile Include="VideoProperties\VideoPropertiesProvider.cs" />

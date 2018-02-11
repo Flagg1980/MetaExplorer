@@ -35,7 +35,7 @@ namespace MetaExplorerBE
             this.myVideoFileCache = videoFileCache;
             this.myVideoThumbnailCache = videoThumbnailCache;
 
-            myExtendedPropertiesProvider = new VideoPropertiesProvider(VideoPropertiesTechnology.WinAPICodePack).Provider;
+            myExtendedPropertiesProvider = new VideoPropertiesProvider(VideoPropertiesTechnology.None).Provider;
         }
 
         #endregion
