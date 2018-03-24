@@ -62,9 +62,6 @@
     <Compile Include="Cache\VideoMetaModelCache.cs" />
     <Compile Include="Cache\VideoThumbnailCache.cs" />
     <Compile Include="Cache\VideoFileCache.cs" />
-    <Compile Include="ExtendedFileProperties\ExtendedFilePropertiesProvider.cs" />
-    <Compile Include="ExtendedFileProperties\IExtendedFilePropertiesProvider.cs" />
-    <Compile Include="ExtendedFileProperties\Shellprovider.cs" />
     <Compile Include="MetaModels\CriterionInstance.cs" />
     <Compile Include="MetaModels\FileNameConverter.cs" />
     <Compile Include="MetaModels\IConverter.cs" />

@@ -9,26 +9,6 @@ namespace MetaExplorer.Common.VideoProperties
 {
     internal class WindowsApiCodepackProvider : IVideoPropertiesProvider
     {
-        //const int IDX_TOTAL_BITRATE = 310;
-        //const int IDX_DATA_BITRATE = 305;
-        //const int IDX_FRAME_WIDTH = 308;
-        //const int IDX_FRAME_HEIGHT = 306;
-
-        //public int GetBitrate(FileInfo file)
-        //{
-        //    return this.GetNumericalProperty(file, IDX_TOTAL_BITRATE);
-        //}
-
-        //public int GetFrameWidth(FileInfo file)
-        //{
-        //    return this.GetNumericalProperty(file, IDX_FRAME_WIDTH);
-        //}
-
-        //public int GetFrameHeight(FileInfo file)
-        //{
-        //    return this.GetNumericalProperty(file, IDX_FRAME_HEIGHT);
-        //}
-
         private string GetProperty(FileInfo file, PropertyKey key)
         {
             try

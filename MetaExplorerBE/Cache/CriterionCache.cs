@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
-using MetaExplorerBE.MetaModels;
 using MetaExplorer.Domain;
 using MetaExplorer.Common;
 
@@ -15,14 +13,6 @@ namespace MetaExplorerBE
     /// </summary>
     public class CriterionCache : BaseCache<string,List<CriterionInstance>>
     {
-        #region Private Members
-
-        //private List<String> supportedImageFormats = new List<string> { ".jpg", ".bmp", ".png" };
-
-        //private Dictionary<string, List<CriterionInstance>> criterionInstances = new Dictionary<string, List<CriterionInstance>>();
-
-        #endregion
-
         public List<CriterionInstance> GetCriterionInstances(Criterion criterion)
         {
             return this.CachedItems[criterion.Name];
@@ -32,10 +22,6 @@ namespace MetaExplorerBE
         {
             return this.CachedItems[criterionName];
         }
-
-        //public int ThumbnailHeight { get; private set; }
-
-        //public int ThumbnailWidth { get; private set; }
 
         private readonly ImageThumbnailCache myCriterionThumbnailCache;
         private readonly VideoMetaModelCache myVideoMetaModelCache;

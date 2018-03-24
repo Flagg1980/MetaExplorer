@@ -12,21 +12,6 @@ namespace MetaExplorer.Common.VideoProperties
         const int IDX_FRAME_WIDTH = 308;
         const int IDX_FRAME_HEIGHT = 306;
 
-        //public int GetBitrate(FileInfo file)
-        //{
-        //    return this.GetNumericalProperty(file, IDX_TOTAL_BITRATE);
-        //}
-
-        //public int GetFrameWidth(FileInfo file)
-        //{
-        //    return this.GetNumericalProperty(file, IDX_FRAME_WIDTH);
-        //}
-
-        //public int GetFrameHeight(FileInfo file)
-        //{
-        //    return this.GetNumericalProperty(file, IDX_FRAME_HEIGHT);
-        //}
-
         [STAThread]
         private string GetProperty(FileInfo file, int index)
         {

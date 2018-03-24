@@ -1,7 +1,5 @@
-﻿using Shell32;
-using System;
+﻿using System;
 using System.IO;
-using System.Text.RegularExpressions;
 
 namespace MetaExplorer.Common.VideoProperties
 {
