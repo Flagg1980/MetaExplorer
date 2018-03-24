@@ -4,11 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
-namespace MetaExplorerBE.MetaModels
+namespace MetaExplorerBE.Converter
 {
     class FileNameConverter : IConverter
     {
@@ -29,12 +27,6 @@ namespace MetaExplorerBE.MetaModels
             try
             {
                 string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(input);
-
-                //get "Date Modified" for later sorting
-                //mm.DateModified = mm.File.LastWriteTime;
-
-                //get file size
-                //mm.FileSize = (new FileInfo(input)).Length;
 
                 //create tokens
                 MatchCollection bla = Regex.Matches(fileNameWithoutExtension, @"\[.*?\]");

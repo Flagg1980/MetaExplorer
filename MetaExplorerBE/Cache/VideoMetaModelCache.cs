@@ -1,7 +1,7 @@
 ﻿using MetaExplorer.Common;
 using MetaExplorer.Common.VideoProperties;
 using MetaExplorer.Domain;
-using MetaExplorerBE.MetaModels;
+using MetaExplorerBE.Converter;
 using System;
 using System.Collections.Generic;
 using System.IO;

@@ -62,10 +62,8 @@
     <Compile Include="Cache\VideoMetaModelCache.cs" />
     <Compile Include="Cache\VideoThumbnailCache.cs" />
     <Compile Include="Cache\VideoFileCache.cs" />
-    <Compile Include="MetaModels\CriterionInstance.cs" />
-    <Compile Include="MetaModels\FileNameConverter.cs" />
-    <Compile Include="MetaModels\IConverter.cs" />
-    <Compile Include="MetaModels\VideoMetaModel.cs" />
+    <Compile Include="Converter\FileNameConverter.cs" />
+    <Compile Include="Converter\IConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
