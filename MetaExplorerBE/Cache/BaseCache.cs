@@ -6,11 +6,6 @@ using System.Threading.Tasks;
 
 namespace MetaExplorerBE
 {
-    public interface ICache
-    {
-        Task InitCacheAsync(IProgress<int> progress, IProgress<string> progressFile);
-    }
-
     public abstract class BaseCache<T> : ICache
     {
         public List<T> CachedItems

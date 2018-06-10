@@ -57,6 +57,7 @@
   <ItemGroup>
     <Compile Include="Cache\BaseCache.cs" />
     <Compile Include="Cache\CriterionCache.cs" />
+    <Compile Include="Cache\ICache.cs" />
     <Compile Include="Cache\ImageThumbnailCache.cs" />
     <Compile Include="Cache\BaseThumbnailCache.cs" />
     <Compile Include="Cache\VideoMetaModelCache.cs" />
