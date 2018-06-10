@@ -20,25 +20,12 @@ namespace MetaExplorerGUI
     public partial class MainWindow : Window
     {
         private ViewModel myViewModel;
-        //private MetaExplorerManager me;
-        private bool windowInitiallyCompletelyRendered = false;
-
-        private Point dragDropStartPoint;
-
-        Dictionary<string, GroupBox> dynamicCriterionMap = new Dictionary<string, GroupBox>();
-
-        //private int progress;
-        //private string progressFile;
-
-        public ViewModel MyViewModel
-        {
-            get { return myViewModel; }
-        }
+        private bool myWindowInitiallyCompletelyRendered = false;
+        private Point myDragDropStartPoint;
 
         public MainWindow()
         {
             InitializeComponent();
-
         }
 
         public void DoInitStuff()
@@ -84,30 +71,6 @@ namespace MetaExplorerGUI
             var criterionCache = new CriterionCache(criterionThumbnailCache, videoMetaModelCache);
             ProgressWindow.DoWorkWithModal("Updating Criterion Cache", criterionCache.InitCacheAsync);
 
-            //============================================
-
-
-
-
-            //me = new MetaExplorerManager(videoFileCache, videoMetaModelCache, criterionCache);
-
-            //ProgressWindow.DoWorkWithModal("Updating Video File Cache", me.VideoMetaModelCache.UpdateVideoFileCacheAsync);
-            
-
-            
-            
-
-            //foreach (Criterion crit in CriteriaConfig.Criteria)
-            //{
-            //    Func<IProgress<int>, IProgress<string>, Task> crit_work = (progress_int, progress_str) =>
-            //    {
-            //        return me.CriterionCache.GenerateDictAsync(crit, videoMetaModelCache.CachedItems, progress_int, progress_str);
-            //    };
-
-
-            //    ProgressWindow.DoWorkWithModal("Updating " + crit.Name + " Dictionary", crit_work);
-            //}
-
             myViewModel = new ViewModel();
             myViewModel.CriterionCache = criterionCache;
             myViewModel.VideoFileCache = videoFileCache;
@@ -120,8 +83,6 @@ namespace MetaExplorerGUI
             myViewModel.UpdateMMref();
             myViewModel.UpdateCurrentSelection();
         }
-
-
 
         public void AddDynamicCriterionButton(Criterion crit)
         {
@@ -185,7 +146,6 @@ namespace MetaExplorerGUI
                 myViewModel.UpdateCurrentSelection();
             };
 
-            this.dynamicCriterionMap[crit.Name] = gb;
             this.CriterionStackPanel.Children.Add(gb);
         }
 
@@ -201,33 +161,10 @@ namespace MetaExplorerGUI
             }
         }
 
-
-        //private VideoMetaModel GetVideoMetaModelFromButton(Button button)
-        //{
-        //    int foundIndex = -1;
-        //    for (int i = 0; i < this.myViewModel.CurrentFileSelectionCount; i++)
-        //    {
-        //        ContentPresenter depobj = myItemsControl.ItemContainerGenerator.ContainerFromIndex(i) as ContentPresenter;
-        //        DataTemplate dataTemplate = depobj.ContentTemplate;
-        //        Button candidate = dataTemplate.FindName("MyButton", depobj) as Button;
-        //        if (candidate == button)
-        //        {
-        //            foundIndex = i;
-        //            break;
-        //        }
-        //    }
-
-        //    if (foundIndex == -1)
-        //        throw new Exception("Cound not map button to video meta model.");
-
-        //    return this.myViewModel.CurrentFileSelection[foundIndex];
-        //}
-
         private void ClearFreeTextSearchButton_Click(object sender, RoutedEventArgs e)
         {
-            this.MyViewModel.FreeTextSearch = String.Empty;
+            this.myViewModel.FreeTextSearch = String.Empty;
         }
-
 
         private void VideoSelectionButton_Click(object sender, RoutedEventArgs e)
         {
@@ -266,24 +203,20 @@ namespace MetaExplorerGUI
         /// <summary>
         /// Remember the first occurence of a left mouse button click. USed for Drag&Drop operation.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void ThumbnailButton_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             // Store the mouse position
-            dragDropStartPoint = e.GetPosition(null);
+            myDragDropStartPoint = e.GetPosition(null);
         }
 
         /// <summary>
         /// Handler for the Drag&Drop operation.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void ThumbnailButton_MouseMove(object sender, MouseEventArgs e)
         {
             // Get the current mouse position
             Point mousePos = e.GetPosition(null);
-            Vector diff = dragDropStartPoint - mousePos;
+            Vector diff = myDragDropStartPoint - mousePos;
             Video videoMetaModel = (sender as Button).DataContext as Video;
 
             if (e.LeftButton == MouseButtonState.Pressed &&
@@ -301,8 +234,6 @@ namespace MetaExplorerGUI
         /// <summary>
         /// Handler which is called once the groupbox enters the dropzone.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void CriterionGroupbox_DragEnter(object sender, DragEventArgs e)
         {
             GroupBox gb = sender as GroupBox;
@@ -319,8 +250,6 @@ namespace MetaExplorerGUI
         /// <summary>
         /// Handler which is called once the groupbox leaves the dropzone.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void CriterionGroupbox_DragLeave(object sender, DragEventArgs e)
         {
             GroupBox gb = sender as GroupBox;
@@ -338,8 +267,6 @@ namespace MetaExplorerGUI
         /// <summary>
         /// Handler which is called once the groupbox is dropped.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void CriterionGroupbox_Drop(object sender, DragEventArgs e)
         {
             string expectedDragType = typeof(Video).FullName;
@@ -399,8 +326,6 @@ namespace MetaExplorerGUI
         /// <summary>
         /// Change the border of a groupbox to thick red or thin grey.
         /// </summary>
-        /// <param name="groupBox"></param>
-        /// <param name="dropReady"></param>
         private void SetGroupboxBorder(GroupBox groupBox, bool dropReady)
         {
             if (dropReady)
@@ -420,8 +345,6 @@ namespace MetaExplorerGUI
         /// Checks if mouse is inside a control. 
         /// This is a replacememnt for Control.IsMOuseOver which does not work in drag/drop mode.
         /// </summary>
-        /// <param name="control"></param>
-        /// <returns></returns>
         private bool IsMouseInside(GroupBox control)
         {
             System.Drawing.Point mousePos = System.Windows.Forms.Control.MousePosition;
@@ -454,7 +377,7 @@ namespace MetaExplorerGUI
         {
             //the first time this event occurs during rendering of the main window, 
             //this one we want to ignore
-            if (!windowInitiallyCompletelyRendered)
+            if (!myWindowInitiallyCompletelyRendered)
                 return;
 
             var selecteditem = e.AddedItems[0] as ComboBoxItem;
@@ -483,7 +406,7 @@ namespace MetaExplorerGUI
 
         private void Window_ContentRendered(object sender, EventArgs e)
         {
-            windowInitiallyCompletelyRendered = true;
+            myWindowInitiallyCompletelyRendered = true;
         }
     }
 }
