@@ -46,10 +46,10 @@ namespace MetaExplorerBE.Converter
                 }
 
                 //segregate stars
-                var starsToken = tokens.FirstOrDefault(x => Regex.IsMatch(x, @"^\d*star$", RegexOptions.IgnoreCase));
+                var starsToken = tokens.FirstOrDefault(x => Regex.IsMatch(x, @"^\dstar$", RegexOptions.IgnoreCase));
                 if (starsToken != null)
                 {
-                    mm.Stars = int.Parse(starsToken);
+                    mm.Stars = int.Parse(starsToken[0].ToString());
                 }
 
                 return mm;
