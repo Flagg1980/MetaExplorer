@@ -4,6 +4,7 @@ using MetaExplorerBE;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -37,7 +38,7 @@ namespace MetaExplorerGUI
 
             //INIT cache Video Files
             var videoFileCache = new VideoFileCache(
-                MetaExplorerGUI.Properties.Settings.Default.VideoFilesBasePath
+                ConfigurationManager.AppSettings["VideoFilesBasePath"]
                 );
             ProgressWindow.DoWorkWithModal("Updating Video File Cache", videoFileCache.InitCacheAsync);
 
@@ -46,7 +47,7 @@ namespace MetaExplorerGUI
                 Path.Combine(Directory.GetCurrentDirectory(), ".cache"),
                 videoThumbNailHeight,
                 videoThumbNailWidth,
-                MetaExplorerGUI.Properties.Settings.Default.FFmpegLocation
+                ConfigurationManager.AppSettings["FFmpegLocation"]
                 );
             ProgressWindow.DoWorkWithModal("Updating Video Thumbnails", videoThumbnailCache.InitCacheAsync);
 
@@ -169,7 +170,7 @@ namespace MetaExplorerGUI
         private void VideoSelectionButton_Click(object sender, RoutedEventArgs e)
         {
             Video found = (sender as Button).DataContext as Video;
-            Helper.Play(MetaExplorerGUI.Properties.Settings.Default.VLCLocation, found.File.FullName);
+            Helper.Play(ConfigurationManager.AppSettings["VLCLocation"], found.File.FullName);
         }
 
         private void PlayRandomButton_Click(object sender, RoutedEventArgs e)
@@ -187,7 +188,7 @@ namespace MetaExplorerGUI
             button.BringIntoView();
 
             //play the video
-            Helper.Play(MetaExplorerGUI.Properties.Settings.Default.VLCLocation, result.File.FullName);
+            Helper.Play(ConfigurationManager.AppSettings["VLCLocation"], result.File.FullName);
         }
 
         private void ContextMenuItem_OpenInExplorer_Click(object sender, RoutedEventArgs e)
