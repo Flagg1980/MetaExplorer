@@ -30,10 +30,6 @@ namespace MetaExplorerBE.Converter
 
                 //create tokens
                 MatchCollection bla = Regex.Matches(fileNameWithoutExtension, @"\[.*?\]");
-                if (bla.Count < 3)
-                {
-                    throw new Exception(String.Format("Error while tokenizing <{0}>. Minumum number of tokens is 3.", fileNameWithoutExtension));
-                }
                 List<string> tokens = bla.Cast<Match>().Select(m => m.Value).ToList();
 
                 //remove separator chars from tokens
