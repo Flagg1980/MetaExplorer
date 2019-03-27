@@ -5,13 +5,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using MetaExplorer.Domain;
 using MetaExplorer.Common;
+using System.Configuration;
 
 namespace MetaExplorerBE
 {
     /// <summary>
     /// This file caches criterion instances and their thumbnails.
     /// </summary>
-    public class CriterionCache : BaseCache<string,List<CriterionInstance>>
+    public class CriterionCache : BaseCache<string, List<CriterionInstance>>
     {
         public List<CriterionInstance> GetCriterionInstances(Criterion criterion)
         {
@@ -36,7 +37,6 @@ namespace MetaExplorerBE
             myVideoMetaModelCache = videoMetaModelCache;
 
             //init list
-            CriteriaConfig.Load();
             CriteriaConfig.Criteria.ForEach((Criterion x) => this.CachedItems.Add(x.Name, new List<CriterionInstance>()));
         }
 

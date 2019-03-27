@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ArrayOfCriterion xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <Criterion>
+  <!--<Criterion>
     <Name>Stars</Name>
     <IndexInFilename>2</IndexInFilename>
     <Mandatory>true</Mandatory>
@@ -19,5 +19,5 @@
     <Name>Keywords</Name>
     <IndexInFilename>3</IndexInFilename>
     <Mandatory>false</Mandatory>
-  </Criterion>
+  </Criterion>-->
 </ArrayOfCriterion>

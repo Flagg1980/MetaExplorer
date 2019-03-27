@@ -43,6 +43,7 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows" />
@@ -63,6 +64,7 @@
     <Compile Include="Cache\VideoMetaModelCache.cs" />
     <Compile Include="Cache\VideoThumbnailCache.cs" />
     <Compile Include="Cache\VideoFileCache.cs" />
+    <Compile Include="Configuration\CriteriaConfig.cs" />
     <Compile Include="Converter\FileNameConverter.cs" />
     <Compile Include="Converter\IConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -71,9 +73,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -101,6 +100,14 @@
       <Project>{CC447023-1442-418D-B100-6C50DC93CFEA}</Project>
       <Name>Domain</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Configuration\CriteriaConfig.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>12.0.1</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
