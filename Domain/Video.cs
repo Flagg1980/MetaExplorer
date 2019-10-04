@@ -14,6 +14,8 @@ namespace MetaExplorer.Domain
         //criteriaContents["Actors"]=("a", "n", "o")
         public Dictionary<string, List<string>> criteriaContents = new Dictionary<string, List<string>>();
 
+        public Dictionary<Criterion, List<CriterionInstance>> criteriaMapping = new Dictionary<Criterion, List<CriterionInstance>>();
+
         #endregion
 
         #region Public Properties

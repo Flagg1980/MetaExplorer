@@ -110,7 +110,7 @@
       <Name>Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\Domain\Domain.csproj">
-      <Project>{CC447023-1442-418D-B100-6C50DC93CFEA}</Project>
+      <Project>{3527e0ab-6867-426a-8b94-2e858e2e91f8}</Project>
       <Name>Domain</Name>
     </ProjectReference>
     <ProjectReference Include="..\MetaExplorerBE\MetaExplorerBE.csproj">

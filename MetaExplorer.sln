@@ -1,15 +1,23 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28729.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetaExplorerBE", "MetaExplorerBE\MetaExplorerBE.csproj", "{8CB8174A-ACC7-4508-8B52-C3644C5ED59F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3527E0AB-6867-426A-8B94-2E858E2E91F8} = {3527E0AB-6867-426A-8B94-2E858E2E91F8}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetaExplorerGUI", "MetaExplorerGUI\MetaExplorerGUI.csproj", "{1156000C-CB1A-4499-8187-7B49B002BA82}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{CC447023-1442-418D-B100-6C50DC93CFEA}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{101CF2B8-5B26-4C51-8368-D83775F591FC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{AD893162-7D2E-46DB-8328-40F60C2E2419}"
+	ProjectSection(SolutionItems) = preProject
+		Design.md = Design.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{3527E0AB-6867-426A-8B94-2E858E2E91F8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,34 +33,19 @@ Global
 		{1156000C-CB1A-4499-8187-7B49B002BA82}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1156000C-CB1A-4499-8187-7B49B002BA82}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1156000C-CB1A-4499-8187-7B49B002BA82}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CC447023-1442-418D-B100-6C50DC93CFEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CC447023-1442-418D-B100-6C50DC93CFEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CC447023-1442-418D-B100-6C50DC93CFEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CC447023-1442-418D-B100-6C50DC93CFEA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{101CF2B8-5B26-4C51-8368-D83775F591FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{101CF2B8-5B26-4C51-8368-D83775F591FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{101CF2B8-5B26-4C51-8368-D83775F591FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{101CF2B8-5B26-4C51-8368-D83775F591FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3527E0AB-6867-426A-8B94-2E858E2E91F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3527E0AB-6867-426A-8B94-2E858E2E91F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3527E0AB-6867-426A-8B94-2E858E2E91F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3527E0AB-6867-426A-8B94-2E858E2E91F8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 5
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = http://stefan-pc:8080/tfs/defaultcollection
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = MetaExplorerBE\\MetaExplorerBE.csproj
-		SccProjectName1 = MetaExplorerBE
-		SccLocalPath1 = MetaExplorerBE
-		SccProjectUniqueName2 = MetaExplorerGUI\\MetaExplorerGUI.csproj
-		SccProjectName2 = MetaExplorerGUI
-		SccLocalPath2 = MetaExplorerGUI
-		SccProjectUniqueName3 = Domain\\Domain.csproj
-		SccProjectName3 = Domain
-		SccLocalPath3 = Domain
-		SccProjectUniqueName4 = Common\\Common.csproj
-		SccProjectName4 = Common
-		SccLocalPath4 = Common
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3C4E97BB-FFF7-4569-B0F2-11FA9C9DBC70}
 	EndGlobalSection
 EndGlobal

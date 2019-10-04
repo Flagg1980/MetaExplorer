@@ -75,12 +75,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Domain\Domain.csproj">
-      <Project>{CC447023-1442-418D-B100-6C50DC93CFEA}</Project>
-      <Name>Domain</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\na.png" />
   </ItemGroup>
   <ItemGroup>

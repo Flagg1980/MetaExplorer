@@ -4,7 +4,7 @@ namespace MetaExplorer.Domain
 {
     public class CriterionInstance
     {
-        public Criterion Criterion { get; set; }
+        //public Criterion Criterion { get; set; }
 
         public Thumbnail Thumbnail { get; set; }
 
