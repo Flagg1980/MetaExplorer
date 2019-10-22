@@ -1,10 +1,10 @@
 ﻿using MetaExplorer.Common;
 using MetaExplorer.Domain;
 using MetaExplorerBE;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -23,9 +23,11 @@ namespace MetaExplorerGUI
         private ViewModel myViewModel;
         private bool myWindowInitiallyCompletelyRendered = false;
         private Point myDragDropStartPoint;
+        private IConfigurationSection myConfig;
 
-        public MainWindow()
+        public MainWindow(IConfigurationSection config)
         {
+            myConfig = config;
             InitializeComponent();
         }
 
@@ -37,9 +39,7 @@ namespace MetaExplorerGUI
             int criterionThumbNailWidth = Int32.Parse(FindResource("CriterionThumbnailWidth").ToString());
 
             //INIT cache Video Files
-            var videoFileCache = new VideoFileCache(
-                ConfigurationManager.AppSettings["VideoFilesBasePath"]
-                );
+            var videoFileCache = new VideoFileCache(myConfig.GetValue<string>("VideoFilesBasePath"));
             ProgressWindow.DoWorkWithModal("Updating Video File Cache", videoFileCache.InitCacheAsync);
 
             //INIT cache video thumbnails
@@ -47,7 +47,7 @@ namespace MetaExplorerGUI
                 Path.Combine(Directory.GetCurrentDirectory(), ".cache"),
                 videoThumbNailHeight,
                 videoThumbNailWidth,
-                ConfigurationManager.AppSettings["FFmpegLocation"]
+                myConfig.GetValue<string>("FFmpegLocation")
                 );
             ProgressWindow.DoWorkWithModal("Updating Video Thumbnails", videoThumbnailCache.InitCacheAsync);
 
@@ -170,7 +170,7 @@ namespace MetaExplorerGUI
         private void VideoSelectionButton_Click(object sender, RoutedEventArgs e)
         {
             Video found = (sender as Button).DataContext as Video;
-            Helper.Play(ConfigurationManager.AppSettings["VLCLocation"], found.File.FullName);
+            Helper.Play(myConfig.GetValue<string>("VLCLocation"), found.File.FullName);
         }
 
         private void PlayRandomButton_Click(object sender, RoutedEventArgs e)
@@ -188,7 +188,7 @@ namespace MetaExplorerGUI
             button.BringIntoView();
 
             //play the video
-            Helper.Play(ConfigurationManager.AppSettings["VLCLocation"], result.File.FullName);
+            Helper.Play(myConfig.GetValue<string>("VLCLocation"), result.File.FullName);
         }
 
         private void ContextMenuItem_OpenInExplorer_Click(object sender, RoutedEventArgs e)
@@ -348,7 +348,8 @@ namespace MetaExplorerGUI
         /// </summary>
         private bool IsMouseInside(GroupBox control)
         {
-            System.Drawing.Point mousePos = System.Windows.Forms.Control.MousePosition;
+            //System.Drawing.Point mousePos = System.Windows.Forms.Control.MousePosition;
+            var mousePos = Mouse.GetPosition(control);
             Point p = new Point(0d, 0d);
             Point controlPos = control.PointToScreen(p);
 

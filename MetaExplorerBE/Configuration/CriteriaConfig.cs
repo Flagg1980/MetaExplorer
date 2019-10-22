@@ -1,7 +1,6 @@
 ﻿using MetaExplorer.Domain;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
@@ -12,12 +11,11 @@ namespace MetaExplorer.Common
     {
         static CriteriaConfig()
         {
-            LoadFromAppSettings();
         }
 
-        public static void LoadFromAppSettings()
+        public static void LoadFromAppSettings(string criterionConfig)
         {
-            var criterionConfigJson = ConfigurationManager.AppSettings["CriterionConfig"];
+            var criterionConfigJson = criterionConfig;
             Criteria = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Criterion>>(criterionConfigJson);
         }
 
