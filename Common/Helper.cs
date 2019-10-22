@@ -53,19 +53,19 @@ namespace MetaExplorer.Common
             DrawingVisual drawingVisual = new DrawingVisual();
 
            // Retrieve the DrawingContext in order to create new drawing content.
-           //DrawingContext drawingContext = drawingVisual.RenderOpen();
+           DrawingContext drawingContext = drawingVisual.RenderOpen();
 
            // draw the image and text in the DrawingContext.
-           // Rect rect = new Rect(new System.Windows.Size(bi.Width, bi.Height));
-           // drawingContext.DrawImage(bi, rect);
+            Rect rect = new Rect(new System.Windows.Size(bi.Width, bi.Height));
+            drawingContext.DrawImage(bi, rect);
 
-           // System.Windows.Media.Pen pen = new System.Windows.Media.Pen(System.Windows.Media.Brushes.Red, 5);
-           // drawingContext.DrawLine(pen, rect.TopLeft, rect.BottomRight);
-           // drawingContext.DrawLine(pen, rect.TopRight, rect.BottomLeft);
+            System.Windows.Media.Pen pen = new System.Windows.Media.Pen(System.Windows.Media.Brushes.Red, 5);
+            drawingContext.DrawLine(pen, rect.TopLeft, rect.BottomRight);
+            drawingContext.DrawLine(pen, rect.TopRight, rect.BottomLeft);
 
            // Persist the drawing content.
-           // drawingContext.Close();
-           // rtb.Render(drawingVisual);
+            drawingContext.Close();
+            rtb.Render(drawingVisual);
 
             return rtb;
         }
@@ -74,17 +74,17 @@ namespace MetaExplorer.Common
         {
             get
             {
-                //if (_NAimage == null)
-                //{
-                //    Bitmap bitmap = Resources.na;
-                //    //Bitmap bitmap = new Bitmap()
-                //    var memoryStream = new System.IO.MemoryStream();
-                //    bitmap.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
-                //    _NAimage = new BitmapImage();
-                //    _NAimage.BeginInit();
-                //    _NAimage.StreamSource = new System.IO.MemoryStream(memoryStream.ToArray());
-                //    _NAimage.EndInit();
-                //}
+                if (_NAimage == null)
+                {
+                    Bitmap bitmap = Resources.na;
+                    //Bitmap bitmap = new Bitmap()
+                    var memoryStream = new System.IO.MemoryStream();
+                    bitmap.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
+                    _NAimage = new BitmapImage();
+                    _NAimage.BeginInit();
+                    _NAimage.StreamSource = new System.IO.MemoryStream(memoryStream.ToArray());
+                    _NAimage.EndInit();
+                }
 
                 return _NAimage;
             }
