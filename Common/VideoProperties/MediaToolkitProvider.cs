@@ -1,5 +1,6 @@
 ﻿using MediaToolkit.Model;
 using System;
+using System.Configuration;
 using System.IO;
 
 namespace MetaExplorer.Common.VideoProperties
@@ -10,7 +11,7 @@ namespace MetaExplorer.Common.VideoProperties
 
         public MediaToolkitProvider()
         {
-            engine = new MediaToolkit.Engine();
+            engine = new MediaToolkit.Engine(ConfigurationManager.AppSettings["FFmpegLocation"]);
         }
 
         public VideoProperties GetVideoProperties(FileInfo file)

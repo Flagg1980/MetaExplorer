@@ -1,11 +1,12 @@
-﻿using System.Diagnostics;
+﻿using Common;
+using System.Diagnostics;
 using System.Drawing;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Common.Properties;
+//using Common3.Properties;
 
 namespace MetaExplorer.Common
 {
@@ -51,20 +52,20 @@ namespace MetaExplorer.Common
             RenderTargetBitmap rtb = new RenderTargetBitmap(bi.PixelWidth, bi.PixelHeight, bi.DpiX, bi.DpiY, PixelFormats.Pbgra32);
             DrawingVisual drawingVisual = new DrawingVisual();
 
-            // Retrieve the DrawingContext in order to create new drawing content.
-            DrawingContext drawingContext = drawingVisual.RenderOpen();
+           // Retrieve the DrawingContext in order to create new drawing content.
+           //DrawingContext drawingContext = drawingVisual.RenderOpen();
 
-            // draw the image and text in the DrawingContext.
-            Rect rect = new Rect(new System.Windows.Size(bi.Width, bi.Height));
-            drawingContext.DrawImage(bi, rect);
+           // draw the image and text in the DrawingContext.
+           // Rect rect = new Rect(new System.Windows.Size(bi.Width, bi.Height));
+           // drawingContext.DrawImage(bi, rect);
 
-            System.Windows.Media.Pen pen = new System.Windows.Media.Pen(System.Windows.Media.Brushes.Red, 5);
-            drawingContext.DrawLine(pen, rect.TopLeft, rect.BottomRight);
-            drawingContext.DrawLine(pen, rect.TopRight, rect.BottomLeft);
-            
-            // Persist the drawing content.
-            drawingContext.Close();
-            rtb.Render(drawingVisual);
+           // System.Windows.Media.Pen pen = new System.Windows.Media.Pen(System.Windows.Media.Brushes.Red, 5);
+           // drawingContext.DrawLine(pen, rect.TopLeft, rect.BottomRight);
+           // drawingContext.DrawLine(pen, rect.TopRight, rect.BottomLeft);
+
+           // Persist the drawing content.
+           // drawingContext.Close();
+           // rtb.Render(drawingVisual);
 
             return rtb;
         }
@@ -73,16 +74,17 @@ namespace MetaExplorer.Common
         {
             get
             {
-                if (_NAimage == null)
-                {
-                    Bitmap bitmap = Resources.na;
-                    var memoryStream = new System.IO.MemoryStream();
-                    bitmap.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
-                    _NAimage = new BitmapImage();
-                    _NAimage.BeginInit();
-                    _NAimage.StreamSource = new System.IO.MemoryStream(memoryStream.ToArray());
-                    _NAimage.EndInit();
-                }
+                //if (_NAimage == null)
+                //{
+                //    Bitmap bitmap = Resources.na;
+                //    //Bitmap bitmap = new Bitmap()
+                //    var memoryStream = new System.IO.MemoryStream();
+                //    bitmap.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
+                //    _NAimage = new BitmapImage();
+                //    _NAimage.BeginInit();
+                //    _NAimage.StreamSource = new System.IO.MemoryStream(memoryStream.ToArray());
+                //    _NAimage.EndInit();
+                //}
 
                 return _NAimage;
             }

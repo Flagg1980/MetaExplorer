@@ -4,9 +4,9 @@ namespace MetaExplorer.Common.VideoProperties
 {
     public enum VideoPropertiesTechnology
     {
-        Shell32,
+        //Shell32,
         MediaToolkit,
-        WinAPICodePack,
+        //WinAPICodePack,
         None
     }
 
@@ -20,12 +20,12 @@ namespace MetaExplorer.Common.VideoProperties
 
         public VideoPropertiesProvider(VideoPropertiesTechnology technology)
         {
-            if (technology == VideoPropertiesTechnology.Shell32)
-                Provider = new Shellprovider();
-            else if (technology == VideoPropertiesTechnology.MediaToolkit)
+            //if (technology == VideoPropertiesTechnology.Shell32)
+            //    Provider = new Shellprovider();
+            /*else*/ if (technology == VideoPropertiesTechnology.MediaToolkit)
                 Provider = new MediaToolkitProvider();
-            else if (technology == VideoPropertiesTechnology.WinAPICodePack)
-                Provider = new WindowsApiCodepackProvider();
+            //else if (technology == VideoPropertiesTechnology.WinAPICodePack)
+            //    Provider = new WindowsApiCodepackProvider();
             else if (technology == VideoPropertiesTechnology.None)
                 Provider = new DefaultProvider();
             else
