@@ -19,8 +19,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetaExplorerBE", "MetaExplorerBE\MetaExplorerBE.csproj", "{BB3A290F-7EA6-4214-AF1C-A2B65B2967BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetaExplorerGUI2", "MetaExplorerGUI\MetaExplorerGUI2.csproj", "{A35B8F12-DFB4-4D6A-A342-138612BFF215}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,10 +41,6 @@ Global
 		{BB3A290F-7EA6-4214-AF1C-A2B65B2967BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB3A290F-7EA6-4214-AF1C-A2B65B2967BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB3A290F-7EA6-4214-AF1C-A2B65B2967BF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A35B8F12-DFB4-4D6A-A342-138612BFF215}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A35B8F12-DFB4-4D6A-A342-138612BFF215}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A35B8F12-DFB4-4D6A-A342-138612BFF215}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A35B8F12-DFB4-4D6A-A342-138612BFF215}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
