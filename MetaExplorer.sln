@@ -7,6 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetaExplorerGUI", "MetaExpl
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{AD893162-7D2E-46DB-8328-40F60C2E2419}"
 	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
 		Design.md = Design.md
 	EndProjectSection
 EndProject
