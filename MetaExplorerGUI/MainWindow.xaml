@@ -41,6 +41,29 @@
             <EventSetter Event="ButtonBase.MouseDoubleClick" Handler="VideoSelectionButton_Click"/>
         </Style>
         
+        <!-- template for criterion thumbnail display -->
+        <!--<DataTemplate x:Key="CriterionButtonTemplate">
+            <Button Name="MyCriterionButton" Style="{StaticResource ResourceKey=ThumbnailButtonStyle}" Height="{Binding Source={StaticResource ThumbnailButtonHeight}}" Width="{Binding Source={StaticResource ThumbnailButtonWidth}}"
+                    PreviewMouseLeftButtonDown="ThumbnailButton_PreviewMouseLeftButtonDown" PreviewMouseMove="ThumbnailButton_MouseMove" >
+                <StackPanel Orientation="Vertical">
+                    <Image Source="{Binding Path=Thumbnail.Image}" Height="{Binding Source={StaticResource VideoThumbnailHeight}}" Width="{Binding Source={StaticResource VideoThumbnailWidth}}" VerticalAlignment="Top"/>
+                </StackPanel>
+            </Button>
+        </DataTemplate>-->
+
+        <DataTemplate x:Key="CriterionButtonTemplate">
+            <WrapPanel>
+                <StackPanel Name ="sp" Orientation="Horizontal">
+                    <Image Width="{Binding Source={StaticResource CriterionThumbnailWidth}}" Height="{Binding Source={StaticResource CriterionThumbnailHeight}}" Source="{Binding Path=Thumbnail.Image}"></Image>
+                    <StackPanel Orientation="Vertical" Width="250">
+                        <Label Height="140" Width="250" VerticalContentAlignment="Center" FontSize="22" FontFamily="Comic Sans MS" Content="{Binding Path=Name}"></Label>
+                        <Label Height="40" Width="250" VerticalAlignment="Center" FontSize="12" Content="{Binding Path=Stats}"></Label>
+                    </StackPanel>
+                </StackPanel>
+            </WrapPanel>
+        </DataTemplate>
+
+        <!-- temnplate for video thumbnail display -->
         <DataTemplate x:Key="ThumbnailButtonTemplate">
             <Button Name="MyButton" Style="{StaticResource ResourceKey=ThumbnailButtonStyle}" Height="{Binding Source={StaticResource ThumbnailButtonHeight}}" Width="{Binding Source={StaticResource ThumbnailButtonWidth}}"
                     PreviewMouseLeftButtonDown="ThumbnailButton_PreviewMouseLeftButtonDown" PreviewMouseMove="ThumbnailButton_MouseMove" >                <!-- Used for Drag&Drop-->
@@ -91,6 +114,17 @@
             </GroupBox>
         </ControlTemplate>
 
+        <DataTemplate x:Key="DetailedTemplate">
+            <WrapPanel>
+                <StackPanel Name ="sp" Orientation="Horizontal">
+                    <Image Width="{Binding Source={StaticResource CriterionThumbnailWidth}}" Height="{Binding Source={StaticResource CriterionThumbnailHeight}}" Source="{Binding Path=Thumbnail.Image}"></Image>
+                    <StackPanel Orientation="Vertical" Width="250">
+                        <Label Height="140" Width="250" VerticalContentAlignment="Center" FontSize="22" FontFamily="Comic Sans MS" Content="{Binding Path=Name}"></Label>
+                        <Label Height="40" Width="250" VerticalAlignment="Center" FontSize="12" Content="{Binding Path=Stats}"></Label>
+                    </StackPanel>
+                </StackPanel>
+            </WrapPanel>
+        </DataTemplate>
 
     </Window.Resources>
 
@@ -123,8 +157,9 @@
         <ScrollViewer x:Name="myScrollViewer" Margin="10" HorizontalScrollBarVisibility="Disabled" 
 			Grid.Row="1" Grid.Column="0">
 
-            <ItemsControl x:Name="myItemsControl" ItemsSource="{Binding CurrentFileSelection}" ItemTemplate="{DynamicResource ThumbnailButtonTemplate}">
-                <ItemsControl.ItemsPanel>
+            <!--<ItemsControl x:Name="myItemsControl" ItemsSource="{Binding CriterionCache}" ItemTemplate="{DynamicResource ThumbnailButtonTemplate}">-->
+            <ItemsControl x:Name="myItemsControl" ItemsSource="{Binding CurrentCriterionList}" ItemTemplate="{DynamicResource DetailedTemplate}">
+                    <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel VerticalAlignment="Top" ScrollViewer.CanContentScroll="True"/>
                     </ItemsPanelTemplate>
@@ -132,6 +167,18 @@
             </ItemsControl>
         </ScrollViewer>
 
+   
+
+
+
+        <!--<ListBox x:Name="criterionListBox" Grid.Row="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ItemsSource="{Binding}" ItemTemplate="{DynamicResource DetailedTemplate}" SelectedIndex="0" 
+                 IsTextSearchCaseSensitive="False" IsTextSearchEnabled="True" TextSearch.TextPath="Name">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel  IsItemsHost="True" />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+        </ListBox>-->
 
         <!--
         Criterion Selection Area

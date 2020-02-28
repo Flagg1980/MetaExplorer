@@ -86,6 +86,11 @@ namespace MetaExplorerGUI
             currentFileSelection = new ObservableCollection<Video>();
 
             CriteriaConfig.Criteria.ForEach((Criterion x) => currentCriterionSelectionIndex[x.Name] = -1);
+
+            CurrentCriterionList = new RangeObservableCollection<CriterionInstance>();
+
+            
+
         }
 
         #endregion
@@ -108,7 +113,11 @@ namespace MetaExplorerGUI
             this.CurrentFileSelectionCount = this.currentFileSelection.Count();
 
             this.CurrentFileSelectionSize = 0;
-            foreach (Video vmm in this.currentFileSelection) { this.CurrentFileSelectionSize += vmm.File.Length; }
+            foreach (Video vmm in this.CurrentFileSelection) { this.CurrentFileSelectionSize += vmm.File.Length; }
+
+            //das muss woanders hin, nicht jedesmal machen, nur einmal
+            List<CriterionInstance> critInstanceList = this.CriterionCache.GetCriterionInstances("Actor");
+            critInstanceList.ForEach(x => CurrentCriterionList.Add(x));
         }
 
         public void UpdateMMref()
