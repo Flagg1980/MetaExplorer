@@ -16,16 +16,21 @@ namespace MetaExplorerGUI
     public partial class App : Application
     {
         private IConfigurationRoot configRoot;
+        private IConfigurationRoot configCrit;
 
         public App() : base()
         {
             this.Dispatcher.UnhandledException += OnDispatcherUnhandledException;
 
-            var builder = new ConfigurationBuilder()
+            var builderRoot = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddEnvironmentVariables();
-            configRoot = builder.Build();         
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+            configRoot = builderRoot.Build();
+
+            var builderCrit = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("critsettings.json", optional: false, reloadOnChange: true);
+            configCrit = builderCrit.Build();
         }
 
         void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
@@ -39,10 +44,9 @@ namespace MetaExplorerGUI
         [STAThread]
         private void ApplicationStart(object sender, StartupEventArgs e)
         {
-            var config = configRoot.GetSection("section0");
-            CriteriaConfig.LoadFromAppSettings(config.GetValue<string>("CriterionConfig"));
+            CriteriaConfig.LoadFromAppSettings(configCrit);
 
-            var mainWindow = new MainWindow(config);
+            var mainWindow = new MainWindow(configRoot);
             mainWindow.Show();
             mainWindow.DoInitStuff();
 

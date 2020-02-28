@@ -23,9 +23,9 @@ namespace MetaExplorerGUI
         private ViewModel myViewModel;
         private bool myWindowInitiallyCompletelyRendered = false;
         private Point myDragDropStartPoint;
-        private IConfigurationSection myConfig;
+        private IConfiguration myConfig;
 
-        public MainWindow(IConfigurationSection config)
+        public MainWindow(IConfiguration config)
         {
             myConfig = config;
             InitializeComponent();
@@ -52,7 +52,7 @@ namespace MetaExplorerGUI
             ProgressWindow.DoWorkWithModal("Updating Video Thumbnails", videoThumbnailCache.InitCacheAsync);
 
             //INIT cache criterion thumbnails
-            List<string> criterionThumbPaths = CriteriaConfig.Criteria.Select(x => Path.Combine(Directory.GetCurrentDirectory(), x.Name)).ToList();
+            List<string> criterionThumbPaths = CriteriaConfig.Criteria.Select(x => Path.Combine(myConfig.GetValue<string>("CriterionFilesBasePath", x.Name))).ToList();
             var criterionThumbnailCache = new ImageThumbnailCache(
                 criterionThumbPaths,
                 criterionThumbNailHeight,

@@ -1,9 +1,7 @@
 ﻿using MetaExplorer.Domain;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Xml;
-using System.Xml.Serialization;
 
 namespace MetaExplorer.Common
 {
@@ -13,10 +11,19 @@ namespace MetaExplorer.Common
         {
         }
 
-        public static void LoadFromAppSettings(string criterionConfig)
+        public static void LoadFromAppSettings(IConfiguration criterionConfig)
         {
             var criterionConfigJson = criterionConfig;
-            Criteria = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Criterion>>(criterionConfigJson);
+            Criteria = new List<Criterion>();
+
+            foreach (var ee in criterionConfig.GetChildren())
+            {
+                Criteria.Add(new Criterion { 
+                 Name = ee.Key,
+                 IndexInFilename = Int32.Parse(ee.GetSection("IndexInFilename").Value),
+                 Mandatory = Boolean.Parse(ee.GetSection("Mandatory").Value),
+                });
+            }
         }
 
         public static List<Criterion> Criteria
