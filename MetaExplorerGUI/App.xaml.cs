@@ -1,9 +1,8 @@
 ﻿using MetaExplorer.Common;
 using MetaExplorer.Domain;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using System;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -22,14 +21,21 @@ namespace MetaExplorerGUI
         {
             this.Dispatcher.UnhandledException += OnDispatcherUnhandledException;
 
+            // read base path for appsettings.json and critsettings.json.
+            // if this bnase path exists, we know we are in staging or productive environment.
+            // if not, we are in development mode.
+            var basePath = ConfigurationManager.AppSettings.Get("ConfigBasePath");
+            if (basePath == null || !Directory.Exists(basePath))
+                basePath = Directory.GetCurrentDirectory();
+
             var builderRoot = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                .SetBasePath(basePath)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false);
             configRoot = builderRoot.Build();
 
             var builderCrit = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("critsettings.json", optional: false, reloadOnChange: true);
+                .SetBasePath(basePath)
+                .AddJsonFile("critsettings.json", optional: false, reloadOnChange: false);
             configCrit = builderCrit.Build();
         }
 

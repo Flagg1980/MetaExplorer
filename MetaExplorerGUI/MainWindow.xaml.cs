@@ -44,7 +44,7 @@ namespace MetaExplorerGUI
 
             //INIT cache video thumbnails
             var videoThumbnailCache = new VideoThumbnailCache(
-                Path.Combine(Directory.GetCurrentDirectory(), ".cache"),
+                Path.Combine(myConfig.GetValue<string>("CriterionFilesBasePath"), ".cache"),
                 videoThumbNailHeight,
                 videoThumbNailWidth,
                 myConfig.GetValue<string>("FFmpegLocation")
