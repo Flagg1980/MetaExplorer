@@ -52,7 +52,7 @@ namespace MetaExplorerGUI
             ProgressWindow.DoWorkWithModal("Updating Video Thumbnails", videoThumbnailCache.InitCacheAsync);
 
             //INIT cache criterion thumbnails
-            List<string> criterionThumbPaths = CriteriaConfig.Criteria.Select(x => Path.Combine(myConfig.GetValue<string>("CriterionFilesBasePath", x.Name))).ToList();
+            List<string> criterionThumbPaths = CriteriaConfig.Criteria.Select(x => Path.Combine(myConfig.GetValue<string>("CriterionFilesBasePath"), x.Name)).ToList();
             var criterionThumbnailCache = new ImageThumbnailCache(
                 criterionThumbPaths,
                 criterionThumbNailHeight,
