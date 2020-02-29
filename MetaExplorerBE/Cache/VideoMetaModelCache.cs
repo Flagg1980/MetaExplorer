@@ -142,17 +142,6 @@ namespace MetaExplorerBE
         /// </summary>
         /// <param name="regex"></param>
         /// <returns></returns>
-        public List<Video> GetThumbnailFileSelection(Video mmRef)
-        {
-            List<Video> videoFiles = this.GetVideoFileSelection(mmRef);
-            return videoFiles;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="regex"></param>
-        /// <returns></returns>
         public List<Video> GetVideoFileSelection(Video mmRef)
         {
             List<Video> res = new List<Video>(this.CachedItems);

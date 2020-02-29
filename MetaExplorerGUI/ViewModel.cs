@@ -105,7 +105,7 @@ namespace MetaExplorerGUI
         public void UpdateCurrentSelection()
         {
             currentFileSelection.Clear();
-            currentFileSelection.AddRange(this.VideoMetaModelCache.GetThumbnailFileSelection(mmRef));
+            currentFileSelection.AddRange(this.VideoMetaModelCache.GetVideoFileSelection(mmRef));
             
             this.CurrentFileSelectionCount = this.currentFileSelection.Count();
 
