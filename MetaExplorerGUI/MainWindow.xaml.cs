@@ -73,10 +73,7 @@ namespace MetaExplorerGUI
             var criterionCache = new CriterionCache(criterionThumbnailCache, videoMetaModelCache);
             ProgressWindow.DoWorkWithModal("Updating Criterion Cache", criterionCache.InitCacheAsync);
 
-            myViewModel = new ViewModel();
-            myViewModel.CriterionCache = criterionCache;
-            myViewModel.VideoFileCache = videoFileCache;
-            myViewModel.VideoMetaModelCache = videoMetaModelCache;
+            myViewModel = new ViewModel(criterionCache, videoFileCache, videoMetaModelCache);
 
             this.DataContext = myViewModel;
             myItemsControl.DataContext = myViewModel;
@@ -111,24 +108,26 @@ namespace MetaExplorerGUI
 
             selectButton.Click += (object sender, RoutedEventArgs args) =>
             {
-                CriterionSelectionWindow w = new CriterionSelectionWindow(myViewModel.CriterionCache.GetCriterionInstances(crit));
-                w.ShowDialog();
+                //CriterionSelectionWindow w = new CriterionSelectionWindow(myViewModel.CriterionCache.GetCriterionInstances(crit));
+                //w.ShowDialog();
 
-                if (w.SelectedIndex != -1)
-                {
-                    myViewModel.CurrentCriterionSelectionIndex[crit.Name] = w.SelectedIndex;
-                    CriterionInstance ci = this.myViewModel.CriterionCache.GetCriterionInstances(crit)[w.SelectedIndex];
+                //if (w.SelectedIndex != -1)
+                //{
+                //    myViewModel.CurrentCriterionSelectionIndex[crit.Name] = w.SelectedIndex;
+                //    CriterionInstance ci = this.myViewModel.CriterionCache.GetCriterionInstances(crit)[w.SelectedIndex];
 
-                    //update the label and the picture of the button
-                    label.Content = ci.Name;
-                    image.Source = ci.Thumbnail.Image;
+                //    //update the label and the picture of the button
+                //    label.Content = ci.Name;
+                //    image.Source = ci.Thumbnail.Image;
 
-                    //update the MMref
-                    myViewModel.UpdateMMref();
+                //    //update the MMref
+                //    myViewModel.UpdateMMref();
 
-                    //update the current selection
-                    myViewModel.UpdateCurrentSelection();
-                }
+                //    //update the current selection
+                //    myViewModel.UpdateCurrentSelection();
+                //}
+
+                SwitchToCriterionThumbnailView(crit);
             };
 
             clearButton.Click += (object sender, RoutedEventArgs args) =>
@@ -146,9 +145,25 @@ namespace MetaExplorerGUI
 
                 //update the current selection
                 myViewModel.UpdateCurrentSelection();
+
+                SwitchToVideoThumbnailView();
             };
 
             this.CriterionStackPanel.Children.Add(gb);
+        }
+
+        private void SwitchToCriterionThumbnailView(Criterion crit)
+        {
+            myItemsControl.ItemsSource = myViewModel.CriterionCache.GetCriterionInstances(crit);
+
+            MyRandomButton.IsEnabled = false;
+        }
+
+        private void SwitchToVideoThumbnailView()
+        {
+            myItemsControl.ItemsSource = myViewModel.CurrentFileSelection;
+
+            MyRandomButton.IsEnabled = true;
         }
 
         /// <summary>
@@ -176,30 +191,30 @@ namespace MetaExplorerGUI
 
         private void PlayRandomButton_Click(object sender, RoutedEventArgs e)
         {
-            ////get current displayed files
-            //int count = this.myViewModel.CurrentFileSelection.Count;
+            //get current displayed files
+            int count = this.myViewModel.CurrentFileSelection.Count;
 
-            //Random rand = new Random();
-            //int rnd = rand.Next(count);   //0..count-1
+            Random rand = new Random();
+            int rnd = rand.Next(count);   //0..count-1
 
-            //Video result = this.myViewModel.CurrentFileSelection[rnd];
+            Video result = this.myViewModel.CurrentFileSelection[rnd];
 
-            ////bring video into view
-            //Button button = GetButtonByVideoMetaModel(result);
-            //button.BringIntoView();
+            //bring video into view
+            Button button = GetButtonByVideoMetaModel(result);
+            button.BringIntoView();
 
-            ////play the video
-            //Helper.Play(myConfig.GetValue<string>("VLCLocation"), result.File.FullName);
+            //play the video
+            Helper.Play(myConfig.GetValue<string>("VLCLocation"), result.File.FullName);
 
-            //myItemsControl.ItemsSource = myViewModel.CurrentCriterionList;
+            //myItemsControl.ItemsSource = myViewModel.CurrentCriterionInstanceList;
 
             //ContentPresenter depobj = myItemsControl.ItemContainerGenerator.ContainerFromItem(myItemsControl) as ContentPresenter;
             //DataTemplate dataTemplate = depobj.ContentTemplate;
 
-            if (myItemsControl.ItemsSource == myViewModel.CurrentCriterionList)
-                myItemsControl.ItemsSource = myViewModel.CurrentFileSelection;
-            else
-                myItemsControl.ItemsSource = myViewModel.CurrentCriterionList;
+            //if (myItemsControl.ItemsSource == myViewModel.CurrentCriterionInstanceList)
+            //    myItemsControl.ItemsSource = myViewModel.CurrentFileSelection;
+            //else
+            //    myItemsControl.ItemsSource = myViewModel.CurrentCriterionInstanceList;
         }
 
         private void ContextMenuItem_OpenInExplorer_Click(object sender, RoutedEventArgs e)
@@ -380,7 +395,7 @@ namespace MetaExplorerGUI
         private Button GetButtonByVideoMetaModel(Video vmm)
         {
             ContentPresenter depobj = myItemsControl.ItemContainerGenerator.ContainerFromItem(vmm) as ContentPresenter;
-            DataTemplate dataTemplate = depobj.ContentTemplate;
+            DataTemplate dataTemplate = depobj.ContentTemplateSelector.SelectTemplate(vmm, depobj);
             Button candidate = dataTemplate.FindName("MyButton", depobj) as Button;
 
             return candidate;

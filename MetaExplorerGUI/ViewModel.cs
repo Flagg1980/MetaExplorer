@@ -24,8 +24,6 @@ namespace MetaExplorerGUI
         public VideoMetaModelCache VideoMetaModelCache { get; set; }
         public CriterionCache CriterionCache { get; set; }
 
-        private ObservableCollection<Video> currentFileSelection;
-
         private Video mmRef = null;
 
         #endregion
@@ -49,16 +47,9 @@ namespace MetaExplorerGUI
             private set { this.mmRef = value; }
         }
 
-        public ObservableCollection<Video> CurrentFileSelection
-        {
-            get { return this.currentFileSelection; }
-        }
+        public ObservableCollection<Video> CurrentFileSelection { get; private set; }
 
-        //public MetaExplorerManager MEManager
-        //{
-        //    get { return this.me; }
-        //    set { this.me = value;  }
-        //}
+        //public ObservableCollection<CriterionInstance> CurrentCriterionInstanceList { get; private set; }
 
         public int CurrentFileSelectionCount
         {
@@ -81,15 +72,17 @@ namespace MetaExplorerGUI
 
         #region C'tor
 
-        public ViewModel()
+        public ViewModel(CriterionCache criterionCache, VideoFileCache videoFileCache, VideoMetaModelCache videoMetaModelCache)
         {
-            currentFileSelection = new ObservableCollection<Video>();
+            CriterionCache = criterionCache;
+            VideoFileCache = videoFileCache;
+            VideoMetaModelCache = videoMetaModelCache;
+
+            CurrentFileSelection = new ObservableCollection<Video>();
 
             CriteriaConfig.Criteria.ForEach((Criterion x) => currentCriterionSelectionIndex[x.Name] = -1);
 
-            CurrentCriterionList = new RangeObservableCollection<CriterionInstance>();
-
-            
+            //CurrentCriterionInstanceList = this.CriterionCache.GetCriterionInstances("Actor");
 
         }
 
@@ -106,18 +99,18 @@ namespace MetaExplorerGUI
 
         public void UpdateCurrentSelection()
         {
-            currentFileSelection.Clear();
+            CurrentFileSelection.Clear();
             //currentFileSelection.AddRange(this.VideoMetaModelCache.GetVideoFileSelection(mmRef));
-            currentFileSelection = this.VideoMetaModelCache.GetVideoFileSelection(mmRef);
+            CurrentFileSelection = this.VideoMetaModelCache.GetVideoFileSelection(mmRef);
 
-            this.CurrentFileSelectionCount = this.currentFileSelection.Count();
+            this.CurrentFileSelectionCount = this.CurrentFileSelection.Count();
 
             this.CurrentFileSelectionSize = 0;
-            foreach (Video vmm in this.CurrentFileSelection) { this.CurrentFileSelectionSize += vmm.File.Length; }
+            foreach (Video vmm in this.CurrentFileSelection) 
+            { 
+                this.CurrentFileSelectionSize += vmm.File.Length; 
+            }
 
-            //das muss woanders hin, nicht jedesmal machen, nur einmal
-            List<CriterionInstance> critInstanceList = this.CriterionCache.GetCriterionInstances("Actor");
-            critInstanceList.ForEach(x => CurrentCriterionList.Add(x));
         }
 
         public void UpdateMMref()
@@ -141,11 +134,8 @@ namespace MetaExplorerGUI
 
         public event PropertyChangedEventHandler PropertyChanged;  
         public void OnPropertyChanged(string Property = "")  
-        {  
-            if (PropertyChanged != null)  
-            {  
-                PropertyChanged(this, new PropertyChangedEventArgs(Property));  
-            }  
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(Property));
         }
 
         #endregion

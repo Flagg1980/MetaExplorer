@@ -202,7 +202,7 @@
                 </StackPanel>
             </GroupBox>
 
-            <Button Height="50" Margin="30" Content="Random" Click="PlayRandomButton_Click"/>
+            <Button Name="MyRandomButton" Height="50" Margin="30" Content="Random" Click="PlayRandomButton_Click"/>
 
         </StackPanel>
 
