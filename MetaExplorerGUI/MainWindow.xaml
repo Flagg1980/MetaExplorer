@@ -8,8 +8,6 @@
 
     <Window.Resources>
 
-        
-
         <Style x:Key="HiddenButtonStyle" TargetType="{x:Type Button}">
             <Setter Property="Padding" Value="1"/>
             <Setter Property="Background" Value="Transparent" />
@@ -64,7 +62,7 @@
         </DataTemplate>
 
         <!-- temnplate for video thumbnail display -->
-        <DataTemplate x:Key="ThumbnailButtonTemplate">
+        <DataTemplate x:Key="Template_ThumbnailArea_VideoThumbs">
             <Button Name="MyButton" Style="{StaticResource ResourceKey=ThumbnailButtonStyle}" Height="{Binding Source={StaticResource ThumbnailButtonHeight}}" Width="{Binding Source={StaticResource ThumbnailButtonWidth}}"
                     PreviewMouseLeftButtonDown="ThumbnailButton_PreviewMouseLeftButtonDown" PreviewMouseMove="ThumbnailButton_MouseMove" >                <!-- Used for Drag&Drop-->
                 <StackPanel Orientation="Vertical">
@@ -114,7 +112,7 @@
             </GroupBox>
         </ControlTemplate>
 
-        <DataTemplate x:Key="DetailedTemplate">
+        <DataTemplate x:Key="Template_ThumbnailArea_CriterionThumbs">
             <WrapPanel>
                 <StackPanel Name ="sp" Orientation="Horizontal">
                     <Image Width="{Binding Source={StaticResource CriterionThumbnailWidth}}" Height="{Binding Source={StaticResource CriterionThumbnailHeight}}" Source="{Binding Path=Thumbnail.Image}"></Image>
@@ -126,6 +124,12 @@
             </WrapPanel>
         </DataTemplate>
 
+        <local:ThumbnailAreaTemplateSelector x:Name="ThumbnailAreaTemplateSelector" 
+                                             x:Key="ThumbnailAreaTemplateSelector"
+                                             TemplateThumbnailAreaVideoThumbs="{StaticResource Template_ThumbnailArea_VideoThumbs}"
+                                             TemplateThumbnailAreaCriterionThumbs="{StaticResource Template_ThumbnailArea_CriterionThumbs}"
+        />
+        
     </Window.Resources>
 
 
@@ -157,8 +161,9 @@
         <ScrollViewer x:Name="myScrollViewer" Margin="10" HorizontalScrollBarVisibility="Disabled" 
 			Grid.Row="1" Grid.Column="0">
 
-            <!--<ItemsControl x:Name="myItemsControl" ItemsSource="{Binding CriterionCache}" ItemTemplate="{DynamicResource ThumbnailButtonTemplate}">-->
-            <ItemsControl x:Name="myItemsControl" ItemsSource="{Binding CurrentCriterionList}" ItemTemplate="{DynamicResource DetailedTemplate}">
+            <ItemsControl x:Name="myItemsControl" ItemsSource="{Binding CurrentFileSelection}" ItemTemplateSelector="{DynamicResource ThumbnailAreaTemplateSelector}">
+               <!--<ItemsControl x:Name="myItemsControl" ItemsSource="{Binding CurrentFileSelection}" ItemTemplate="{DynamicResource Template_ThumbnailArea_VideoThumbs}">-->
+                    <!--<ItemsControl x:Name="myItemsControl" ItemsSource="{Binding CurrentCriterionList}" ItemTemplate="{DynamicResource Template_ThumbnailArea_CriterionThumbs}">-->
                     <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel VerticalAlignment="Top" ScrollViewer.CanContentScroll="True"/>
@@ -171,7 +176,7 @@
 
 
 
-        <!--<ListBox x:Name="criterionListBox" Grid.Row="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ItemsSource="{Binding}" ItemTemplate="{DynamicResource DetailedTemplate}" SelectedIndex="0" 
+        <!--<ListBox x:Name="criterionListBox" Grid.Row="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ItemsSource="{Binding}" ItemTemplate="{DynamicResource Template_ThumbnailArea_CriterionThumbs}" SelectedIndex="0" 
                  IsTextSearchCaseSensitive="False" IsTextSearchEnabled="True" TextSearch.TextPath="Name">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>

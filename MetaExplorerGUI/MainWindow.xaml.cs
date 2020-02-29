@@ -176,20 +176,30 @@ namespace MetaExplorerGUI
 
         private void PlayRandomButton_Click(object sender, RoutedEventArgs e)
         {
-            //get current displayed files
-            int count = this.myViewModel.CurrentFileSelection.Count;
+            ////get current displayed files
+            //int count = this.myViewModel.CurrentFileSelection.Count;
 
-            Random rand = new Random();
-            int rnd = rand.Next(count);   //0..count-1
+            //Random rand = new Random();
+            //int rnd = rand.Next(count);   //0..count-1
 
-            Video result = this.myViewModel.CurrentFileSelection[rnd];
+            //Video result = this.myViewModel.CurrentFileSelection[rnd];
 
-            //bring video into view
-            Button button = GetButtonByVideoMetaModel(result);
-            button.BringIntoView();
+            ////bring video into view
+            //Button button = GetButtonByVideoMetaModel(result);
+            //button.BringIntoView();
 
-            //play the video
-            Helper.Play(myConfig.GetValue<string>("VLCLocation"), result.File.FullName);
+            ////play the video
+            //Helper.Play(myConfig.GetValue<string>("VLCLocation"), result.File.FullName);
+
+            //myItemsControl.ItemsSource = myViewModel.CurrentCriterionList;
+
+            //ContentPresenter depobj = myItemsControl.ItemContainerGenerator.ContainerFromItem(myItemsControl) as ContentPresenter;
+            //DataTemplate dataTemplate = depobj.ContentTemplate;
+
+            if (myItemsControl.ItemsSource == myViewModel.CurrentCriterionList)
+                myItemsControl.ItemsSource = myViewModel.CurrentFileSelection;
+            else
+                myItemsControl.ItemsSource = myViewModel.CurrentCriterionList;
         }
 
         private void ContextMenuItem_OpenInExplorer_Click(object sender, RoutedEventArgs e)
