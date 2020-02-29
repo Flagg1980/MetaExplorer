@@ -4,6 +4,7 @@ using MetaExplorerBE;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -282,7 +283,7 @@ namespace MetaExplorerGUI
                 this.SetGroupboxBorder(gb, false);
 
                 string critName = gb.Header as string;
-                List<CriterionInstance> ciList = this.myViewModel.CriterionCache.GetCriterionInstances(critName);
+                ObservableCollection<CriterionInstance> ciList = this.myViewModel.CriterionCache.GetCriterionInstances(critName);
 
                 //get the criterion instance
                 CriterionInstance ci = null;

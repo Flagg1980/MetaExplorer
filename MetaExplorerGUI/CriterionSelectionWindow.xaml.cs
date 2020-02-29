@@ -1,6 +1,5 @@
 ﻿using MetaExplorer.Domain;
-using MetaExplorerBE.Converter;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
 
@@ -17,7 +16,7 @@ namespace MetaExplorerGUI
             set;
         }
 
-        public CriterionSelectionWindow(List<CriterionInstance> list)
+        public CriterionSelectionWindow(ObservableCollection<CriterionInstance> list)
         {
             InitializeComponent();
 

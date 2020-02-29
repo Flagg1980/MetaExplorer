@@ -1,14 +1,11 @@
-﻿#region Imports
-
-using MetaExplorer.Common;
+﻿using MetaExplorer.Common;
 using MetaExplorer.Domain;
 using MetaExplorerBE;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-
-#endregion
 
 namespace MetaExplorerGUI
 {
@@ -27,7 +24,7 @@ namespace MetaExplorerGUI
         public VideoMetaModelCache VideoMetaModelCache { get; set; }
         public CriterionCache CriterionCache { get; set; }
 
-        private RangeObservableCollection<Video> currentFileSelection;
+        private ObservableCollection<Video> currentFileSelection;
 
         private Video mmRef = null;
 
@@ -52,7 +49,7 @@ namespace MetaExplorerGUI
             private set { this.mmRef = value; }
         }
 
-        public RangeObservableCollection<Video> CurrentFileSelection
+        public ObservableCollection<Video> CurrentFileSelection
         {
             get { return this.currentFileSelection; }
         }
@@ -86,7 +83,7 @@ namespace MetaExplorerGUI
 
         public ViewModel()
         {
-            currentFileSelection = new RangeObservableCollection<Video>();
+            currentFileSelection = new ObservableCollection<Video>();
 
             CriteriaConfig.Criteria.ForEach((Criterion x) => currentCriterionSelectionIndex[x.Name] = -1);
         }
@@ -105,8 +102,9 @@ namespace MetaExplorerGUI
         public void UpdateCurrentSelection()
         {
             currentFileSelection.Clear();
-            currentFileSelection.AddRange(this.VideoMetaModelCache.GetVideoFileSelection(mmRef));
-            
+            //currentFileSelection.AddRange(this.VideoMetaModelCache.GetVideoFileSelection(mmRef));
+            currentFileSelection = this.VideoMetaModelCache.GetVideoFileSelection(mmRef);
+
             this.CurrentFileSelectionCount = this.currentFileSelection.Count();
 
             this.CurrentFileSelectionSize = 0;

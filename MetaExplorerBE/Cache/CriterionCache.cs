@@ -5,21 +5,21 @@ using System.Linq;
 using System.Threading.Tasks;
 using MetaExplorer.Domain;
 using MetaExplorer.Common;
-using System.Configuration;
+using System.Collections.ObjectModel;
 
 namespace MetaExplorerBE
 {
     /// <summary>
     /// This file caches criterion instances and their thumbnails.
     /// </summary>
-    public class CriterionCache : BaseCache<string, List<CriterionInstance>>
+    public class CriterionCache : BaseCache<string, ObservableCollection<CriterionInstance>>
     {
-        public List<CriterionInstance> GetCriterionInstances(Criterion criterion)
+        public ObservableCollection<CriterionInstance> GetCriterionInstances(Criterion criterion)
         {
             return this.CachedItems[criterion.Name];
         }
 
-        public List<CriterionInstance> GetCriterionInstances(string criterionName)
+        public ObservableCollection<CriterionInstance> GetCriterionInstances(string criterionName)
         {
             return this.CachedItems[criterionName];
         }
@@ -37,7 +37,7 @@ namespace MetaExplorerBE
             myVideoMetaModelCache = videoMetaModelCache;
 
             //init list
-            CriteriaConfig.Criteria.ForEach((Criterion x) => this.CachedItems.Add(x.Name, new List<CriterionInstance>()));
+            CriteriaConfig.Criteria.ForEach((Criterion x) => this.CachedItems.Add(x.Name, new ObservableCollection<CriterionInstance>()));
         }
 
         #endregion
@@ -71,9 +71,9 @@ namespace MetaExplorerBE
             progress.Report(0);
             progressFile.Report("Updating Criterion Cache <" + criterion.Name + ">");
 
-            List<CriterionInstance> currentCriterionMetaModelList = this.CachedItems[criterion.Name];
+            ObservableCollection<CriterionInstance> currentCriterionMetaModelList = this.CachedItems[criterion.Name];
             if (currentCriterionMetaModelList == null)
-                currentCriterionMetaModelList = new List<CriterionInstance>();
+                currentCriterionMetaModelList = new ObservableCollection<CriterionInstance>();
 
             currentCriterionMetaModelList.Clear();
 
@@ -103,7 +103,7 @@ namespace MetaExplorerBE
                 vmm.GetList(criterion).ForEach(crit =>
                 {
                     //is this already in the criterion meta model list?
-                    CriterionInstance existing = currentCriterionMetaModelList.Find(ci =>
+                    CriterionInstance existing = currentCriterionMetaModelList.FirstOrDefault(ci =>
                     {
                         return string.Equals(crit, ci.Name, StringComparison.OrdinalIgnoreCase);
                     });
@@ -136,18 +136,17 @@ namespace MetaExplorerBE
                 }).
                 ThenBy(x => x.Name).ToList();
 
-            currentCriterionMetaModelList.Clear();
-            currentCriterionMetaModelList.AddRange(dummyCriterionMetaModelList);
+            currentCriterionMetaModelList = new ObservableCollection<CriterionInstance>(dummyCriterionMetaModelList);
 
             //foreach orphan criterion instance, mark with a red cross
-            currentCriterionMetaModelList.ForEach(x =>
+            foreach (var x in currentCriterionMetaModelList)
             {
                 if (x.Count == 0)
                 {
                     x.Thumbnail.Image = Helper.CrossBitmapImage(x.Thumbnail.Image);
                     x.Thumbnail.Image.Freeze();
                 }
-            });
+            }
 
             progress.Report(100);
             progressFile.Report("");

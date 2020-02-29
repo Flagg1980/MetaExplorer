@@ -4,6 +4,7 @@ using MetaExplorer.Domain;
 using MetaExplorerBE.Converter;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -142,14 +143,14 @@ namespace MetaExplorerBE
         /// </summary>
         /// <param name="regex"></param>
         /// <returns></returns>
-        public List<Video> GetVideoFileSelection(Video mmRef)
+        public ObservableCollection<Video> GetVideoFileSelection(Video mmRef)
         {
-            List<Video> res = new List<Video>(this.CachedItems);
+            IEnumerable<Video> res = this.CachedItems;
 
             //check stars
             if (mmRef.Stars != 0)
             {
-                res = res.Where((Video m) => { return m.Stars == mmRef.Stars; }).ToList();
+                res = res.Where((Video m) => { return m.Stars == mmRef.Stars; });
             }
 
             foreach (Criterion criterion in CriteriaConfig.Criteria)
@@ -185,7 +186,7 @@ namespace MetaExplorerBE
                     .ToList();
             }
 
-            return res;
+            return new ObservableCollection<Video>(res);
         }
 
         public void ResortBy(Func<Video, object> func)
