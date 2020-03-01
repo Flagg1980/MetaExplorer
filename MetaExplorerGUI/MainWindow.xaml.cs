@@ -150,7 +150,7 @@ namespace MetaExplorerGUI
 
             clearButton.Click += (object sender, RoutedEventArgs args) =>
             {
-                myViewModel.CurrentCriterionSelectionIndex[crit.Name] = -1;
+                myViewModel.CurrentCriterionSelection[crit] = null;
 
                 //update the label of the button
                 //label.Content = "Select " + crit.Name;
@@ -216,19 +216,13 @@ namespace MetaExplorerGUI
             else if (button.DataContext is CriterionInstance)
             {
                 var criterionInstance = button.DataContext as CriterionInstance;
-                
-                //update the label and the picture of the button
-                //label.Content = criterionInstance.Name;
-                //image.Source = criterionInstance.Thumbnail.Image;
-
                 UpdateCriterionButton(criterionInstance.Criterion, criterionInstance.Name, criterionInstance.Thumbnail.Image);
 
-                SwitchToVideoThumbnailView();
-
-                //myViewModel.CurrentCriterionSelectionIndex[criterionInstance.Criterion.Name] = 
+                myViewModel.CurrentCriterionSelection[criterionInstance.Criterion] = criterionInstance;
                 myViewModel.UpdateMMref();
-
                 myViewModel.UpdateCurrentSelection();
+
+                SwitchToVideoThumbnailView();
             }
         }
 
@@ -248,16 +242,6 @@ namespace MetaExplorerGUI
 
             //play the video
             Helper.Play(myConfig.GetValue<string>("VLCLocation"), result.File.FullName);
-
-            //myItemsControl.ItemsSource = myViewModel.CurrentCriterionInstanceList;
-
-            //ContentPresenter depobj = myItemsControl.ItemContainerGenerator.ContainerFromItem(myItemsControl) as ContentPresenter;
-            //DataTemplate dataTemplate = depobj.ContentTemplate;
-
-            //if (myItemsControl.ItemsSource == myViewModel.CurrentCriterionInstanceList)
-            //    myItemsControl.ItemsSource = myViewModel.CurrentFileSelection;
-            //else
-            //    myItemsControl.ItemsSource = myViewModel.CurrentCriterionInstanceList;
         }
 
         private void ContextMenuItem_OpenInExplorer_Click(object sender, RoutedEventArgs e)
@@ -350,12 +334,14 @@ namespace MetaExplorerGUI
 
                 this.SetGroupboxBorder(gb, false);
 
+                Button selectButton = gb.Template.FindName("SelectButton", gb) as Button;
+
                 string critName = gb.Header as string;
                 ObservableCollection<CriterionInstance> ciList = this.myViewModel.CriterionCache.GetCriterionInstances(critName);
 
                 //get the criterion instance
-                CriterionInstance ci = null;
-                int ciIndex = -1;
+                CriterionInstance critInstance = null;
+                //int ciIndex = -1;
 
                 //No criterion, e.g.[bla1][bla2][3Star][][] no criterion instance for criterion "keyword" is defined
                 if (vmm.criteriaContents[critName].Count == 0)
@@ -367,23 +353,23 @@ namespace MetaExplorerGUI
                 {
                     //for now we just take the first criteria and neglect the others. TODO: offer a selection box??
                     string searchCritInstanceName = vmm.criteriaContents[critName][0];
-                    ci = ciList.FirstOrDefault(x => String.Compare(x.Name, searchCritInstanceName, true) == 0);
-                    ciIndex = ciList.IndexOf(ci);
+                    critInstance = ciList.FirstOrDefault(x => String.Compare(x.Name, searchCritInstanceName, true) == 0);
+                    //ciIndex = ciList.IndexOf(critInstance);
                 }
                 //default case: one criteria
                 else
                 {
                     string searchCritInstanceName = vmm.criteriaContents[critName][0];
-                    ci = ciList.FirstOrDefault(x => String.Compare(x.Name, searchCritInstanceName, true) == 0);
-                    ciIndex = ciList.IndexOf(ci);
+                    critInstance = ciList.FirstOrDefault(x => String.Compare(x.Name, searchCritInstanceName, true) == 0);
+                    //ciIndex = ciList.IndexOf(critInstance);
                 }
 
                 //update the label and the picture of the button
-                label.Content = ci.Name;
-                image.Source = ci.Thumbnail.Image;
+                label.Content = critInstance.Name;
+                image.Source = critInstance.Thumbnail.Image;
 
                 //important: set the current selection index such that the MMref can be set up properly
-                myViewModel.CurrentCriterionSelectionIndex[critName] = ciIndex;
+                myViewModel.CurrentCriterionSelection[critInstance.Criterion] = critInstance;
 
                 //update the MMref
                 myViewModel.UpdateMMref();

@@ -16,8 +16,6 @@ namespace MetaExplorerGUI
         private int currentFileSelectionCount = 0;
         private long currentFileSelectionSize = 0;
         
-        private Dictionary<string, int> currentCriterionSelectionIndex = new Dictionary<string, int>();
-        
         private string _freeTextSearch = string.Empty;
 
         public VideoFileCache VideoFileCache { get; set; }
@@ -30,10 +28,7 @@ namespace MetaExplorerGUI
 
         #region Public Properties
 
-        public Dictionary<string, int> CurrentCriterionSelectionIndex
-        {
-            get { return this.currentCriterionSelectionIndex; }
-        }
+        public Dictionary<Criterion, CriterionInstance> CurrentCriterionSelection { get; set; }
 
         public string FreeTextSearch
         {
@@ -80,7 +75,11 @@ namespace MetaExplorerGUI
 
             CurrentFileSelection = new ObservableCollection<Video>();
 
-            CriteriaConfig.Criteria.ForEach((Criterion x) => currentCriterionSelectionIndex[x.Name] = -1);
+            CurrentCriterionSelection = new Dictionary<Criterion, CriterionInstance>();
+            CriteriaConfig.Criteria.ForEach((Criterion crit) => 
+            {
+                CurrentCriterionSelection.Add(crit, null);
+            });
 
             //CurrentCriterionInstanceList = this.CriterionCache.GetCriterionInstances("Actor");
 
@@ -119,15 +118,15 @@ namespace MetaExplorerGUI
 
             MMRef.ThumbnailCaption1 = this.FreeTextSearch;
 
-            CriteriaConfig.Criteria.ForEach((Criterion x) =>
+            CriteriaConfig.Criteria.ForEach((Criterion crit) =>
             {
-                this.MMRef.criteriaContents[x.Name] = new List<string>();
+                this.MMRef.criteriaContents[crit.Name] = new List<string>();
 
-                if (this.currentCriterionSelectionIndex[x.Name] >= 0)
+                if (this.CurrentCriterionSelection[crit] != null)
                 {
-                    int critInstanceIndex = this.currentCriterionSelectionIndex[x.Name];
-                    CriterionInstance critInstance = this.CriterionCache.GetCriterionInstances(x)[critInstanceIndex];
-                    this.MMRef.criteriaContents[x.Name].Add(critInstance.Name);
+                    CriterionInstance critInstance = this.CurrentCriterionSelection[crit];
+                    //CriterionInstance critInstance = this.CriterionCache.GetCriterionInstances(crit)[critInstanceIndex];
+                    this.MMRef.criteriaContents[crit.Name].Add(critInstance.Name);
                 }
             });
         }
