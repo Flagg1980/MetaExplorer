@@ -100,7 +100,7 @@
                         <ColumnDefinition Width="20"/>
                         <ColumnDefinition Width="50"/>
                     </Grid.ColumnDefinitions>
-                    <Button x:Name="KeywordSelectionButton"  Grid.Column="0" Height="50" IsManipulationEnabled="True" Style="{StaticResource HiddenButtonStyle}">
+                    <Button x:Name="SelectButton"  Grid.Column="0" Height="50" IsManipulationEnabled="True" Style="{StaticResource HiddenButtonStyle}">
                         <DockPanel HorizontalAlignment="Left" Width="{TemplateBinding ActualWidth}">
                             <Image Name="SelectionImage" HorizontalAlignment="Left" Height="50" Width="50"/>
                             <Label Name="SelectionLabel" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="11" FontFamily="Comic Sans MS"/>
@@ -113,6 +113,7 @@
             </GroupBox>
         </ControlTemplate>
 
+        <!-- temnplate for criterion thumbnail display -->
         <DataTemplate x:Key="Template_ThumbnailArea_CriterionThumbs">
                 <Button Name="ThumbnailArea_CriterionThumb_Button" Style="{StaticResource ResourceKey=ThumbnailButtonStyle}">
                 <WrapPanel>
@@ -169,13 +170,9 @@
         <!--
         Thumbnail Area
         -->
-        <ScrollViewer x:Name="myScrollViewer" Margin="10" HorizontalScrollBarVisibility="Disabled" 
-			Grid.Row="1" Grid.Column="0">
-
+        <ScrollViewer x:Name="myScrollViewer" Margin="10" HorizontalScrollBarVisibility="Disabled" Grid.Row="1" Grid.Column="0">
             <ItemsControl x:Name="myItemsControl" ItemsSource="{Binding CurrentFileSelection}" ItemTemplateSelector="{DynamicResource ThumbnailAreaTemplateSelector}">
-               <!--<ItemsControl x:Name="myItemsControl" ItemsSource="{Binding CurrentFileSelection}" ItemTemplate="{DynamicResource Template_ThumbnailArea_VideoThumbs}">-->
-                    <!--<ItemsControl x:Name="myItemsControl" ItemsSource="{Binding CurrentCriterionList}" ItemTemplate="{DynamicResource Template_ThumbnailArea_CriterionThumbs}">-->
-                    <ItemsControl.ItemsPanel>
+                <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel VerticalAlignment="Top" ScrollViewer.CanContentScroll="True"/>
                     </ItemsPanelTemplate>
@@ -183,7 +180,7 @@
             </ItemsControl>
         </ScrollViewer>
 
-   
+
 
 
 
@@ -196,9 +193,7 @@
             </ListBox.ItemsPanel>
         </ListBox>-->
 
-        <!--
-        Criterion Selection Area
-        -->
+        <!-- Criterion Selection Area -->
         <StackPanel Orientation="Vertical" Name="CriterionStackPanel"
 			Grid.Row="1" Grid.Column="1">
 
@@ -217,9 +212,7 @@
 
         </StackPanel>
 
-        <!--
-        File Count Info
-        -->
+        <!-- File Count Info -->
         <StackPanel Orientation="Horizontal"
 			Grid.Row="3" Grid.Column="0">
             <Label Content="Files:" />
@@ -229,7 +222,5 @@
         </StackPanel>
 
     </Grid>
-
-
-
+    
 </Window>

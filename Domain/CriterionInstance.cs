@@ -14,6 +14,8 @@ namespace MetaExplorer.Domain
 
         public int SumStars { get; set; }
 
+        public Criterion Criterion { get; set; }
+
         public string Stats
         {
             get

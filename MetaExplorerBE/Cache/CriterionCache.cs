@@ -87,6 +87,7 @@ namespace MetaExplorerBE
             {
                 CriterionInstance cmm = new CriterionInstance();
                 cmm.Name = Path.GetFileNameWithoutExtension(x.Key.FullName);
+                cmm.Criterion = criterion;
                 cmm.Count = 0;
                 cmm.SumStars = 0;
                 cmm.Thumbnail.Image = myCriterionThumbnailCache.GetByFilename(Path.GetFileName(x.Key.Name));
@@ -112,6 +113,7 @@ namespace MetaExplorerBE
                     {
                         existing = new CriterionInstance();
                         existing.Name = crit;
+                        existing.Criterion = criterion;
                         existing.Thumbnail.Image = Helper.NAimage;
                         existing.Thumbnail.Image.Freeze();
                         currentCriterionMetaModelList.Add(existing);

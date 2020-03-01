@@ -26,6 +26,8 @@ namespace MetaExplorerGUI
         private Point myDragDropStartPoint;
         private IConfiguration myConfig;
 
+        private Dictionary<Criterion, Button> dynamicCriterionButtons = new Dictionary<Criterion, Button>();
+
         public MainWindow(IConfiguration config)
         {
             myConfig = config;
@@ -83,6 +85,17 @@ namespace MetaExplorerGUI
             myViewModel.UpdateCurrentSelection();
         }
 
+        private void UpdateCriterionButton(Criterion crit, string labelText, ImageSource image)
+        {
+            Button selectButton = this.dynamicCriterionButtons[crit];
+
+            var sp = selectButton.Content as DockPanel;
+            Label label = sp.FindName("SelectionLabel") as Label;
+            label.Content = labelText;
+            Image i = sp.FindName("SelectionImage") as Image;
+            i.Source = image;
+        }
+
         public void AddDynamicCriterionButton(Criterion crit)
         {
             var template = this.FindResource("CriterionTemplate") as ControlTemplate;
@@ -99,22 +112,26 @@ namespace MetaExplorerGUI
             var groupBox = gb.Template.FindName("CriterionGroupbox", gb) as GroupBox;
             groupBox.Header = crit.Name;
 
-            Button selectButton = gb.Template.FindName("KeywordSelectionButton", gb) as Button;
+            Button selectButton = gb.Template.FindName("SelectButton", gb) as Button;
+            selectButton.Name = crit.Name + "SelectButton";
 
             DockPanel sp = selectButton.Content as DockPanel;
             Label label = sp.FindName("SelectionLabel") as Label;
             label.Content = "Select " + crit.Name;
             Image image = sp.FindName("SelectionImage") as Image;
 
+            this.dynamicCriterionButtons.Add(crit, selectButton);
+
             selectButton.Click += (object sender, RoutedEventArgs args) =>
             {
                 //CriterionSelectionWindow w = new CriterionSelectionWindow(myViewModel.CriterionCache.GetCriterionInstances(crit));
+                
                 //w.ShowDialog();
 
                 //if (w.SelectedIndex != -1)
                 //{
                 //    myViewModel.CurrentCriterionSelectionIndex[crit.Name] = w.SelectedIndex;
-                //    CriterionInstance ci = this.myViewModel.CriterionCache.GetCriterionInstances(crit)[w.SelectedIndex];
+                    //CriterionInstance ci = this.myViewModel.CriterionCache.GetCriterionInstances(crit)[w.SelectedIndex];
 
                 //    //update the label and the picture of the button
                 //    label.Content = ci.Name;
@@ -126,6 +143,7 @@ namespace MetaExplorerGUI
                 //    //update the current selection
                 //    myViewModel.UpdateCurrentSelection();
                 //}
+                //UpdateCriterionButton(selectButton, "Select " + crit.Name, ci.Thumbnail.Image);
 
                 SwitchToCriterionThumbnailView(crit);
             };
@@ -135,11 +153,13 @@ namespace MetaExplorerGUI
                 myViewModel.CurrentCriterionSelectionIndex[crit.Name] = -1;
 
                 //update the label of the button
-                label.Content = "Select " + crit.Name;
+                //label.Content = "Select " + crit.Name;
+
+                UpdateCriterionButton(crit, "Select " + crit.Name, null);
 
                 //update the picture of the button
-                image.Source = null;
-
+                //image.Source = null;
+                //UpdateCriterionButton(selectButton, "Select " + crit.Name, null);
                 //update the MMref
                 myViewModel.UpdateMMref();
 
@@ -185,12 +205,30 @@ namespace MetaExplorerGUI
 
         private void ThumbnailSelectionButton_Click(object sender, RoutedEventArgs e)
         {
-            var found = (sender as Button).DataContext as Video;
-            
+            var button = (sender as Button);
+
             // found is null if the double clicked thumbnail is a criterion
-            if (found != null)
+            if (button.DataContext is Video)
             {
-                Helper.Play(myConfig.GetValue<string>("VLCLocation"), found.File.FullName);
+                var video = button.DataContext as Video;
+                Helper.Play(myConfig.GetValue<string>("VLCLocation"), video.File.FullName);
+            }
+            else if (button.DataContext is CriterionInstance)
+            {
+                var criterionInstance = button.DataContext as CriterionInstance;
+                
+                //update the label and the picture of the button
+                //label.Content = criterionInstance.Name;
+                //image.Source = criterionInstance.Thumbnail.Image;
+
+                UpdateCriterionButton(criterionInstance.Criterion, criterionInstance.Name, criterionInstance.Thumbnail.Image);
+
+                SwitchToVideoThumbnailView();
+
+                //myViewModel.CurrentCriterionSelectionIndex[criterionInstance.Criterion.Name] = 
+                myViewModel.UpdateMMref();
+
+                myViewModel.UpdateCurrentSelection();
             }
         }
 
