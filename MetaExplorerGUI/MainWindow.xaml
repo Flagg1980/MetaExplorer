@@ -30,13 +30,14 @@
         <Style x:Key="ThumbnailButtonStyleMouseOver" TargetType="{x:Type Button}">
             <Setter Property="Margin" Value="{StaticResource ThumbButtonMargin}"/>
             <Setter Property="Effect" Value="{StaticResource ThumbDropShadowEffect}"/>
-            <EventSetter Event="ButtonBase.MouseDoubleClick" Handler="VideoSelectionButton_Click"/>
+            <EventSetter Event="ButtonBase.MouseDoubleClick" Handler="ThumbnailSelectionButton_Click"/>
         </Style>
 
         <!-- style for the thumbnail button-->
         <Style x:Key="ThumbnailButtonStyle" TargetType="{x:Type Button}">
             <Setter Property="Margin" Value="{StaticResource ThumbButtonMargin}"/>
-            <EventSetter Event="ButtonBase.MouseDoubleClick" Handler="VideoSelectionButton_Click"/>
+            <Setter Property="Background" Value="GhostWhite"/>
+            <EventSetter Event="ButtonBase.MouseDoubleClick" Handler="ThumbnailSelectionButton_Click"/>
         </Style>
         
         <!-- template for criterion thumbnail display -->
@@ -63,7 +64,7 @@
 
         <!-- temnplate for video thumbnail display -->
         <DataTemplate x:Key="Template_ThumbnailArea_VideoThumbs">
-            <Button Name="MyButton" Style="{StaticResource ResourceKey=ThumbnailButtonStyle}" Height="{Binding Source={StaticResource ThumbnailButtonHeight}}" Width="{Binding Source={StaticResource ThumbnailButtonWidth}}"
+            <Button Name="ThumbnailArea_VideoThumb_Button" Style="{StaticResource ResourceKey=ThumbnailButtonStyle}" Height="{Binding Source={StaticResource ThumbnailButtonHeight}}" Width="{Binding Source={StaticResource ThumbnailButtonWidth}}"
                     PreviewMouseLeftButtonDown="ThumbnailButton_PreviewMouseLeftButtonDown" PreviewMouseMove="ThumbnailButton_MouseMove" >                <!-- Used for Drag&Drop-->
                 <StackPanel Orientation="Vertical">
                     <Image Source="{Binding Path=Thumbnail.Image}" Height="{Binding Source={StaticResource VideoThumbnailHeight}}" Width="{Binding Source={StaticResource VideoThumbnailWidth}}" VerticalAlignment="Top"/>
@@ -82,10 +83,10 @@
             </Button>
             <DataTemplate.Triggers>
                 <Trigger Property="IsMouseOver" Value="true">
-                    <Setter TargetName="MyButton" Property="Style" Value="{StaticResource ResourceKey=ThumbnailButtonStyleMouseOver}" />
+                    <Setter TargetName="ThumbnailArea_VideoThumb_Button" Property="Style" Value="{StaticResource ResourceKey=ThumbnailButtonStyleMouseOver}" />
                 </Trigger>
                 <Trigger Property="IsMouseOver" Value="false">
-                    <Setter TargetName="MyButton" Property="Style" Value="{StaticResource ResourceKey=ThumbnailButtonStyle}" />
+                    <Setter TargetName="ThumbnailArea_VideoThumb_Button" Property="Style" Value="{StaticResource ResourceKey=ThumbnailButtonStyle}" />
                 </Trigger>
             </DataTemplate.Triggers>
         </DataTemplate>
@@ -113,15 +114,25 @@
         </ControlTemplate>
 
         <DataTemplate x:Key="Template_ThumbnailArea_CriterionThumbs">
-            <WrapPanel>
-                <StackPanel Name ="sp" Orientation="Horizontal">
-                    <Image Width="{Binding Source={StaticResource CriterionThumbnailWidth}}" Height="{Binding Source={StaticResource CriterionThumbnailHeight}}" Source="{Binding Path=Thumbnail.Image}"></Image>
-                    <StackPanel Orientation="Vertical" Width="250">
-                        <Label Height="140" Width="250" VerticalContentAlignment="Center" FontSize="22" FontFamily="Comic Sans MS" Content="{Binding Path=Name}"></Label>
-                        <Label Height="40" Width="250" VerticalAlignment="Center" FontSize="12" Content="{Binding Path=Stats}"></Label>
+                <Button Name="ThumbnailArea_CriterionThumb_Button" Style="{StaticResource ResourceKey=ThumbnailButtonStyle}">
+                <WrapPanel>
+                    <StackPanel Name ="sp" Orientation="Horizontal">
+                        <Image Width="{Binding Source={StaticResource CriterionThumbnailWidth}}" Height="{Binding Source={StaticResource CriterionThumbnailHeight}}" Source="{Binding Path=Thumbnail.Image}"></Image>
+                        <StackPanel Orientation="Vertical" Width="250">
+                            <Label Height="140" Width="250" VerticalContentAlignment="Center" FontSize="22" FontFamily="Comic Sans MS" Content="{Binding Path=Name}"></Label>
+                            <Label Height="40" Width="250" VerticalAlignment="Center" FontSize="12" Content="{Binding Path=Stats}"></Label>
+                        </StackPanel>
                     </StackPanel>
-                </StackPanel>
-            </WrapPanel>
+                </WrapPanel>
+            </Button>
+            <DataTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="true">
+                    <Setter TargetName="ThumbnailArea_CriterionThumb_Button" Property="Style" Value="{StaticResource ResourceKey=ThumbnailButtonStyleMouseOver}" />
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="false">
+                    <Setter TargetName="ThumbnailArea_CriterionThumb_Button" Property="Style" Value="{StaticResource ResourceKey=ThumbnailButtonStyle}" />
+                </Trigger>
+            </DataTemplate.Triggers>
         </DataTemplate>
 
         <local:ThumbnailAreaTemplateSelector x:Name="ThumbnailAreaTemplateSelector" 

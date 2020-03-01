@@ -183,10 +183,15 @@ namespace MetaExplorerGUI
             this.myViewModel.FreeTextSearch = String.Empty;
         }
 
-        private void VideoSelectionButton_Click(object sender, RoutedEventArgs e)
+        private void ThumbnailSelectionButton_Click(object sender, RoutedEventArgs e)
         {
-            Video found = (sender as Button).DataContext as Video;
-            Helper.Play(myConfig.GetValue<string>("VLCLocation"), found.File.FullName);
+            var found = (sender as Button).DataContext as Video;
+            
+            // found is null if the double clicked thumbnail is a criterion
+            if (found != null)
+            {
+                Helper.Play(myConfig.GetValue<string>("VLCLocation"), found.File.FullName);
+            }
         }
 
         private void PlayRandomButton_Click(object sender, RoutedEventArgs e)
