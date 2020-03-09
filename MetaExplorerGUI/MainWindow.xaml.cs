@@ -162,10 +162,7 @@ namespace MetaExplorerGUI
                 //UpdateCriterionButton(selectButton, "Select " + crit.Name, null);
                 //update the MMref
                 myViewModel.UpdateMMref();
-
-                //update the current selection
                 myViewModel.UpdateCurrentSelection();
-
                 SwitchToVideoThumbnailView();
             };
 
@@ -371,11 +368,9 @@ namespace MetaExplorerGUI
                 //important: set the current selection index such that the MMref can be set up properly
                 myViewModel.CurrentCriterionSelection[critInstance.Criterion] = critInstance;
 
-                //update the MMref
                 myViewModel.UpdateMMref();
-
-                //update the current selection
                 myViewModel.UpdateCurrentSelection();
+                SwitchToVideoThumbnailView();
             }
         }
 
