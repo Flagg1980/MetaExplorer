@@ -172,14 +172,12 @@ namespace MetaExplorerGUI
         private void SwitchToCriterionThumbnailView(Criterion crit)
         {
             myItemsControl.ItemsSource = myViewModel.CriterionCache.GetCriterionInstances(crit);
-
             MyRandomButton.IsEnabled = false;
         }
 
         private void SwitchToVideoThumbnailView()
         {
             myItemsControl.ItemsSource = myViewModel.CurrentFileSelection;
-
             MyRandomButton.IsEnabled = true;
         }
 
@@ -192,6 +190,7 @@ namespace MetaExplorerGUI
             {
                 myViewModel.UpdateMMref();
                 myViewModel.UpdateCurrentSelection();
+                this.SwitchToVideoThumbnailView();
             }
         }
 
