@@ -9,6 +9,8 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -25,6 +27,9 @@ namespace MetaExplorerGUI
         private bool myWindowInitiallyCompletelyRendered = false;
         private Point myDragDropStartPoint;
         private IConfiguration myConfig;
+
+        private int myCurrentLazyLoadIndex = 0;
+        private VideoMetaModelCache videoMetaModelCache = null;
 
         public MainWindow(IConfiguration config)
         {
@@ -62,12 +67,17 @@ namespace MetaExplorerGUI
             ProgressWindow.DoWorkWithModal("Updating Criterion Thumbnails", criterionThumbnailCache.InitCacheAsync);
 
             //INIT cache video meta model
-            var videoMetaModelCache = new VideoMetaModelCache(
+            videoMetaModelCache = new VideoMetaModelCache(
+                videoFileCache,
+                videoThumbnailCache
+            );
+
+            var videoMetaModelCacheEmpty = new VideoMetaModelCache(
                 videoFileCache,
                 videoThumbnailCache
             );
             ProgressWindow.DoWorkWithModal("Updating Video Meta Model Cache", videoMetaModelCache.InitCacheAsync);
-            ProgressWindow.DoWorkWithModal("Updating Video Meta Model Cache", videoMetaModelCache.UpdateNonExistingThumbnailCacheAsync);
+            //ProgressWindow.DoWorkWithModal("Updating Video Meta Model Cache", videoMetaModelCache.UpdateNonExistingThumbnailCacheAsync);
 
             //INIT cache criterion
             var criterionCache = new CriterionCache(criterionThumbnailCache, videoMetaModelCache);
@@ -76,11 +86,26 @@ namespace MetaExplorerGUI
             myViewModel = new ViewModel();
             myViewModel.CriterionCache = criterionCache;
             myViewModel.VideoFileCache = videoFileCache;
-            myViewModel.VideoMetaModelCache = videoMetaModelCache;
+            myViewModel.VideoMetaModelCache = videoMetaModelCacheEmpty;
 
             this.DataContext = myViewModel;
             myItemsControl.DataContext = myViewModel;
             myViewModel.PropertyChanged += Event_PropertyChanged;
+
+            //Add VideoMetaModelCache lazy
+            Task.Factory.StartNew(() =>
+            {
+                App.Current.Dispatcher.Invoke(async () =>
+                {
+                    for (int i = 0; i < videoMetaModelCache.CachedItems.Count; i++)
+                    {
+                        myViewModel.VideoMetaModelCache.CachedItems.Add(videoMetaModelCache.CachedItems[i]);
+                        myViewModel.AddToCurrentSelection(i);
+
+                        await Task.Delay(1);
+                    }
+                });
+            });
 
             myViewModel.UpdateMMref();
             myViewModel.UpdateCurrentSelection();

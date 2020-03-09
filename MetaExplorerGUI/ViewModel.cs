@@ -111,6 +111,17 @@ namespace MetaExplorerGUI
             foreach (Video vmm in this.currentFileSelection) { this.CurrentFileSelectionSize += vmm.File.Length; }
         }
 
+        /// <summary>
+        /// Adds a specific item from the VideoMetaModelCache to the current selection.
+        /// </summary>
+        /// <param name="index">The index of the VideoMetaModelCache to be added.</param>
+        public void AddToCurrentSelection(int index)
+        {
+            currentFileSelection.Add(this.VideoMetaModelCache.CachedItems[index]);
+            this.CurrentFileSelectionCount++;
+            this.CurrentFileSelectionSize += this.VideoMetaModelCache.CachedItems[index].File.Length;
+        }
+
         public void UpdateMMref()
         { 
             this.MMRef = new Video();
