@@ -78,16 +78,13 @@ namespace MetaExplorerGUI
                 videoThumbnailCache
             );
             ProgressWindow.DoWorkWithModal("Updating Video Meta Model Cache", videoMetaModelCache.InitCacheAsync);
-            //ProgressWindow.DoWorkWithModal("Updating Video Meta Model Cache", videoMetaModelCache.UpdateNonExistingThumbnailCacheAsync);
+            ProgressWindow.DoWorkWithModal("Updating Video Meta Model Cache", videoMetaModelCache.UpdateNonExistingThumbnailCacheAsync);
 
             //INIT cache criterion
             var criterionCache = new CriterionCache(criterionThumbnailCache, videoMetaModelCache);
             ProgressWindow.DoWorkWithModal("Updating Criterion Cache", criterionCache.InitCacheAsync);
 
             myViewModel = new ViewModel(criterionCache, videoFileCache, videoMetaModelCacheEmpty);
-            //myViewModel.CriterionCache = criterionCache;
-            //myViewModel.VideoFileCache = videoFileCache;
-            //myViewModel.VideoMetaModelCache = videoMetaModelCacheEmpty;
 
             this.DataContext = myViewModel;
             myItemsControl.DataContext = myViewModel;
