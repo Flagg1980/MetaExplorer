@@ -118,7 +118,7 @@ namespace MetaExplorerGUI
         /// <param name="index">The index of the VideoMetaModelCache to be added.</param>
         public void AddToCurrentSelection(int index)
         {
-            currentFileSelection.Add(this.VideoMetaModelCache.CachedItems[index]);
+            CurrentFileSelection.Add(this.VideoMetaModelCache.CachedItems[index]);
             this.CurrentFileSelectionCount++;
             this.CurrentFileSelectionSize += this.VideoMetaModelCache.CachedItems[index].File.Length;
         }

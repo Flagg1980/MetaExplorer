@@ -84,10 +84,10 @@ namespace MetaExplorerGUI
             var criterionCache = new CriterionCache(criterionThumbnailCache, videoMetaModelCache);
             ProgressWindow.DoWorkWithModal("Updating Criterion Cache", criterionCache.InitCacheAsync);
 
-            myViewModel = new ViewModel();
-            myViewModel.CriterionCache = criterionCache;
-            myViewModel.VideoFileCache = videoFileCache;
-            myViewModel.VideoMetaModelCache = videoMetaModelCacheEmpty;
+            myViewModel = new ViewModel(criterionCache, videoFileCache, videoMetaModelCacheEmpty);
+            //myViewModel.CriterionCache = criterionCache;
+            //myViewModel.VideoFileCache = videoFileCache;
+            //myViewModel.VideoMetaModelCache = videoMetaModelCacheEmpty;
 
             this.DataContext = myViewModel;
             myItemsControl.DataContext = myViewModel;
