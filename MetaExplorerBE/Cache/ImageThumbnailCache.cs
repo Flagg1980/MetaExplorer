@@ -12,7 +12,7 @@ namespace MetaExplorerBE
     {
         private List<string> myThumbnailPaths;
 
-        private List<String> mySupportedImageFormats = new List<string> { ".jpg", ".bmp", ".png" };
+        private List<String> mySupportedImageFormats = new List<string> { ".jpg", ".bmp", ".png" , ".jpeg"};
 
         #region C'tor
 

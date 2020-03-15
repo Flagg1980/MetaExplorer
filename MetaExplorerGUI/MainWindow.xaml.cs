@@ -29,7 +29,6 @@ namespace MetaExplorerGUI
         private IConfiguration myConfig;
 
         private Dictionary<Criterion, Button> dynamicCriterionButtons = new Dictionary<Criterion, Button>();
-        private int myCurrentLazyLoadIndex = 0;
         private VideoMetaModelCache videoMetaModelCache = null;
 
         public MainWindow(IConfiguration config)
@@ -104,9 +103,6 @@ namespace MetaExplorerGUI
                     }
                 });
             });
-
-            myViewModel.UpdateMMref();
-            myViewModel.UpdateCurrentSelection();
         }
 
         private void UpdateCriterionButton(Criterion crit, string labelText, ImageSource image)
@@ -148,27 +144,6 @@ namespace MetaExplorerGUI
 
             selectButton.Click += (object sender, RoutedEventArgs args) =>
             {
-                //CriterionSelectionWindow w = new CriterionSelectionWindow(myViewModel.CriterionCache.GetCriterionInstances(crit));
-                
-                //w.ShowDialog();
-
-                //if (w.SelectedIndex != -1)
-                //{
-                //    myViewModel.CurrentCriterionSelectionIndex[crit.Name] = w.SelectedIndex;
-                    //CriterionInstance ci = this.myViewModel.CriterionCache.GetCriterionInstances(crit)[w.SelectedIndex];
-
-                //    //update the label and the picture of the button
-                //    label.Content = ci.Name;
-                //    image.Source = ci.Thumbnail.Image;
-
-                //    //update the MMref
-                //    myViewModel.UpdateMMref();
-
-                //    //update the current selection
-                //    myViewModel.UpdateCurrentSelection();
-                //}
-                //UpdateCriterionButton(selectButton, "Select " + crit.Name, ci.Thumbnail.Image);
-
                 SwitchToCriterionThumbnailView(crit);
             };
 
@@ -176,15 +151,8 @@ namespace MetaExplorerGUI
             {
                 myViewModel.CurrentCriterionSelection[crit] = null;
 
-                //update the label of the button
-                //label.Content = "Select " + crit.Name;
-
                 UpdateCriterionButton(crit, "Select " + crit.Name, null);
 
-                //update the picture of the button
-                //image.Source = null;
-                //UpdateCriterionButton(selectButton, "Select " + crit.Name, null);
-                //update the MMref
                 myViewModel.UpdateMMref();
                 myViewModel.UpdateCurrentSelection();
                 SwitchToVideoThumbnailView();
