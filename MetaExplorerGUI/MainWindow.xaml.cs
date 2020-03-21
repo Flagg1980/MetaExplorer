@@ -411,7 +411,7 @@ namespace MetaExplorerGUI
         {
             ContentPresenter depobj = myItemsControl.ItemContainerGenerator.ContainerFromItem(vmm) as ContentPresenter;
             DataTemplate dataTemplate = depobj.ContentTemplateSelector.SelectTemplate(vmm, depobj);
-            Button candidate = dataTemplate.FindName("MyButton", depobj) as Button;
+            Button candidate = dataTemplate.FindName("ThumbnailArea_VideoThumb_Button", depobj) as Button;
 
             return candidate;
         }
