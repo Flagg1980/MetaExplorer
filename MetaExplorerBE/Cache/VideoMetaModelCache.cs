@@ -36,7 +36,8 @@ namespace MetaExplorerBE
             this.myVideoFileCache = videoFileCache;
             this.myVideoThumbnailCache = videoThumbnailCache;
 
-            myExtendedPropertiesProvider = new VideoPropertiesProvider(VideoPropertiesTechnology.None).Provider;
+            myExtendedPropertiesProvider = new VideoPropertiesProvider(VideoPropertiesTechnology.MediaToolkit).Provider;
+            ((MediaToolkitProvider)myExtendedPropertiesProvider).
         }
 
         #endregion
@@ -77,6 +78,7 @@ namespace MetaExplorerBE
                         //retrieve extended file properties
                         FileInfo fi = new FileInfo(file);
                         VideoProperties vp = myExtendedPropertiesProvider.GetVideoProperties(fi);
+                       
 
                         mm.BitRate = vp.bitrate;
                         mm.FrameHeight = vp.frameheight;
