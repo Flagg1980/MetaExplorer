@@ -10,7 +10,8 @@ namespace MetaExplorerBE
     public class VideoThumbnailCache : BaseThumbnailCache
     {
         private string myThumbnailPath;
-        private string myFFmpegLocation;
+        
+        internal string FFmpegLocation { get; private set; }
 
         #region C'tor
 
@@ -18,7 +19,7 @@ namespace MetaExplorerBE
             :base(thumbnailHeight, thumbnailWidth)
         {
             myThumbnailPath = thumbnailPath;
-            myFFmpegLocation = locationFFmpeg;
+            FFmpegLocation = locationFFmpeg;
         }
 
         #endregion
@@ -67,7 +68,7 @@ namespace MetaExplorerBE
         /// </summary>
         public BitmapSource UpdateThumbnailCache(FileInfo file)
         {
-            FFmpegWrapper wrapper = new FFmpegWrapper(myFFmpegLocation);
+            FFmpegWrapper wrapper = new FFmpegWrapper(FFmpegLocation);
 
             string md5 = Helper.GetMD5Hash(file.Name);
 

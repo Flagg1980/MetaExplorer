@@ -18,16 +18,24 @@ namespace MetaExplorer.Common.VideoProperties
             private set;
         }
 
-        public VideoPropertiesProvider(VideoPropertiesTechnology technology)
+        public VideoPropertiesProvider(VideoPropertiesTechnology technology, string ffmpegLocation)
         {
             //if (technology == VideoPropertiesTechnology.Shell32)
             //    Provider = new Shellprovider();
             if (technology == VideoPropertiesTechnology.MediaToolkit)
-                Provider = new MediaToolkitProvider("");
+            {
+                Provider = new MediaToolkitProvider()
+                {
+                    FFMpegLocation = ffmpegLocation
+                };
+
+            }
             //else if (technology == VideoPropertiesTechnology.WinAPICodePack)
             //    Provider = new WindowsApiCodepackProvider();
             else if (technology == VideoPropertiesTechnology.None)
+            {
                 Provider = new DefaultProvider();
+            }
             else
             {
                 string errorMsg = String.Format("Unsupported Technology: <{0}>", technology.ToString());

@@ -6,14 +6,14 @@ namespace MetaExplorer.Common.VideoProperties
 {
     internal class MediaToolkitProvider : IVideoPropertiesProvider
     {
-        public MediaToolkit.Engine Engine { get; set; }
+        public string FFMpegLocation { get; set; }
 
         public VideoProperties GetVideoProperties(FileInfo file)
         {
-            //engine = new MediaToolkit.Engine(fFmpegLocation);
+            MediaToolkit.Engine engine = new MediaToolkit.Engine(FFMpegLocation);
 
             var inputFile = new MediaFile { Filename = file.FullName };
-            Engine.GetMetadata(inputFile);
+            engine.GetMetadata(inputFile);
 
             //get bitrate
             int? bitrateN = inputFile.Metadata.VideoData.BitRateKbs;
