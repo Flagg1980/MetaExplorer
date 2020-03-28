@@ -1,8 +1,9 @@
 ﻿using MediaToolkit.Model;
 using System;
 using System.IO;
+using Domain;
 
-namespace MetaExplorer.Common.VideoProperties
+namespace MetaExplorer.Common.VideoPropertiesProvider
 {
     internal class MediaToolkitProvider : IVideoPropertiesProvider
     {
@@ -31,9 +32,9 @@ namespace MetaExplorer.Common.VideoProperties
 
             return new VideoProperties
             {
-                bitrate = bitratei,
-                frameheight = heighti,
-                frameWidth = widthi
+                BitRate = bitratei,
+                FrameHeight = heighti,
+                FrameWidth = widthi
             };
         }
     }

@@ -1,6 +1,7 @@
 ﻿using Common;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows;
@@ -13,25 +14,25 @@ namespace MetaExplorer.Common
     public class Helper
     {
         private static BitmapImage _NAimage = null;
+        private static MD5CryptoServiceProvider myMD5CryptoServiceProvider = new MD5CryptoServiceProvider();
 
         /// <summary>
         /// Gibt einen MD5 Hash als String zurück
         /// </summary>
         /// <param name="TextToHash">string der Gehasht werden soll.</param>
         /// <returns>Hash als string.</returns>
-        public static string GetMD5Hash(string TextToHash)
+        public static string GetMD5Hash(FileInfo file)
         {
             //Prüfen ob Daten übergeben wurden.
-            if ((TextToHash == null) || (TextToHash.Length == 0))
+            if (file == null)
             {
                 return string.Empty;
             }
 
             //MD5 Hash aus dem String berechnen. Dazu muss der string in ein Byte[]
             //zerlegt werden. Danach muss das Resultat wieder zurück in ein string.
-            MD5 md5 = new MD5CryptoServiceProvider();
-            byte[] textToHash = Encoding.Default.GetBytes(TextToHash);
-            byte[] result = md5.ComputeHash(textToHash);
+            byte[] textToHash = Encoding.Default.GetBytes(file.FullName);
+            byte[] result = myMD5CryptoServiceProvider.ComputeHash(textToHash);
 
             return System.BitConverter.ToString(result);
         }

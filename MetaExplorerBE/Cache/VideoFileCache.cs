@@ -25,8 +25,6 @@ namespace MetaExplorerBE
             {
                 progress.Report(0);
 
-                //string baseDir = this.LocationVideoFiles;
-
                 if (!Directory.Exists(myPathToVideoFiles))
                 {
                     throw new Exception(String.Format("Basedir <{0}> does not exist.", myPathToVideoFiles));

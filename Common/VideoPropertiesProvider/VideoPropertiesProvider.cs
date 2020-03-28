@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MetaExplorer.Common.VideoProperties
+namespace MetaExplorer.Common.VideoPropertiesProvider
 {
     public enum VideoPropertiesTechnology
     {

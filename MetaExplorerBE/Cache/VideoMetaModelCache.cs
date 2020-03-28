@@ -1,10 +1,12 @@
-﻿using MetaExplorer.Common;
-using MetaExplorer.Common.VideoProperties;
+﻿using Domain;
+using MetaExplorer.Common;
+using MetaExplorer.Common.VideoPropertiesProvider;
 using MetaExplorer.Domain;
 using MetaExplorerBE.Converter;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,7 +18,7 @@ namespace MetaExplorerBE
     /// </summary>
     public class VideoMetaModelCache : BaseCache<Video>
     {
-        private IVideoPropertiesProvider myExtendedPropertiesProvider;
+        private readonly VideoPropertiesCache myVideoPropertiesCache;
         private readonly VideoFileCache myVideoFileCache;
         private readonly VideoThumbnailCache myVideoThumbnailCache;
 
@@ -27,14 +29,11 @@ namespace MetaExplorerBE
 
         /// <summary>
         /// </summary>
-        public VideoMetaModelCache(VideoFileCache videoFileCache, VideoThumbnailCache videoThumbnailCache)
+        public VideoMetaModelCache(VideoFileCache videoFileCache, VideoThumbnailCache videoThumbnailCache, VideoPropertiesCache videoPropertiesCache)
         {
-            this.myVideoFileCache = videoFileCache;
-            this.myVideoThumbnailCache = videoThumbnailCache;
-
-            //myExtendedPropertiesProvider = new VideoPropertiesProvider(VideoPropertiesTechnology.MediaToolkit).Provider;
-            //((MediaToolkitProvider)myExtendedPropertiesProvider).
-            myExtendedPropertiesProvider = new VideoPropertiesProvider(VideoPropertiesTechnology.MediaToolkit, myVideoThumbnailCache.FFmpegLocation).Provider;
+            myVideoFileCache = videoFileCache;
+            myVideoThumbnailCache = videoThumbnailCache;
+            myVideoPropertiesCache = videoPropertiesCache;
         }
 
         #endregion
@@ -57,7 +56,7 @@ namespace MetaExplorerBE
                     try
                     {
                         //attach thumbnail
-                        string md5 = Helper.GetMD5Hash(Path.GetFileName(file));
+                        string md5 = Helper.GetMD5Hash(new FileInfo(file));
 
                         var cachedThumb = myVideoThumbnailCache.GetByFilename(md5);
 
@@ -74,22 +73,28 @@ namespace MetaExplorerBE
 
                         //retrieve extended file properties
                         FileInfo fi = new FileInfo(file);
-                        VideoProperties vp = myExtendedPropertiesProvider.GetVideoProperties(fi);
 
-                        mm.BitRate = vp.bitrate;
-                        mm.FrameHeight = vp.frameheight;
-                        mm.FrameWidth = vp.frameWidth;
+                        mm.Properties = myVideoPropertiesCache.CachedItems.GetValueOrDefault(md5);
+                        if (mm.Properties == null)
+                        {
+                            mm.Properties = new VideoProperties();
+                            Trace.TraceError($"Could not find Video properties cache entry for file <{file}> with md5 <{md5}> in video properties cache file <{myVideoPropertiesCache.Location}>.");
+                        }
+
+                        //mm.BitRate = vp.bitrate;
+                        //mm.FrameHeight = vp.frameheight;
+                        //mm.FrameWidth = vp.frameWidth;
 
                         //define the captions of the thumbnails
                         mm.ThumbnailCaption1 = Path.GetFileName(file);
-                        mm.ThumbnailCaption2 = String.Format("{0} x {1} ({2} Kbs)", mm.FrameWidth, mm.FrameHeight, mm.BitRate.ToString("N0"));
+                        mm.ThumbnailCaption2 = string.Format("{0} x {1} ({2} Kbs)", mm.Properties.FrameWidth, mm.Properties.FrameHeight, mm.Properties.BitRate.ToString("N0"));
 
                         //add meta model to cache
                         this.CachedItems.Add(mm);
                     }
                     catch (Exception e)
                     {
-                        throw new Exception(String.Format("Error while attaching thumbnail to video meta model for file <{0}>. Message: <{1}>", file, e.Message));
+                        throw new Exception(string.Format("Error while attaching thumbnail to video meta model for file <{0}>. Message: <{1}>", file, e.Message));
                     }
 
                     progress.Report((i * 99) / myVideoFileCache.CachedItems.Count);

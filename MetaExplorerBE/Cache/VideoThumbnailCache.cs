@@ -70,7 +70,7 @@ namespace MetaExplorerBE
         {
             FFmpegWrapper wrapper = new FFmpegWrapper(FFmpegLocation);
 
-            string md5 = Helper.GetMD5Hash(file.Name);
+            string md5 = Helper.GetMD5Hash(file);
 
             string cacheFileLocation = Path.Combine(myThumbnailPath, md5);
 

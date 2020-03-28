@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -34,11 +35,13 @@ namespace MetaExplorer.Domain
 
         public int Stars { get; set; }
 
-        public int BitRate { get; set; }
+        //public int BitRate { get; set; }
 
-        public int FrameWidth { get; set; }
+        //public int FrameWidth { get; set; }
 
-        public int FrameHeight { get; set; }
+        //public int FrameHeight { get; set; }
+
+        public VideoProperties Properties { get; set; }
 
         #endregion
 

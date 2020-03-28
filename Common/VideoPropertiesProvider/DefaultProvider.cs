@@ -1,7 +1,8 @@
 ﻿using System;
 using System.IO;
+using Domain;
 
-namespace MetaExplorer.Common.VideoProperties
+namespace MetaExplorer.Common.VideoPropertiesProvider
 {
     internal class DefaultProvider : IVideoPropertiesProvider
     {
@@ -15,15 +16,10 @@ namespace MetaExplorer.Common.VideoProperties
         {
             return new VideoProperties
             {
-                bitrate = 0,
-                frameheight = 0,
-                frameWidth = 0
+                BitRate = 0,
+                FrameHeight = 0,
+                FrameWidth = 0
             };
-        }
-
-        private int GetNumericalProperty(FileInfo file, int index)
-        {
-            return 0;
         }
     }
 }
