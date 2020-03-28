@@ -22,8 +22,6 @@ namespace MetaExplorerGUI
         public VideoMetaModelCache VideoMetaModelCache { get; set; }
         public CriterionCache CriterionCache { get; set; }
 
-        private Video mmRef = null;
-
         #endregion
 
         #region Public Properties
@@ -36,15 +34,9 @@ namespace MetaExplorerGUI
             set { this._freeTextSearch = value; OnPropertyChanged("FreeTextSearch");  }
         }
 
-        public Video MMRef
-        {
-            get { return this.mmRef; }
-            private set { this.mmRef = value; }
-        }
+        public Video MMRef { get; private set; } = null;
 
         public ObservableCollection<Video> CurrentFileSelection { get; private set; }
-
-        //public ObservableCollection<CriterionInstance> CurrentCriterionInstanceList { get; private set; }
 
         public int CurrentFileSelectionCount
         {
@@ -80,9 +72,6 @@ namespace MetaExplorerGUI
             {
                 CurrentCriterionSelection.Add(crit, null);
             });
-
-            //CurrentCriterionInstanceList = this.CriterionCache.GetCriterionInstances("Actor");
-
         }
 
         #endregion
@@ -100,7 +89,7 @@ namespace MetaExplorerGUI
         {
             CurrentFileSelection.Clear();
             //currentFileSelection.AddRange(this.VideoMetaModelCache.GetVideoFileSelection(mmRef));
-            CurrentFileSelection = this.VideoMetaModelCache.GetVideoFileSelection(mmRef);
+            CurrentFileSelection = this.VideoMetaModelCache.GetVideoFileSelection(MMRef);
 
             this.CurrentFileSelectionCount = this.CurrentFileSelection.Count();
 

@@ -1,4 +1,5 @@
 ﻿using MetaExplorer.Common;
+using MetaExplorer.Common.VideoPropertiesProvider;
 using MetaExplorer.Domain;
 using MetaExplorerBE;
 using Microsoft.Extensions.Configuration;
@@ -6,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -44,9 +46,19 @@ namespace MetaExplorerGUI
             int criterionThumbNailHeight = Int32.Parse(FindResource("CriterionThumbnailHeight").ToString());
             int criterionThumbNailWidth = Int32.Parse(FindResource("CriterionThumbnailWidth").ToString());
 
+            string configFFmpegLocation = myConfig.GetValue<string>("FFmpegLocation");
+            string configCriterionFilesBasePath = myConfig.GetValue<string>("CriterionFilesBasePath");
+            string configVLCLocation = myConfig.GetValue<string>("VLCLocation");
+            string configVideoFilesBasePath = myConfig.GetValue<string>("VideoFilesBasePath");
+
             //INIT cache Video Files
-            var videoFileCache = new VideoFileCache(myConfig.GetValue<string>("VideoFilesBasePath"));
+            var videoFileCache = new VideoFileCache(configVideoFilesBasePath);
             ProgressWindow.DoWorkWithModal("Updating Video File Cache", videoFileCache.InitCacheAsync);
+
+            //INIT cache video properties
+            var videoPropertiesCacheLocation = Path.Combine(ConfigurationManager.AppSettings.Get("ConfigBasePath"), "VideoPropertyCache.json");
+            var videoPropertiesCache = new VideoPropertiesCache(videoPropertiesCacheLocation, configFFmpegLocation, videoFileCache);
+            ProgressWindow.DoWorkWithModal("Updating Video Properties Cache", videoPropertiesCache.InitCacheAsync);
 
             //INIT cache video thumbnails
             var videoThumbnailCache = new VideoThumbnailCache(
@@ -58,7 +70,7 @@ namespace MetaExplorerGUI
             ProgressWindow.DoWorkWithModal("Updating Video Thumbnails", videoThumbnailCache.InitCacheAsync);
 
             //INIT cache criterion thumbnails
-            List<string> criterionThumbPaths = CriteriaConfig.Criteria.Select(x => Path.Combine(myConfig.GetValue<string>("CriterionFilesBasePath"), x.Name)).ToList();
+            List<string> criterionThumbPaths = CriteriaConfig.Criteria.Select(x => Path.Combine(configCriterionFilesBasePath, x.Name)).ToList();
             var criterionThumbnailCache = new ImageThumbnailCache(
                 criterionThumbPaths,
                 criterionThumbNailHeight,
@@ -69,15 +81,17 @@ namespace MetaExplorerGUI
             //INIT cache video meta model
             videoMetaModelCache = new VideoMetaModelCache(
                 videoFileCache,
-                videoThumbnailCache
+                videoThumbnailCache,
+                videoPropertiesCache
             );
 
             var videoMetaModelCacheEmpty = new VideoMetaModelCache(
                 videoFileCache,
-                videoThumbnailCache
+                videoThumbnailCache,
+                videoPropertiesCache
             );
             ProgressWindow.DoWorkWithModal("Updating Video Meta Model Cache", videoMetaModelCache.InitCacheAsync);
-            ProgressWindow.DoWorkWithModal("Updating Video Meta Model Cache", videoMetaModelCache.UpdateNonExistingThumbnailCacheAsync);
+            ProgressWindow.DoWorkWithModal("Creating non existing video thumbnails", videoMetaModelCache.UpdateNonExistingThumbnailCacheAsync);
 
             //INIT cache criterion
             var criterionCache = new CriterionCache(criterionThumbnailCache, videoMetaModelCache);
@@ -432,11 +446,11 @@ namespace MetaExplorerGUI
             }
             else if (itemstr.Contains("resolution"))
             {
-                this.myViewModel.VideoMetaModelCache.ResortBy(x => x.FrameHeight * x.FrameWidth);
+                this.myViewModel.VideoMetaModelCache.ResortBy(x => x.Properties.FrameHeight * x.Properties.FrameWidth);
             }
             else if (itemstr.Contains("bitrate"))
             {
-                this.myViewModel.VideoMetaModelCache.ResortBy(x => x.BitRate);
+                this.myViewModel.VideoMetaModelCache.ResortBy(x => x.Properties.BitRate);
             }
             else
             {

@@ -1,20 +1,18 @@
 ﻿using MediaToolkit.Model;
 using System;
 using System.IO;
+using Domain;
 
-namespace MetaExplorer.Common.VideoProperties
+namespace MetaExplorer.Common.VideoPropertiesProvider
 {
     internal class MediaToolkitProvider : IVideoPropertiesProvider
     {
-        MediaToolkit.Engine engine;
-
-        public MediaToolkitProvider(string fFmpegLocation)
-        {
-            engine = new MediaToolkit.Engine(fFmpegLocation);
-        }
+        public string FFMpegLocation { get; set; }
 
         public VideoProperties GetVideoProperties(FileInfo file)
         {
+            MediaToolkit.Engine engine = new MediaToolkit.Engine(FFMpegLocation);
+
             var inputFile = new MediaFile { Filename = file.FullName };
             engine.GetMetadata(inputFile);
 
@@ -34,9 +32,9 @@ namespace MetaExplorer.Common.VideoProperties
 
             return new VideoProperties
             {
-                bitrate = bitratei,
-                frameheight = heighti,
-                frameWidth = widthi
+                BitRate = bitratei,
+                FrameHeight = heighti,
+                FrameWidth = widthi
             };
         }
     }

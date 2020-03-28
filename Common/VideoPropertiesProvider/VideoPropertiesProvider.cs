@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace MetaExplorer.Common.VideoProperties
+namespace MetaExplorer.Common.VideoPropertiesProvider
 {
     public enum VideoPropertiesTechnology
     {
         //Shell32,
-        //MediaToolkit,
+        MediaToolkit,
         //WinAPICodePack,
         None
     }
@@ -18,16 +18,24 @@ namespace MetaExplorer.Common.VideoProperties
             private set;
         }
 
-        public VideoPropertiesProvider(VideoPropertiesTechnology technology)
+        public VideoPropertiesProvider(VideoPropertiesTechnology technology, string ffmpegLocation)
         {
             //if (technology == VideoPropertiesTechnology.Shell32)
             //    Provider = new Shellprovider();
-            /*else*/ //if (technology == VideoPropertiesTechnology.MediaToolkit)
-                //Provider = new MediaToolkitProvider();
+            if (technology == VideoPropertiesTechnology.MediaToolkit)
+            {
+                Provider = new MediaToolkitProvider()
+                {
+                    FFMpegLocation = ffmpegLocation
+                };
+
+            }
             //else if (technology == VideoPropertiesTechnology.WinAPICodePack)
             //    Provider = new WindowsApiCodepackProvider();
-            if (technology == VideoPropertiesTechnology.None)
+            else if (technology == VideoPropertiesTechnology.None)
+            {
                 Provider = new DefaultProvider();
+            }
             else
             {
                 string errorMsg = String.Format("Unsupported Technology: <{0}>", technology.ToString());
