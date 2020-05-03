@@ -171,7 +171,9 @@
         Thumbnail Area
         -->
         <ScrollViewer x:Name="myScrollViewer" Margin="10" HorizontalScrollBarVisibility="Disabled" Grid.Row="1" Grid.Column="0">
-            <ItemsControl x:Name="myItemsControl" ItemsSource="{Binding CurrentFileSelection}" ItemTemplateSelector="{DynamicResource ThumbnailAreaTemplateSelector}" 
+            <ItemsControl x:Name="myItemsControl" 
+                          ItemsSource="{Binding ThumbnailViewContent}" 
+                          ItemTemplateSelector="{DynamicResource ThumbnailAreaTemplateSelector}" 
                           VirtualizingStackPanel.IsVirtualizing="True">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>

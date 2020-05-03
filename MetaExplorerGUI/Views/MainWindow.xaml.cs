@@ -104,6 +104,7 @@ namespace MetaExplorerGUI
             myViewModel.PropertyChanged += Event_PropertyChanged;
 
             //Add VideoMetaModelCache lazy
+            myViewModel.SwitchToVideoThumbnailView();
             Task.Factory.StartNew(() =>
             {
                 App.Current.Dispatcher.Invoke(async () =>
@@ -177,13 +178,13 @@ namespace MetaExplorerGUI
 
         private void SwitchToCriterionThumbnailView(Criterion crit)
         {
-            myItemsControl.ItemsSource = myViewModel.CriterionCache.GetCriterionInstances(crit);
+            myViewModel.SwitchToCriterionThumbnailView(crit);
             MyRandomButton.IsEnabled = false;
         }
 
         private void SwitchToVideoThumbnailView()
         {
-            myItemsControl.ItemsSource = myViewModel.CurrentFileSelection;
+            myViewModel.SwitchToVideoThumbnailView();
             MyRandomButton.IsEnabled = true;
         }
 

@@ -2,9 +2,11 @@
 using MetaExplorer.Domain;
 using MetaExplorerBE;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Dynamic;
 using System.Linq;
 
 namespace MetaExplorerGUI
@@ -21,6 +23,8 @@ namespace MetaExplorerGUI
         public VideoFileCache VideoFileCache { get; set; }
         public VideoMetaModelCache VideoMetaModelCache { get; set; }
         public CriterionCache CriterionCache { get; set; }
+
+        public IEnumerable ThumbnailViewContent { get; set; }
 
         #endregion
 
@@ -138,5 +142,17 @@ namespace MetaExplorerGUI
         }
 
         #endregion
+
+        public void SwitchToCriterionThumbnailView(Criterion crit)
+        {
+            ThumbnailViewContent = CriterionCache.GetCriterionInstances(crit);
+            OnPropertyChanged();
+        }
+
+        public void SwitchToVideoThumbnailView()
+        {
+            ThumbnailViewContent = CurrentFileSelection;
+            OnPropertyChanged();
+        }
     }
 }
