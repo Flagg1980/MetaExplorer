@@ -10,12 +10,12 @@ using System.Threading.Tasks;
 
 namespace MetaExplorerBE
 {
-    public class VideoPropertiesCache : BaseCache<string, VideoProperties>
+    public class VideoPropertiesCache : BaseCache<string, VideoProperties>, IVideoPropertiesCache
     {
-        private readonly VideoFileCache myVideoFileCache;
+        private readonly IVideoFileCache myVideoFileCache;
         private IVideoPropertiesProvider myVideoPropertiesProvider;
 
-        public VideoPropertiesCache(string cacheLocation, string ffMpegLocation, VideoFileCache videoFileCache)
+        public VideoPropertiesCache(string cacheLocation, string ffMpegLocation, IVideoFileCache videoFileCache)
         {
             Location = cacheLocation;
             myVideoFileCache = videoFileCache;

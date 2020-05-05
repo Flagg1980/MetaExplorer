@@ -10,7 +10,7 @@ namespace MetaExplorerBE
     /// <summary>
     /// Reads all files from a given base directory and caches the file locations.
     /// </summary>
-    public class VideoFileCache : BaseCache<string>
+    public class VideoFileCache : BaseCache<string>, IVideoFileCache
     {
         private string myPathToVideoFiles;
 

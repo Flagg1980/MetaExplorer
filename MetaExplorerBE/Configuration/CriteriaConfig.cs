@@ -13,7 +13,6 @@ namespace MetaExplorer.Common
 
         public static void LoadFromAppSettings(IConfiguration criterionConfig)
         {
-            var criterionConfigJson = criterionConfig;
             Criteria = new List<Criterion>();
 
             foreach (var ee in criterionConfig.GetChildren())

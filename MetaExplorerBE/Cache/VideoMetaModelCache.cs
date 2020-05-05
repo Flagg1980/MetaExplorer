@@ -18,9 +18,9 @@ namespace MetaExplorerBE
     /// </summary>
     public class VideoMetaModelCache : BaseCache<Video>
     {
-        private readonly VideoPropertiesCache myVideoPropertiesCache;
-        private readonly VideoFileCache myVideoFileCache;
-        private readonly VideoThumbnailCache myVideoThumbnailCache;
+        private readonly IVideoPropertiesCache myVideoPropertiesCache;
+        private readonly IVideoFileCache myVideoFileCache;
+        private readonly IVideoThumbnailCache myVideoThumbnailCache;
 
         private string BaseDir { get; set; }
 
@@ -29,7 +29,7 @@ namespace MetaExplorerBE
 
         /// <summary>
         /// </summary>
-        public VideoMetaModelCache(VideoFileCache videoFileCache, VideoThumbnailCache videoThumbnailCache, VideoPropertiesCache videoPropertiesCache)
+        public VideoMetaModelCache(IVideoFileCache videoFileCache, IVideoThumbnailCache videoThumbnailCache, IVideoPropertiesCache videoPropertiesCache)
         {
             myVideoFileCache = videoFileCache;
             myVideoThumbnailCache = videoThumbnailCache;

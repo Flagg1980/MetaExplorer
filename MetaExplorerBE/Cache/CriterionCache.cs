@@ -12,7 +12,7 @@ namespace MetaExplorerBE
     /// <summary>
     /// This file caches criterion instances and their thumbnails.
     /// </summary>
-    public class CriterionCache : BaseCache<string, ObservableCollection<CriterionInstance>>
+    public class CriterionCache : BaseCache<string, ObservableCollection<CriterionInstance>>, ICriterionCache
     {
         public ObservableCollection<CriterionInstance> GetCriterionInstances(Criterion criterion)
         {

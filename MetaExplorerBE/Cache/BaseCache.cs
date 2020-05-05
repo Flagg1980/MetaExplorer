@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MetaExplorerBE
 {
-    public abstract class BaseCache<T> : ICache
+    public abstract class BaseCache<T> : ICache<T>
     {
         public List<T> CachedItems
         {
@@ -22,7 +22,7 @@ namespace MetaExplorerBE
         public abstract Task InitCacheAsync(IProgress<int> progress, IProgress<string> progressFile);
     }
 
-    public abstract class BaseCache<T,U> : ICache
+    public abstract class BaseCache<T,U> : ICache<T,U>
     {
         public Dictionary<T,U> CachedItems
         {

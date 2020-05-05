@@ -20,11 +20,11 @@ namespace MetaExplorerGUI
         
         private string _freeTextSearch = string.Empty;
 
-        public VideoFileCache VideoFileCache { get; set; }
+        public IVideoFileCache VideoFileCache { get; set; }
         public VideoMetaModelCache VideoMetaModelCache { get; set; }
-        public CriterionCache CriterionCache { get; set; }
+        public ICriterionCache CriterionCache { get; set; }
 
-        public IEnumerable ThumbnailViewContent { get; set; }
+        public ICollection ThumbnailViewContent { get; set; }
 
         #endregion
 
@@ -63,7 +63,7 @@ namespace MetaExplorerGUI
 
         #region C'tor
 
-        public ViewModel(CriterionCache criterionCache, VideoFileCache videoFileCache, VideoMetaModelCache videoMetaModelCache)
+        public ViewModel(ICriterionCache criterionCache, IVideoFileCache videoFileCache, VideoMetaModelCache videoMetaModelCache)
         {
             CriterionCache = criterionCache;
             VideoFileCache = videoFileCache;

@@ -7,7 +7,7 @@ using System.Windows.Media.Imaging;
 
 namespace MetaExplorerBE
 {
-    public class VideoThumbnailCache : BaseThumbnailCache
+    public class VideoThumbnailCache : BaseThumbnailCache, IVideoThumbnailCache
     {
         private string myThumbnailPath;
         
