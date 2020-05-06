@@ -50,13 +50,14 @@ namespace MetaExplorerGUI
         [STAThread]
         private void ApplicationStart(object sender, StartupEventArgs e)
         {
-            CriteriaConfig.LoadFromAppSettings(configCrit);
+            CriteriaConfig criteriaConfig = new CriteriaConfig();
+            criteriaConfig.LoadFromAppSettings(configCrit);
 
-            var mainWindow = new MainWindow(configRoot);
+            var mainWindow = new MainWindow(configRoot, criteriaConfig);
             mainWindow.Show();
             mainWindow.DoInitStuff();
 
-            foreach (Criterion crit in CriteriaConfig.Criteria)
+            foreach (Criterion crit in criteriaConfig.Criteria)
             {
                 mainWindow.AddDynamicCriterionButton(crit);
             }

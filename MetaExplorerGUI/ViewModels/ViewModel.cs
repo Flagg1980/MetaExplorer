@@ -23,8 +23,9 @@ namespace MetaExplorerGUI
         public IVideoFileCache VideoFileCache { get; set; }
         public VideoMetaModelCache VideoMetaModelCache { get; set; }
         public ICriterionCache CriterionCache { get; set; }
-
         public ICollection ThumbnailViewContent { get; set; }
+
+        private readonly ICriteriaConfig myCriteriaConfig;
 
         #endregion
 
@@ -63,16 +64,17 @@ namespace MetaExplorerGUI
 
         #region C'tor
 
-        public ViewModel(ICriterionCache criterionCache, IVideoFileCache videoFileCache, VideoMetaModelCache videoMetaModelCache)
+        public ViewModel(ICriterionCache criterionCache, IVideoFileCache videoFileCache, VideoMetaModelCache videoMetaModelCache, ICriteriaConfig criteriaConfig)
         {
             CriterionCache = criterionCache;
             VideoFileCache = videoFileCache;
             VideoMetaModelCache = videoMetaModelCache;
+            myCriteriaConfig = criteriaConfig;
 
             CurrentFileSelection = new ObservableCollection<Video>();
 
             CurrentCriterionSelection = new Dictionary<Criterion, CriterionInstance>();
-            CriteriaConfig.Criteria.ForEach((Criterion crit) => 
+            myCriteriaConfig.Criteria.ForEach((Criterion crit) => 
             {
                 CurrentCriterionSelection.Add(crit, null);
             });
@@ -122,7 +124,7 @@ namespace MetaExplorerGUI
 
             MMRef.ThumbnailCaption1 = this.FreeTextSearch;
 
-            CriteriaConfig.Criteria.ForEach((Criterion crit) =>
+            myCriteriaConfig.Criteria.ForEach((Criterion crit) =>
             {
                 this.MMRef.criteriaContents[crit.Name] = new List<string>();
 

@@ -32,10 +32,12 @@ namespace MetaExplorerGUI
 
         private Dictionary<Criterion, Button> dynamicCriterionButtons = new Dictionary<Criterion, Button>();
         private VideoMetaModelCache videoMetaModelCache = null;
+        private CriteriaConfig myCriteriaConfig;
 
-        public MainWindow(IConfiguration config)
+        public MainWindow(IConfiguration config, CriteriaConfig criteriaConfig)
         {
             myConfig = config;
+            myCriteriaConfig = criteriaConfig;
             InitializeComponent();
         }
 
@@ -70,7 +72,7 @@ namespace MetaExplorerGUI
             ProgressWindow.DoWorkWithModal("Updating Video Thumbnails", videoThumbnailCache.InitCacheAsync);
 
             //INIT cache criterion thumbnails
-            List<string> criterionThumbPaths = CriteriaConfig.Criteria.Select(x => Path.Combine(configCriterionFilesBasePath, x.Name)).ToList();
+            List<string> criterionThumbPaths = myCriteriaConfig.Criteria.Select(x => Path.Combine(configCriterionFilesBasePath, x.Name)).ToList();
             var criterionThumbnailCache = new ImageThumbnailCache(
                 criterionThumbPaths,
                 criterionThumbNailHeight,
@@ -82,22 +84,24 @@ namespace MetaExplorerGUI
             videoMetaModelCache = new VideoMetaModelCache(
                 videoFileCache,
                 videoThumbnailCache,
-                videoPropertiesCache
+                videoPropertiesCache,
+                myCriteriaConfig
             );
 
             var videoMetaModelCacheEmpty = new VideoMetaModelCache(
                 videoFileCache,
                 videoThumbnailCache,
-                videoPropertiesCache
+                videoPropertiesCache,
+                myCriteriaConfig
             );
             ProgressWindow.DoWorkWithModal("Updating Video Meta Model Cache", videoMetaModelCache.InitCacheAsync);
             ProgressWindow.DoWorkWithModal("Creating non existing video thumbnails", videoMetaModelCache.UpdateNonExistingThumbnailCacheAsync);
 
             //INIT cache criterion
-            var criterionCache = new CriterionCache(criterionThumbnailCache, videoMetaModelCache);
+            var criterionCache = new CriterionCache(criterionThumbnailCache, videoMetaModelCache, myCriteriaConfig);
             ProgressWindow.DoWorkWithModal("Updating Criterion Cache", criterionCache.InitCacheAsync);
 
-            myViewModel = new ViewModel(criterionCache, videoFileCache, videoMetaModelCacheEmpty);
+            myViewModel = new ViewModel(criterionCache, videoFileCache, videoMetaModelCacheEmpty, myCriteriaConfig);
 
             this.DataContext = myViewModel;
             myItemsControl.DataContext = myViewModel;
@@ -193,7 +197,7 @@ namespace MetaExplorerGUI
         /// </summary>
         private void Event_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (CriteriaConfig.Criteria.Exists((Criterion x) => e.PropertyName == x.Name) || e.PropertyName == "FreeTextSearch")
+            if (myCriteriaConfig.Criteria.Exists((Criterion x) => e.PropertyName == x.Name) || e.PropertyName == "FreeTextSearch")
             {
                 myViewModel.UpdateMMref();
                 myViewModel.UpdateCurrentSelection();

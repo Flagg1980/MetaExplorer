@@ -21,6 +21,7 @@ namespace MetaExplorerBE
         private readonly IVideoPropertiesCache myVideoPropertiesCache;
         private readonly IVideoFileCache myVideoFileCache;
         private readonly IVideoThumbnailCache myVideoThumbnailCache;
+        private readonly ICriteriaConfig myCriteriaConfig;
 
         private string BaseDir { get; set; }
 
@@ -29,11 +30,12 @@ namespace MetaExplorerBE
 
         /// <summary>
         /// </summary>
-        public VideoMetaModelCache(IVideoFileCache videoFileCache, IVideoThumbnailCache videoThumbnailCache, IVideoPropertiesCache videoPropertiesCache)
+        public VideoMetaModelCache(IVideoFileCache videoFileCache, IVideoThumbnailCache videoThumbnailCache, IVideoPropertiesCache videoPropertiesCache, ICriteriaConfig criteriaConfig)
         {
             myVideoFileCache = videoFileCache;
             myVideoThumbnailCache = videoThumbnailCache;
             myVideoPropertiesCache = videoPropertiesCache;
+            myCriteriaConfig = criteriaConfig;
         }
 
         #endregion
@@ -45,7 +47,7 @@ namespace MetaExplorerBE
             return Task.Factory.StartNew(() =>
             {
                 this.CachedItems.Clear();
-                IConverter mmConverter = new FileNameConverter();
+                IConverter mmConverter = new FileNameConverter(myCriteriaConfig);
 
                 progress.Report(0);
 
@@ -156,7 +158,7 @@ namespace MetaExplorerBE
                 res = res.Where((Video m) => { return m.Stars == mmRef.Stars; });
             }
 
-            foreach (Criterion criterion in CriteriaConfig.Criteria)
+            foreach (Criterion criterion in myCriteriaConfig.Criteria)
             {
                 List<string> critContent = mmRef.criteriaContents[criterion.Name];
 

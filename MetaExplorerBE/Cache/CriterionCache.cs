@@ -26,18 +26,20 @@ namespace MetaExplorerBE
 
         private readonly ImageThumbnailCache myCriterionThumbnailCache;
         private readonly VideoMetaModelCache myVideoMetaModelCache;
+        private readonly CriteriaConfig myCriteriaConfig;
 
         #region Constructor
 
         /// <summary>
         /// </summary>
-        public CriterionCache(ImageThumbnailCache criterionThumbnailCache, VideoMetaModelCache videoMetaModelCache)
+        public CriterionCache(ImageThumbnailCache criterionThumbnailCache, VideoMetaModelCache videoMetaModelCache, CriteriaConfig criteriaConfig)
         {
             myCriterionThumbnailCache = criterionThumbnailCache;
             myVideoMetaModelCache = videoMetaModelCache;
+            myCriteriaConfig = criteriaConfig;
 
             //init list
-            CriteriaConfig.Criteria.ForEach((Criterion x) => this.CachedItems.Add(x.Name, new ObservableCollection<CriterionInstance>()));
+            myCriteriaConfig.Criteria.ForEach((Criterion x) => this.CachedItems.Add(x.Name, new ObservableCollection<CriterionInstance>()));
         }
 
         #endregion
@@ -57,7 +59,7 @@ namespace MetaExplorerBE
         {
             return Task.Factory.StartNew(() =>
             {
-                foreach (Criterion crit in CriteriaConfig.Criteria)
+                foreach (Criterion crit in myCriteriaConfig.Criteria)
                 {
                     InitCacheCrit(crit, progress, progressFile);
                 }

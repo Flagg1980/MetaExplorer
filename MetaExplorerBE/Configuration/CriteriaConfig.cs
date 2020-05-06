@@ -5,13 +5,14 @@ using System.Collections.Generic;
 
 namespace MetaExplorer.Common
 {
-    public static class CriteriaConfig
-    {
-        static CriteriaConfig()
-        {
-        }
+    public interface ICriteriaConfig
+    { 
+        public List<Criterion> Criteria { get; }
+    }
 
-        public static void LoadFromAppSettings(IConfiguration criterionConfig)
+    public class CriteriaConfig : ICriteriaConfig
+    {
+        public void LoadFromAppSettings(IConfiguration criterionConfig)
         {
             Criteria = new List<Criterion>();
 
@@ -25,7 +26,7 @@ namespace MetaExplorer.Common
             }
         }
 
-        public static List<Criterion> Criteria
+        public List<Criterion> Criteria
         {
             get;
             set;

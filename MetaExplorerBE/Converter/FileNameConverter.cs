@@ -14,6 +14,14 @@ namespace MetaExplorerBE.Converter
 
         private readonly char SEPARATOR2 = '_';
 
+        private readonly ICriteriaConfig myCriteriaConfig;
+
+
+        public FileNameConverter(ICriteriaConfig criteriaConfig)
+        {
+            myCriteriaConfig = criteriaConfig;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -36,7 +44,7 @@ namespace MetaExplorerBE.Converter
                 tokens = tokens.Select(x => x.Trim(this.SEPARATOR1.ToCharArray())).ToList();
 
                 //segregate predefined criteria
-                foreach (Criterion crit in CriteriaConfig.Criteria)
+                foreach (Criterion crit in myCriteriaConfig.Criteria)
                 {
                     if (crit.Mandatory || tokens.Count > crit.IndexInFilename)
                     {
