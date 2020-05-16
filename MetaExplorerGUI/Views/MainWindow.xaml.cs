@@ -298,14 +298,8 @@ namespace MetaExplorerGUI
         private void CriterionGroupbox_DragEnter(object sender, DragEventArgs e)
         {
             GroupBox gb = sender as GroupBox;
-            if (!IsMouseInside(gb))
-            {
-                this.SetGroupboxBorder(gb, false);
-            }
-            else
-            {
-                this.SetGroupboxBorder(gb, true);
-            }
+            this.SetGroupboxBorder(gb, !IsMouseInside(gb));
+
         }
 
         /// <summary>
@@ -314,15 +308,7 @@ namespace MetaExplorerGUI
         private void CriterionGroupbox_DragLeave(object sender, DragEventArgs e)
         {
             GroupBox gb = sender as GroupBox;
-
-            if (IsMouseInside(gb))
-            {
-                this.SetGroupboxBorder(gb, true);
-            }
-            else
-            {
-                this.SetGroupboxBorder(gb, false);
-            }
+            this.SetGroupboxBorder(gb, IsMouseInside(gb));
         }
 
         /// <summary>
