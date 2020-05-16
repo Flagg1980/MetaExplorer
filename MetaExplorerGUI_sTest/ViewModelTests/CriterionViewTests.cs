@@ -9,35 +9,40 @@ using System;
 using MetaExplorer.Common;
 using System.Collections.Generic;
 
-namespace MetaExplorerGUI_sTest
+namespace MetaExplorerGUI_sTest.ViewModelTests
 {
-    public class ViewModelTests
+    public class CriterionViewTests
     {
+        Criterion dummyCriterion;
 
+        Mock<ICriteriaConfig> myCriteriaConfigMock;
+        Mock<ICriterionCache> myCriterionCacheMock;
+        Mock<IVideoFileCache> myVideoFileCacheMock;
+        Mock<IVideoThumbnailCache> myVideoThumbnailCache;
+        Mock<IVideoPropertiesCache> myVideoPropertiesCache;
 
-        [SetUp]
-        public void Setup()
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
+            dummyCriterion = CreateDummyCriterion(5);
+
+            myCriteriaConfigMock = SetupCriteriaConfigMock(dummyCriterion);
+            myCriterionCacheMock = SetupCriterionCacheMock(dummyCriterion);
+            myVideoFileCacheMock = SetupVideoFileCacheMock();
+            myVideoThumbnailCache = SetupVideoThumbnailCacheMock();
+            myVideoPropertiesCache = SetupVideoPropertiesCacheMock();
         }
 
         [Test]
         public void ChangeFromVideoViewToCriterionView_PropertyChangedEventRaised()
         {
-            var dummyCriterion = CreateDummyCriterion(5);
-
-            var myCriteriaConfigMock = SetupCriteriaConfigMock(dummyCriterion);
-            var myCriterionCacheMock = SetupCriterionCacheMock(dummyCriterion);
-
-            var myVideoFileCache = new Mock<IVideoFileCache>();
-            var myVideoThumbnailCache = new Mock<IVideoThumbnailCache>();
-            var myVideoPropertiesCache = new Mock<IVideoPropertiesCache>();
-            var myVideoMetaModelCache = new VideoMetaModelCache(myVideoFileCache.Object,
+            var myVideoMetaModelCache = new VideoMetaModelCache(myVideoFileCacheMock.Object,
                 myVideoThumbnailCache.Object,
                 myVideoPropertiesCache.Object,
                 myCriteriaConfigMock.Object);
 
             var myViewModel = new ViewModel(myCriterionCacheMock.Object,
-                myVideoFileCache.Object,
+                myVideoFileCacheMock.Object,
                 myVideoMetaModelCache,
                 myCriteriaConfigMock.Object);
 
@@ -57,21 +62,13 @@ namespace MetaExplorerGUI_sTest
         [Test]
         public void ChangeFromVideoViewToCriterionView_ThumbnailViewContainsOnlyCriterionInstances()
         {
-            var dummyCriterion = CreateDummyCriterion(5);
-
-            var myCriteriaConfigMock = SetupCriteriaConfigMock(dummyCriterion);
-            var myCriterionCacheMock = SetupCriterionCacheMock(dummyCriterion);
-
-            var myVideoFileCache = new Mock<IVideoFileCache>();
-            var myVideoThumbnailCache = new Mock<IVideoThumbnailCache>();
-            var myVideoPropertiesCache = new Mock<IVideoPropertiesCache>();
-            var myVideoMetaModelCache = new VideoMetaModelCache(myVideoFileCache.Object, 
+            var myVideoMetaModelCache = new VideoMetaModelCache(myVideoFileCacheMock.Object, 
                 myVideoThumbnailCache.Object, 
                 myVideoPropertiesCache.Object, 
                 myCriteriaConfigMock.Object);
 
             var myViewModel = new ViewModel(myCriterionCacheMock.Object, 
-                myVideoFileCache.Object, 
+                myVideoFileCacheMock.Object, 
                 myVideoMetaModelCache, 
                 myCriteriaConfigMock.Object);
 
@@ -86,6 +83,21 @@ namespace MetaExplorerGUI_sTest
             Assert.That(resultSet as ObservableCollection<CriterionInstance>, 
                 Is.Not.Null, 
                 "Result Set does not contain items of type CriterionInstance.");
+        }
+
+        private Mock<IVideoPropertiesCache> SetupVideoPropertiesCacheMock()
+        { 
+            return new Mock<IVideoPropertiesCache>();
+        }
+
+        private Mock<IVideoThumbnailCache> SetupVideoThumbnailCacheMock()
+        { 
+            return new Mock<IVideoThumbnailCache>();
+        }
+
+        private Mock<IVideoFileCache> SetupVideoFileCacheMock()
+        { 
+            return new Mock<IVideoFileCache>();
         }
 
         private Mock<ICriterionCache> SetupCriterionCacheMock(Criterion shallContainCriterion)
