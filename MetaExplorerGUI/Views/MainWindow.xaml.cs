@@ -168,10 +168,9 @@ namespace MetaExplorerGUI
 
             clearButton.Click += (object sender, RoutedEventArgs args) =>
             {
-                myViewModel.CurrentCriterionSelection[crit] = null;
-
                 UpdateCriterionButton(crit, "Select " + crit.Name, null);
 
+                myViewModel.CurrentCriterionSelection[crit] = null;
                 myViewModel.UpdateMMref();
                 myViewModel.UpdateCurrentSelection();
                 SwitchToVideoThumbnailView();
@@ -316,9 +315,7 @@ namespace MetaExplorerGUI
         /// </summary>
         private void CriterionGroupbox_Drop(object sender, DragEventArgs e)
         {
-            string expectedDragType = typeof(Video).FullName;
-
-            if (e.Data.GetDataPresent(expectedDragType))
+            if (e.Data.GetDataPresent(typeof(Video)))
             {
                 Video vmm = e.Data.GetData(typeof(Video)) as Video;
                 GroupBox gb = sender as GroupBox;
@@ -327,45 +324,60 @@ namespace MetaExplorerGUI
 
                 this.SetGroupboxBorder(gb, false);
 
-                Button selectButton = gb.Template.FindName("SelectButton", gb) as Button;
+                //Button selectButton = gb.Template.FindName("SelectButton", gb) as Button;
 
                 string critName = gb.Header as string;
+                
+                
+                
+                
+                
+                
                 ObservableCollection<CriterionInstance> ciList = this.myViewModel.CriterionCache.GetCriterionInstances(critName);
+                Criterion criterion = myViewModel.CriterionCache.GetCriterionByName(critName);
 
                 //get the criterion instance
                 CriterionInstance critInstance = null;
                 //int ciIndex = -1;
 
                 //No criterion, e.g.[bla1][bla2][3Star][][] no criterion instance for criterion "keyword" is defined
-                if (vmm.criteriaContents[critName].Count == 0)
+                if (vmm.criteriaMapping[criterion].Count == 0)
                 {
                     return;
                 }
                 //Multiple criteria, e.g.[bla1][bla2][3Star][][bla3_bla4] we have two criteria instances for criterion "keyword", namely "bla3" and "bla4"
-                else if (vmm.criteriaContents[critName].Count > 1)
+                else if (vmm.criteriaMapping[criterion].Count > 1)
                 {
                     //for now we just take the first criteria and neglect the others. TODO: offer a selection box??
-                    string searchCritInstanceName = vmm.criteriaContents[critName][0];
-                    critInstance = ciList.FirstOrDefault(x => String.Compare(x.Name, searchCritInstanceName, true) == 0);
+                    critInstance = vmm.criteriaMapping[criterion][0];
+                    //critInstance = ciList.FirstOrDefault(x => String.Compare(x.Name, searchCritInstanceName, true) == 0);
                     //ciIndex = ciList.IndexOf(critInstance);
                 }
                 //default case: one criteria
                 else
                 {
-                    string searchCritInstanceName = vmm.criteriaContents[critName][0];
-                    critInstance = ciList.FirstOrDefault(x => String.Compare(x.Name, searchCritInstanceName, true) == 0);
+                    critInstance = vmm.criteriaMapping[criterion][0];
+                    //critInstance = ciList.FirstOrDefault(x => String.Compare(x.Name, searchCritInstanceName, true) == 0);
                     //ciIndex = ciList.IndexOf(critInstance);
                 }
+
+                
+
+                //important: set the current selection index such that the MMref can be set up properly
+                myViewModel.CurrentCriterionSelection[critInstance.Criterion] = critInstance;
+                myViewModel.UpdateMMref();
+                myViewModel.UpdateCurrentSelection();
+
+
+
+
+
+
 
                 //update the label and the picture of the button
                 label.Content = critInstance.Name;
                 image.Source = critInstance.Thumbnail.Image;
 
-                //important: set the current selection index such that the MMref can be set up properly
-                myViewModel.CurrentCriterionSelection[critInstance.Criterion] = critInstance;
-
-                myViewModel.UpdateMMref();
-                myViewModel.UpdateCurrentSelection();
                 SwitchToVideoThumbnailView();
             }
         }

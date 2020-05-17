@@ -13,7 +13,7 @@ namespace MetaExplorer.Domain
         #region Public Members
 
         //criteriaContents["Actors"]=("a", "n", "o")
-        public Dictionary<string, List<string>> criteriaContents = new Dictionary<string, List<string>>();
+        //public Dictionary<string, List<string>> criteriaContents = new Dictionary<string, List<string>>();
 
         public Dictionary<Criterion, List<CriterionInstance>> criteriaMapping = new Dictionary<Criterion, List<CriterionInstance>>();
 
@@ -54,16 +54,16 @@ namespace MetaExplorer.Domain
 
         #endregion
 
-        #region Public Methods
+        //#region Public Methods
 
-        public List<string> GetList(Criterion criterion)
-        {
-            if (!this.criteriaContents.ContainsKey(criterion.Name))
-                this.criteriaContents[criterion.Name] = new List<string>();
+        //public List<string> GetList(Criterion criterion)
+        //{
+        //    if (!this.criteriaContents.ContainsKey(criterion.Name))
+        //        this.criteriaContents[criterion.Name] = new List<string>();
 
-            return this.criteriaContents[criterion.Name];
-        }
+        //    return this.criteriaContents[criterion.Name];
+        //}
 
-        #endregion
+        //#endregion
     }
 }

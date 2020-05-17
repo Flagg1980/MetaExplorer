@@ -24,6 +24,11 @@ namespace MetaExplorerBE
             return this.CachedItems[criterionName];
         }
 
+        public Criterion GetCriterionByName(string criterionName)
+        {
+            return myCriteriaConfig.Criteria.FirstOrDefault(x => x.Name.Equals(criterionName, StringComparison.InvariantCultureIgnoreCase));
+        }
+
         private readonly ImageThumbnailCache myCriterionThumbnailCache;
         private readonly VideoMetaModelCache myVideoMetaModelCache;
         private readonly CriteriaConfig myCriteriaConfig;
@@ -100,21 +105,28 @@ namespace MetaExplorerBE
             // create criterion instances for all criteria coming from the video meta models but do not have a file system (thumbnail) representative
             int i = 0;
             //from all video meta model cached items
-            this.myVideoMetaModelCache.CachedItems.ForEach(vmm =>
+            foreach (Video vmm in myVideoMetaModelCache.CachedItems)
             {
+                // The criterion is not available for this video. Should only happen for non-mandatory criteria.
+                if (!vmm.criteriaMapping.ContainsKey(criterion))
+                {
+                    continue;
+                }
+
                 //look at all criterion instances for this criterion
-                vmm.GetList(criterion).ForEach(crit =>
+                foreach (CriterionInstance criterionInstance in vmm.criteriaMapping[criterion])
                 {
                     //is this already in the criterion meta model list?
                     CriterionInstance existing = currentCriterionMetaModelList.FirstOrDefault(ci =>
                     {
-                        return string.Equals(crit, ci.Name, StringComparison.OrdinalIgnoreCase);
+                        //return string.Equals(crit, ci.Name, StringComparison.OrdinalIgnoreCase);
+                        return criterionInstance == ci;
                     });
 
                     if (existing == null)
                     {
                         existing = new CriterionInstance();
-                        existing.Name = crit;
+                        existing.Name = criterionInstance.Name;
                         existing.Criterion = criterion;
                         existing.Thumbnail.Image = Helper.NAimage;
                         existing.Thumbnail.Image.Freeze();
@@ -129,8 +141,8 @@ namespace MetaExplorerBE
                     i++;
                     progress.Report((i * 99) / this.myVideoMetaModelCache.CachedItems.Count);
                     progressFile.Report(vmm.File.FullName);
-                });
-            });
+                }
+            }
 
             //sort by name only
             List<CriterionInstance> dummyCriterionMetaModelList = 

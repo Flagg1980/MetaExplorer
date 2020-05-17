@@ -126,13 +126,12 @@ namespace MetaExplorerGUI
 
             myCriteriaConfig.Criteria.ForEach((Criterion crit) =>
             {
-                this.MMRef.criteriaContents[crit.Name] = new List<string>();
+                this.MMRef.criteriaMapping[crit] = new List<CriterionInstance>();
 
                 if (this.CurrentCriterionSelection[crit] != null)
                 {
                     CriterionInstance critInstance = this.CurrentCriterionSelection[crit];
-                    //CriterionInstance critInstance = this.CriterionCache.GetCriterionInstances(crit)[critInstanceIndex];
-                    this.MMRef.criteriaContents[crit.Name].Add(critInstance.Name);
+                    this.MMRef.criteriaMapping[crit].Add(critInstance);
                 }
             });
         }

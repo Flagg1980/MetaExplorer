@@ -160,7 +160,7 @@ namespace MetaExplorerBE
 
             foreach (Criterion criterion in myCriteriaConfig.Criteria)
             {
-                List<string> critContent = mmRef.criteriaContents[criterion.Name];
+                List<CriterionInstance> critContent = mmRef.criteriaMapping[criterion];
 
                 if (critContent.Count == 0)
                 {
@@ -172,10 +172,10 @@ namespace MetaExplorerBE
                 }
                 else
                 {
-                    res = res.Where((Video m) =>
+                    var filterCriterionInstance = mmRef.criteriaMapping[criterion][0];
+                    res = res.Where((Video video) =>
                                     {
-                                        return m.criteriaContents[criterion.Name].Contains(mmRef.criteriaContents[criterion.Name][0], 
-                                                                                           StringComparer.CurrentCultureIgnoreCase);
+                                        return video.criteriaMapping[criterion].Contains(filterCriterionInstance);
                                     })
                                     .ToList();
                 }

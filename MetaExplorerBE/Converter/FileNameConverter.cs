@@ -46,10 +46,23 @@ namespace MetaExplorerBE.Converter
                 //segregate predefined criteria
                 foreach (Criterion crit in myCriteriaConfig.Criteria)
                 {
-                    if (crit.Mandatory || tokens.Count > crit.IndexInFilename)
+                    // Case 1: The criterion is set in the filename
+                    if (tokens.Count > crit.IndexInFilename)
                     {
-                        mm.criteriaContents[crit.Name] = tokens[crit.IndexInFilename].Split(this.SEPARATOR2).ToList();
-                        mm.criteriaContents[crit.Name].RemoveAll(x => String.IsNullOrWhiteSpace(x));
+                        List<string> criterionInstanceList = tokens[crit.IndexInFilename].Split(this.SEPARATOR2).ToList();
+                        criterionInstanceList.RemoveAll(x => String.IsNullOrWhiteSpace(x));
+
+                        mm.criteriaMapping[crit] = criterionInstanceList.ConvertAll(x => new CriterionInstance()
+                        {
+                            Name = x,
+                            Criterion = crit,
+                        });
+                    }
+                    // Case 2: The file name does not contain the criterion. This is ok for non-mandatory 
+                    // criteria. We add it here anyway with an empty list to avoid null-reference accesses later.
+                    else
+                    {
+                        mm.criteriaMapping[crit] = new List<CriterionInstance>();
                     }
                 }
 

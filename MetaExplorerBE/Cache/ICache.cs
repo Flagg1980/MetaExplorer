@@ -28,6 +28,8 @@ namespace MetaExplorerBE
         ObservableCollection<CriterionInstance> GetCriterionInstances(Criterion criterion);
 
         ObservableCollection<CriterionInstance> GetCriterionInstances(string criterionName);
+
+        Criterion GetCriterionByName(string criterionName);
     }
 
     public interface IVideoFileCache : ICache<string>
