@@ -1,11 +1,11 @@
 ﻿using MetaExplorer.Domain;
+using System.Collections.Generic;
 
 namespace MetaExplorerBE.Converter
 {
     interface IConverter
     {
-        Video ConvertFrom(string input);
-
-        string ConvertTo(Video input);
+        List<CriterionInstance> ConvertFrom(string input);
+        string ConvertTo(List<CriterionInstance> input);
     }
 }

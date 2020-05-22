@@ -1,17 +1,14 @@
 ﻿using MetaExplorer.Common;
-using MetaExplorer.Common.VideoPropertiesProvider;
 using MetaExplorer.Domain;
 using MetaExplorerBE;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -80,26 +77,27 @@ namespace MetaExplorerGUI
                 );
             ProgressWindow.DoWorkWithModal("Updating Criterion Thumbnails", criterionThumbnailCache.InitCacheAsync);
 
+            //INIT cache criterion
+            var criterionCache = new CriterionCache(criterionThumbnailCache, myCriteriaConfig, videoFileCache);
+            ProgressWindow.DoWorkWithModal("Updating Criterion Cache", criterionCache.InitCacheAsync);
+
             //INIT cache video meta model
             videoMetaModelCache = new VideoMetaModelCache(
                 videoFileCache,
                 videoThumbnailCache,
                 videoPropertiesCache,
-                myCriteriaConfig
+                criterionCache
             );
 
             var videoMetaModelCacheEmpty = new VideoMetaModelCache(
                 videoFileCache,
                 videoThumbnailCache,
                 videoPropertiesCache,
-                myCriteriaConfig
+                criterionCache
             );
             ProgressWindow.DoWorkWithModal("Updating Video Meta Model Cache", videoMetaModelCache.InitCacheAsync);
             ProgressWindow.DoWorkWithModal("Creating non existing video thumbnails", videoMetaModelCache.UpdateNonExistingThumbnailCacheAsync);
 
-            //INIT cache criterion
-            var criterionCache = new CriterionCache(criterionThumbnailCache, videoMetaModelCache, myCriteriaConfig);
-            ProgressWindow.DoWorkWithModal("Updating Criterion Cache", criterionCache.InitCacheAsync);
 
             myViewModel = new ViewModel(criterionCache, videoFileCache, videoMetaModelCacheEmpty, myCriteriaConfig);
 
@@ -170,7 +168,7 @@ namespace MetaExplorerGUI
             {
                 UpdateCriterionButton(crit, "Select " + crit.Name, null);
 
-                myViewModel.CurrentCriterionSelection[crit] = null;
+                myViewModel.CurrentCriterionFilter.RemoveAll(critInst => critInst.Criterion == crit);
                 myViewModel.UpdateMMref();
                 myViewModel.UpdateCurrentSelection();
                 SwitchToVideoThumbnailView();
@@ -224,7 +222,7 @@ namespace MetaExplorerGUI
                 var criterionInstance = button.DataContext as CriterionInstance;
                 UpdateCriterionButton(criterionInstance.Criterion, criterionInstance.Name, criterionInstance.Thumbnail.Image);
 
-                myViewModel.CurrentCriterionSelection[criterionInstance.Criterion] = criterionInstance;
+                myViewModel.CurrentCriterionFilter.Add(criterionInstance);
                 myViewModel.UpdateMMref();
                 myViewModel.UpdateCurrentSelection();
 
@@ -327,52 +325,24 @@ namespace MetaExplorerGUI
                 //Button selectButton = gb.Template.FindName("SelectButton", gb) as Button;
 
                 string critName = gb.Header as string;
-                
-                
-                
-                
-                
-                
-                ObservableCollection<CriterionInstance> ciList = this.myViewModel.CriterionCache.GetCriterionInstances(critName);
+                     
                 Criterion criterion = myViewModel.CriterionCache.GetCriterionByName(critName);
 
                 //get the criterion instance
                 CriterionInstance critInstance = null;
-                //int ciIndex = -1;
+
+                critInstance = vmm.criteriaMapping.FirstOrDefault(ci => ci.Criterion == criterion);
 
                 //No criterion, e.g.[bla1][bla2][3Star][][] no criterion instance for criterion "keyword" is defined
-                if (vmm.criteriaMapping[criterion].Count == 0)
+                if (critInstance == null)
                 {
                     return;
                 }
-                //Multiple criteria, e.g.[bla1][bla2][3Star][][bla3_bla4] we have two criteria instances for criterion "keyword", namely "bla3" and "bla4"
-                else if (vmm.criteriaMapping[criterion].Count > 1)
-                {
-                    //for now we just take the first criteria and neglect the others. TODO: offer a selection box??
-                    critInstance = vmm.criteriaMapping[criterion][0];
-                    //critInstance = ciList.FirstOrDefault(x => String.Compare(x.Name, searchCritInstanceName, true) == 0);
-                    //ciIndex = ciList.IndexOf(critInstance);
-                }
-                //default case: one criteria
-                else
-                {
-                    critInstance = vmm.criteriaMapping[criterion][0];
-                    //critInstance = ciList.FirstOrDefault(x => String.Compare(x.Name, searchCritInstanceName, true) == 0);
-                    //ciIndex = ciList.IndexOf(critInstance);
-                }
-
-                
 
                 //important: set the current selection index such that the MMref can be set up properly
-                myViewModel.CurrentCriterionSelection[critInstance.Criterion] = critInstance;
+                myViewModel.CurrentCriterionFilter.Add(critInstance);
                 myViewModel.UpdateMMref();
                 myViewModel.UpdateCurrentSelection();
-
-
-
-
-
-
 
                 //update the label and the picture of the button
                 label.Content = critInstance.Name;

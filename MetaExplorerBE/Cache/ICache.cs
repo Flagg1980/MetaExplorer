@@ -1,4 +1,5 @@
 ﻿using Domain;
+using MetaExplorer.Common;
 using MetaExplorer.Domain;
 using System;
 using System.Collections.Generic;
@@ -23,13 +24,15 @@ namespace MetaExplorerBE
         Dictionary<T, U> CachedItems { get; }
     }
 
-    public interface ICriterionCache : ICache<string, ObservableCollection<CriterionInstance>>
+    public interface ICriterionCache : ICache<CriterionInstance>
     {
-        ObservableCollection<CriterionInstance> GetCriterionInstances(Criterion criterion);
+        List<CriterionInstance> GetCriterionInstances(Criterion criterion);
 
-        ObservableCollection<CriterionInstance> GetCriterionInstances(string criterionName);
+        List<CriterionInstance> GetCriterionInstances(string criterionName);
 
         Criterion GetCriterionByName(string criterionName);
+
+        CriteriaConfig CriteriaConfig { get; set; }
     }
 
     public interface IVideoFileCache : ICache<string>

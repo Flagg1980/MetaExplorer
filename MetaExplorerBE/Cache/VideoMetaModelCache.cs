@@ -1,6 +1,5 @@
 ﻿using Domain;
 using MetaExplorer.Common;
-using MetaExplorer.Common.VideoPropertiesProvider;
 using MetaExplorer.Domain;
 using MetaExplorerBE.Converter;
 using System;
@@ -21,21 +20,20 @@ namespace MetaExplorerBE
         private readonly IVideoPropertiesCache myVideoPropertiesCache;
         private readonly IVideoFileCache myVideoFileCache;
         private readonly IVideoThumbnailCache myVideoThumbnailCache;
-        private readonly ICriteriaConfig myCriteriaConfig;
+        private readonly ICriterionCache myCriterionCache;
 
-        private string BaseDir { get; set; }
-
+        private readonly IEqualityComparer<CriterionInstance> myComparer = new CriterionInstanceComparer();
 
         #region Constructor
 
         /// <summary>
         /// </summary>
-        public VideoMetaModelCache(IVideoFileCache videoFileCache, IVideoThumbnailCache videoThumbnailCache, IVideoPropertiesCache videoPropertiesCache, ICriteriaConfig criteriaConfig)
+        public VideoMetaModelCache(IVideoFileCache videoFileCache, IVideoThumbnailCache videoThumbnailCache, IVideoPropertiesCache videoPropertiesCache, ICriterionCache criterionCache)
         {
             myVideoFileCache = videoFileCache;
             myVideoThumbnailCache = videoThumbnailCache;
             myVideoPropertiesCache = videoPropertiesCache;
-            myCriteriaConfig = criteriaConfig;
+            myCriterionCache = criterionCache;
         }
 
         #endregion
@@ -47,14 +45,21 @@ namespace MetaExplorerBE
             return Task.Factory.StartNew(() =>
             {
                 this.CachedItems.Clear();
-                IConverter mmConverter = new FileNameConverter(myCriteriaConfig);
+                IConverter mmConverter = new FileNameConverter(myCriterionCache.CriteriaConfig);
 
                 progress.Report(0);
 
                 int i = 0;
                 foreach (string file in myVideoFileCache.CachedItems)
                 {
-                    Video mm = mmConverter.ConvertFrom(file);
+                    Video video = new Video();
+                    video.criteriaMapping = mmConverter.ConvertFrom(file);
+                    
+                    video.File = new FileInfo(file);
+                    string starsString = video.criteriaMapping.FirstOrDefault(x =>
+                        x.Criterion.Name.Equals("Stars", StringComparison.InvariantCultureIgnoreCase)).Name;
+                    
+                    video.Stars = int.Parse(starsString[0].ToString());
                     try
                     {
                         //attach thumbnail
@@ -64,35 +69,31 @@ namespace MetaExplorerBE
 
                         if (cachedThumb != null)
                         {
-                            mm.Thumbnail.Image = cachedThumb;
-                            mm.Thumbnail.Image.Freeze();
+                            video.Thumbnail.Image = cachedThumb;
+                            video.Thumbnail.Image.Freeze();
                         }
                         else
                         {
                             //TODO: create thumbnail if not yet existing
-                            mm.Thumbnail = null;
+                            video.Thumbnail = null;
                         }
 
                         //retrieve extended file properties
                         FileInfo fi = new FileInfo(file);
 
-                        mm.Properties = myVideoPropertiesCache.CachedItems.GetValueOrDefault(md5);
-                        if (mm.Properties == null)
+                        video.Properties = myVideoPropertiesCache.CachedItems.GetValueOrDefault(md5);
+                        if (video.Properties == null)
                         {
-                            mm.Properties = new VideoProperties();
+                            video.Properties = new VideoProperties();
                             Trace.TraceError($"Could not find Video properties cache entry for file <{file}> with md5 <{md5}> in video properties cache file <{myVideoPropertiesCache.Location}>.");
                         }
 
-                        //mm.BitRate = vp.bitrate;
-                        //mm.FrameHeight = vp.frameheight;
-                        //mm.FrameWidth = vp.frameWidth;
-
                         //define the captions of the thumbnails
-                        mm.ThumbnailCaption1 = Path.GetFileName(file);
-                        mm.ThumbnailCaption2 = string.Format("{0} x {1} ({2} Kbs)", mm.Properties.FrameWidth, mm.Properties.FrameHeight, mm.Properties.BitRate.ToString("N0"));
+                        video.ThumbnailCaption1 = Path.GetFileName(file);
+                        video.ThumbnailCaption2 = string.Format("{0} x {1} ({2} Kbs)", video.Properties.FrameWidth, video.Properties.FrameHeight, video.Properties.BitRate.ToString("N0"));
 
                         //add meta model to cache
-                        this.CachedItems.Add(mm);
+                        this.CachedItems.Add(video);
                     }
                     catch (Exception e)
                     {
@@ -110,8 +111,6 @@ namespace MetaExplorerBE
                 progress.Report(100);
             });
         }
-
-
 
         public Task UpdateNonExistingThumbnailCacheAsync(IProgress<int> progress, IProgress<string> progressFile)
         {
@@ -158,27 +157,14 @@ namespace MetaExplorerBE
                 res = res.Where((Video m) => { return m.Stars == mmRef.Stars; });
             }
 
-            foreach (Criterion criterion in myCriteriaConfig.Criteria)
+            //foreach (Criterion criterion in myCriterionCache.CriteriaConfig.Criteria)
+            foreach (CriterionInstance critInst in mmRef.criteriaMapping)
             {
-                List<CriterionInstance> critContent = mmRef.criteriaMapping[criterion];
-
-                if (critContent.Count == 0)
-                {
-                    //do nothing, no contriction necessary
-                }
-                else if (critContent.Count > 1)
-                {
-                    throw new Exception("Criterion count > 1 not supported.");
-                }
-                else
-                {
-                    var filterCriterionInstance = mmRef.criteriaMapping[criterion][0];
-                    res = res.Where((Video video) =>
-                                    {
-                                        return video.criteriaMapping[criterion].Contains(filterCriterionInstance);
-                                    })
-                                    .ToList();
-                }
+                res = res.Where((Video video) =>
+                                {
+                                    return video.criteriaMapping.Contains(critInst, myComparer);
+                                })
+                                .ToList();
             }
 
             //check freetext search (last because most expensive)

@@ -1,12 +1,9 @@
+using MetaExplorer.Common;
+using MetaExplorer.Domain;
 using MetaExplorerBE;
 using MetaExplorerGUI;
-using NUnit.Framework;
 using Moq;
-using System.Linq;
-using System.Collections.ObjectModel;
-using MetaExplorer.Domain;
-using System;
-using MetaExplorer.Common;
+using NUnit.Framework;
 using System.Collections.Generic;
 
 namespace MetaExplorerGUI_sTest.ViewModelTests
@@ -39,7 +36,7 @@ namespace MetaExplorerGUI_sTest.ViewModelTests
             var myVideoMetaModelCache = new VideoMetaModelCache(myVideoFileCacheMock.Object,
                 myVideoThumbnailCache.Object,
                 myVideoPropertiesCache.Object,
-                myCriteriaConfigMock.Object);
+                myCriterionCacheMock.Object);
 
             var myViewModel = new ViewModel(myCriterionCacheMock.Object,
                 myVideoFileCacheMock.Object,
@@ -65,7 +62,7 @@ namespace MetaExplorerGUI_sTest.ViewModelTests
             var myVideoMetaModelCache = new VideoMetaModelCache(myVideoFileCacheMock.Object, 
                 myVideoThumbnailCache.Object, 
                 myVideoPropertiesCache.Object, 
-                myCriteriaConfigMock.Object);
+                myCriterionCacheMock.Object);
 
             var myViewModel = new ViewModel(myCriterionCacheMock.Object, 
                 myVideoFileCacheMock.Object, 
@@ -80,7 +77,7 @@ namespace MetaExplorerGUI_sTest.ViewModelTests
                 Is.EqualTo(dummyCriterion.Instances.Count), 
                 "Result Set does not contain the right number of items.");
             
-            Assert.That(resultSet as ObservableCollection<CriterionInstance>, 
+            Assert.That(resultSet as List<CriterionInstance>, 
                 Is.Not.Null, 
                 "Result Set does not contain items of type CriterionInstance.");
         }
@@ -103,7 +100,7 @@ namespace MetaExplorerGUI_sTest.ViewModelTests
         private Mock<ICriterionCache> SetupCriterionCacheMock(Criterion shallContainCriterion)
         {
             var myCriterionCacheMock = new Mock<ICriterionCache>();
-            myCriterionCacheMock.Setup(x => x.GetCriterionInstances(shallContainCriterion)).Returns(new ObservableCollection<CriterionInstance>(shallContainCriterion.Instances));
+            myCriterionCacheMock.Setup(x => x.GetCriterionInstances(shallContainCriterion)).Returns(new List<CriterionInstance>(shallContainCriterion.Instances));
 
             return myCriterionCacheMock;
         }

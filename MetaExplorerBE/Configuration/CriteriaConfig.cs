@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MetaExplorer.Common
 {
@@ -30,6 +31,17 @@ namespace MetaExplorer.Common
         {
             get;
             set;
+        }
+
+        public Criterion GetCriterionByName(string name)
+        {
+            var criterion = Criteria.FirstOrDefault(c => c.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            if (criterion == null)
+            {
+                throw new Exception(String.Format("Could not find a matching criterion for criterion instance <{0}> in the criteria config.",
+                    name));
+            }
+            return criterion;
         }
     }
 }

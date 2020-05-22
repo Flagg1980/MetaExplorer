@@ -27,10 +27,9 @@ namespace MetaExplorerBE.Converter
         /// </summary>
         /// <param name="input">file location</param>
         /// <returns></returns>
-        public Video ConvertFrom(string input)
+        public List<CriterionInstance> ConvertFrom(string input)
         {
-            Video mm = new Video();
-            mm.File = new FileInfo(input);
+            var result = new List<CriterionInstance>();
 
             try
             {
@@ -49,31 +48,22 @@ namespace MetaExplorerBE.Converter
                     // Case 1: The criterion is set in the filename
                     if (tokens.Count > crit.IndexInFilename)
                     {
-                        List<string> criterionInstanceList = tokens[crit.IndexInFilename].Split(this.SEPARATOR2).ToList();
-                        criterionInstanceList.RemoveAll(x => String.IsNullOrWhiteSpace(x));
+                        List<string> criterionInstanceStringList = tokens[crit.IndexInFilename].Split(this.SEPARATOR2).ToList();
+                        criterionInstanceStringList.RemoveAll(x => String.IsNullOrWhiteSpace(x));
 
-                        mm.criteriaMapping[crit] = criterionInstanceList.ConvertAll(x => new CriterionInstance()
+                        var criterionInstanceList = criterionInstanceStringList.ConvertAll(x => new CriterionInstance()
                         {
                             Name = x,
                             Criterion = crit,
                         });
-                    }
-                    // Case 2: The file name does not contain the criterion. This is ok for non-mandatory 
-                    // criteria. We add it here anyway with an empty list to avoid null-reference accesses later.
-                    else
-                    {
-                        mm.criteriaMapping[crit] = new List<CriterionInstance>();
+
+                        criterionInstanceList.ForEach(ci => ci.Criterion.Instances.Add(ci));
+
+                        result.AddRange(criterionInstanceList);                       
                     }
                 }
 
-                //segregate stars
-                var starsToken = tokens.FirstOrDefault(x => Regex.IsMatch(x, @"^\dstar$", RegexOptions.IgnoreCase));
-                if (starsToken != null)
-                {
-                    mm.Stars = int.Parse(starsToken[0].ToString());
-                }
-
-                return mm;
+                return result;
             }
             catch (Exception e)
             {
@@ -81,7 +71,7 @@ namespace MetaExplorerBE.Converter
             }
         }
 
-        public string ConvertTo(Video input)
+        public string ConvertTo(List<CriterionInstance> input)
         {
             throw new NotImplementedException();
         }

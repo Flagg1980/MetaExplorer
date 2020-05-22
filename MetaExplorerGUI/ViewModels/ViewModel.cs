@@ -6,7 +6,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Dynamic;
 using System.Linq;
 
 namespace MetaExplorerGUI
@@ -31,7 +30,8 @@ namespace MetaExplorerGUI
 
         #region Public Properties
 
-        public Dictionary<Criterion, CriterionInstance> CurrentCriterionSelection { get; set; }
+        //TODO: do we really need this? is it not a duplicate of this.MMRef.criteriaMapping??
+        public List<CriterionInstance> CurrentCriterionFilter { get; set; }
 
         public string FreeTextSearch
         {
@@ -73,28 +73,16 @@ namespace MetaExplorerGUI
 
             CurrentFileSelection = new ObservableCollection<Video>();
 
-            CurrentCriterionSelection = new Dictionary<Criterion, CriterionInstance>();
-            myCriteriaConfig.Criteria.ForEach((Criterion crit) => 
-            {
-                CurrentCriterionSelection.Add(crit, null);
-            });
+            CurrentCriterionFilter = new List<CriterionInstance>();
         }
 
         #endregion
 
         #region Public Methods
 
-        //public void Resort()
-        //{
-        //    //sort by property
-        //    //this.MEManager.VideoMetaModelCache = this.videoMetaModelCache.OrderByDescending(x => x.DateModified).ToList();
-        //    this.MEManager.VideoMetaModelCache.ResortBy(x => x.DateModified);
-        //}
-
         public void UpdateCurrentSelection()
         {
             CurrentFileSelection.Clear();
-            //currentFileSelection.AddRange(this.VideoMetaModelCache.GetVideoFileSelection(mmRef));
             CurrentFileSelection = this.VideoMetaModelCache.GetVideoFileSelection(MMRef);
 
             this.CurrentFileSelectionCount = this.CurrentFileSelection.Count();
@@ -104,7 +92,6 @@ namespace MetaExplorerGUI
             { 
                 this.CurrentFileSelectionSize += vmm.File.Length; 
             }
-
         }
 
         /// <summary>
@@ -124,16 +111,7 @@ namespace MetaExplorerGUI
 
             MMRef.ThumbnailCaption1 = this.FreeTextSearch;
 
-            myCriteriaConfig.Criteria.ForEach((Criterion crit) =>
-            {
-                this.MMRef.criteriaMapping[crit] = new List<CriterionInstance>();
-
-                if (this.CurrentCriterionSelection[crit] != null)
-                {
-                    CriterionInstance critInstance = this.CurrentCriterionSelection[crit];
-                    this.MMRef.criteriaMapping[crit].Add(critInstance);
-                }
-            });
+            this.MMRef.criteriaMapping = this.CurrentCriterionFilter;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;  
