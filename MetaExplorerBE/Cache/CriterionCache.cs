@@ -20,8 +20,6 @@ namespace MetaExplorerBE
 
         public CriteriaConfig CriteriaConfig { get; set; }
 
-        #region Constructor
-
         /// <summary>
         /// </summary>
         public CriterionCache(ImageThumbnailCache criterionThumbnailCache, CriteriaConfig criteriaConfig, IVideoFileCache videoFileCache)
@@ -31,28 +29,15 @@ namespace MetaExplorerBE
             myVideoFileCache = videoFileCache;
         }
 
-        #endregion
-
-        //TODO consider to remove, use Cacheditems instead directly
         public List<CriterionInstance> GetCriterionInstances(Criterion criterion)
         {
-            //return this.CachedItems[criterion.Name];
             return CachedItems.Where(item => item.Criterion.Name.Equals(criterion.Name, StringComparison.InvariantCultureIgnoreCase)).ToList();
-        }
-
-        //TODO consider to remove, use Cacheditems instead directly
-        public List<CriterionInstance> GetCriterionInstances(string criterionName)
-        {
-            //return this.CachedItems[criterionName];
-            return CachedItems.Where(item => item.Criterion.Name.Equals(criterionName, StringComparison.InvariantCultureIgnoreCase)).ToList();
         }
 
         public Criterion GetCriterionByName(string criterionName)
         {
             return CriteriaConfig.Criteria.FirstOrDefault(x => x.Name.Equals(criterionName, StringComparison.InvariantCultureIgnoreCase));
         }
-
-        #region Public Methods
 
         /// <summary>
         /// 
@@ -70,8 +55,6 @@ namespace MetaExplorerBE
                     InitCacheCrit(progress, progressFile);
             });
         }
-
-        #endregion
 
         private void InitCacheCrit(IProgress<int> progress, IProgress<string> progressFile)
         {

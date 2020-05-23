@@ -28,8 +28,6 @@ namespace MetaExplorerBE
     {
         List<CriterionInstance> GetCriterionInstances(Criterion criterion);
 
-        List<CriterionInstance> GetCriterionInstances(string criterionName);
-
         Criterion GetCriterionByName(string criterionName);
 
         CriteriaConfig CriteriaConfig { get; set; }
