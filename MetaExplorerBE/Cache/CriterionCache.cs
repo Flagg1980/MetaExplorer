@@ -62,8 +62,11 @@ namespace MetaExplorerBE
             progressFile.Report("Updating Criterion Cache.");
 
             var fromThumbNails = CreateInstancesFromFileSystemThumbNails();
+            progress.Report(25);
             var fromFileNames = CreateInstancesFromFileNames();
+            progress.Report(50);
             CopyCounts(fromThumbNails, fromFileNames);
+            progress.Report(75);
 
             var notAvailable = fromFileNames.Except(fromThumbNails, myComparer).ToList();
             MarkNotAvailable(notAvailable);
