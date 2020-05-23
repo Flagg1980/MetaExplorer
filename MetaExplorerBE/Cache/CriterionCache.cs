@@ -147,7 +147,7 @@ namespace MetaExplorerBE
                 ci.Thumbnail.Image.Freeze();
                 result.Add(ci);
 
-                criterion.Instances.Add(ci);
+                //criterion.Instances.Add(ci);
             };
 
             return result;

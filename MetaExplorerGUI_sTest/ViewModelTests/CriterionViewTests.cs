@@ -11,6 +11,7 @@ namespace MetaExplorerGUI_sTest.ViewModelTests
     public class CriterionViewTests
     {
         Criterion dummyCriterion;
+        List<CriterionInstance> dummyCriterionInstances;
 
         Mock<ICriteriaConfig> myCriteriaConfigMock;
         Mock<ICriterionCache> myCriterionCacheMock;
@@ -21,7 +22,8 @@ namespace MetaExplorerGUI_sTest.ViewModelTests
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            dummyCriterion = CreateDummyCriterion(5);
+            dummyCriterion = CreateDummyCriterion();
+            dummyCriterionInstances = CreateDummyCriterionInstances(dummyCriterion, 5);
 
             myCriteriaConfigMock = SetupCriteriaConfigMock(dummyCriterion);
             myCriterionCacheMock = SetupCriterionCacheMock(dummyCriterion);
@@ -74,7 +76,7 @@ namespace MetaExplorerGUI_sTest.ViewModelTests
             var resultSet = myViewModel.ThumbnailViewContent;
 
             Assert.That(resultSet.Count, 
-                Is.EqualTo(dummyCriterion.Instances.Count), 
+                Is.EqualTo(dummyCriterionInstances.Count), 
                 "Result Set does not contain the right number of items.");
             
             Assert.That(resultSet as List<CriterionInstance>, 
@@ -100,7 +102,7 @@ namespace MetaExplorerGUI_sTest.ViewModelTests
         private Mock<ICriterionCache> SetupCriterionCacheMock(Criterion shallContainCriterion)
         {
             var myCriterionCacheMock = new Mock<ICriterionCache>();
-            myCriterionCacheMock.Setup(x => x.GetCriterionInstances(shallContainCriterion)).Returns(new List<CriterionInstance>(shallContainCriterion.Instances));
+            myCriterionCacheMock.Setup(x => x.GetCriterionInstances(shallContainCriterion)).Returns(dummyCriterionInstances);
 
             return myCriterionCacheMock;
         }
@@ -113,7 +115,17 @@ namespace MetaExplorerGUI_sTest.ViewModelTests
             return myCriteriaConfigMock;
         }
 
-        private Criterion CreateDummyCriterion(int numberOfCriterionInstances)
+        private Criterion CreateDummyCriterion()
+        {
+            var criterion = new Criterion
+            {
+                Name = "Crit1",
+            };
+
+            return criterion;
+        }
+
+        private List<CriterionInstance> CreateDummyCriterionInstances(Criterion criterion, int numberOfCriterionInstances)
         {
             var criterionInstances = new List<CriterionInstance>();
 
@@ -121,15 +133,12 @@ namespace MetaExplorerGUI_sTest.ViewModelTests
             {
                 criterionInstances.Add(new CriterionInstance
                 {
-                    Name = $"CritInstance_{i}"
+                    Name = $"CritInstance_{i}",
+                    Criterion = criterion
                 });
             }
 
-            return new Criterion
-            {
-                Name = "Crit1",
-                Instances = criterionInstances
-            };
+            return criterionInstances;
         }
     }
 }

@@ -57,7 +57,7 @@ namespace MetaExplorerBE.Converter
                             Criterion = crit,
                         });
 
-                        criterionInstanceList.ForEach(ci => ci.Criterion.Instances.Add(ci));
+                        //criterionInstanceList.ForEach(ci => ci.Criterion.Instances.Add(ci));
 
                         result.AddRange(criterionInstanceList);                       
                     }
